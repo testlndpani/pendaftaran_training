@@ -1619,6 +1619,24 @@
             <!-- Status daftar kompetensi -->
             <div id="cmpMasterBanner" class="hidden px-4 py-3 rounded-lg border text-body-sm font-body-sm flex items-center justify-between gap-3"></div>
 
+            <!-- Mode Selector (Segmented Switcher) -->
+            <div class="bg-surface-container-lowest p-2 rounded-2xl border border-surface-container shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div class="flex items-center gap-2 bg-surface-container-low p-1 rounded-xl border border-outline-variant/50 w-full md:w-auto">
+                <button type="button" id="cmpTabModePerson" onclick="switchCompetencyMode('person')" class="flex-1 md:flex-initial h-10 px-4 rounded-lg text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all bg-surface-container-lowest text-primary shadow-xs border border-outline-variant/40">
+                  <span class="material-symbols-outlined text-[18px]">person</span>
+                  <span>Mode 1: Per Karyawan (1 Orang, Banyak Pelatihan)</span>
+                </button>
+                <button type="button" id="cmpTabModeBatch" onclick="switchCompetencyMode('batch')" class="flex-1 md:flex-initial h-10 px-4 rounded-lg text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all text-on-surface-variant hover:text-on-surface">
+                  <span class="material-symbols-outlined text-[18px]">groups</span>
+                  <span>Mode 2: Per Pelatihan (1 Pelatihan, Banyak Orang)</span>
+                </button>
+              </div>
+              <div class="text-xs text-on-surface-variant font-medium px-2 flex items-center gap-1.5 hidden lg:flex">
+                <span class="material-symbols-outlined text-primary text-[16px]">info</span>
+                <span id="cmpModeHintText">Cocok untuk karyawan mengisi riwayat sertifikasi mandiri.</span>
+              </div>
+            </div>
+
             <!-- Hasil pengiriman -->
             <div id="cmpResultBox" class="hidden px-4 py-3 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-950 font-body-sm text-body-sm flex items-start gap-2.5">
               <span class="material-symbols-outlined text-emerald-700 text-[20px] shrink-0">check_circle</span>
@@ -1626,25 +1644,216 @@
               <button type="button" onclick="document.getElementById('cmpResultBox').classList.add('hidden')" class="text-emerald-800 hover:text-emerald-950" aria-label="Tutup"><span class="material-symbols-outlined text-[16px]">close</span></button>
             </div>
 
-            <!-- Kartu karyawan -->
-            <div id="cmpPersonList" class="flex flex-col gap-5"></div>
+            <!-- ============================================================= -->
+            <!-- MODE 1: PER KARYAWAN (CARD-BASED MULTI-COMPETENCY)            -->
+            <!-- ============================================================= -->
+            <div id="cmpModePersonWrap" class="flex flex-col gap-6">
+              <!-- Kartu karyawan -->
+              <div id="cmpPersonList" class="flex flex-col gap-5"></div>
 
-            <!-- Aksi -->
-            <div class="bg-surface-container-lowest rounded-xl p-4 sm:p-5 shadow-sm border border-surface-container flex flex-col lg:flex-row lg:items-center justify-between gap-3 sticky bottom-3 z-20">
-              <div class="flex flex-wrap items-center gap-2">
-                <button type="button" id="cmpBtnAdd" class="h-10 px-3.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-primary font-label-md text-label-md flex items-center gap-1.5 font-semibold border border-outline-variant/60 transition-colors">
-                  <span class="material-symbols-outlined text-[18px]">person_add</span><span>Tambah Karyawan</span>
-                </button>
-                <button type="button" id="cmpBtnAdd5" class="h-10 px-3.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-primary font-label-md text-label-md flex items-center gap-1.5 font-semibold border border-outline-variant/60 transition-colors">
-                  <span class="material-symbols-outlined text-[18px]">group_add</span><span>+ 5 Karyawan</span>
-                </button>
-                <button type="button" id="cmpBtnReset" class="h-10 px-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container font-label-md text-label-md flex items-center gap-1.5 font-semibold transition-colors">
-                  <span class="material-symbols-outlined text-[18px]">restart_alt</span><span>Reset Formulir</span>
+              <!-- Aksi Mode 1 -->
+              <div class="bg-surface-container-lowest rounded-xl p-4 sm:p-5 shadow-sm border border-surface-container flex flex-col lg:flex-row lg:items-center justify-between gap-3 sticky bottom-3 z-20">
+                <div class="flex flex-wrap items-center gap-2">
+                  <button type="button" id="cmpBtnAdd" class="h-10 px-3.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-primary font-label-md text-label-md flex items-center gap-1.5 font-semibold border border-outline-variant/60 transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">person_add</span><span>Tambah Karyawan</span>
+                  </button>
+                  <button type="button" id="cmpBtnAdd5" class="h-10 px-3.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-primary font-label-md text-label-md flex items-center gap-1.5 font-semibold border border-outline-variant/60 transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">group_add</span><span>+ 5 Karyawan</span>
+                  </button>
+                  <button type="button" id="cmpBtnReset" class="h-10 px-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container font-label-md text-label-md flex items-center gap-1.5 font-semibold transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">restart_alt</span><span>Reset Formulir</span>
+                  </button>
+                </div>
+                <button type="button" id="cmpBtnSubmit" class="h-11 px-6 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg font-semibold inline-flex items-center justify-center gap-2 shadow-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                  <span class="material-symbols-outlined text-[20px]">send</span><span id="cmpBtnSubmitText">Kirim Data Kompetensi</span>
                 </button>
               </div>
-              <button type="button" id="cmpBtnSubmit" class="h-11 px-6 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg font-semibold inline-flex items-center justify-center gap-2 shadow-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
-                <span class="material-symbols-outlined text-[20px]">send</span><span id="cmpBtnSubmitText">Kirim Data Kompetensi</span>
-              </button>
+            </div>
+
+            <!-- ============================================================= -->
+            <!-- MODE 2: PER PELATIHAN (1 PELATIHAN -> TABEL BANYAK KARYAWAN) -->
+            <!-- ============================================================= -->
+            <div id="cmpModeBatchWrap" class="hidden flex flex-col gap-6">
+              <!-- Card 1: Pengaturan Pelatihan & Tanggal -->
+              <div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-surface-container flex flex-col gap-5">
+                <div class="flex items-center gap-3 pb-3 border-b border-surface-container">
+                  <div class="w-9 h-9 rounded-lg bg-primary-fixed flex items-center justify-center text-primary shrink-0">
+                    <span class="material-symbols-outlined text-[20px]">school</span>
+                  </div>
+                  <div>
+                    <h2 class="font-title-md text-title-md text-on-surface font-semibold">1. Informasi Pelatihan / Sertifikasi</h2>
+                    <p class="font-body-sm text-body-sm text-on-surface-variant">Pilih 1 nama pelatihan yang sama yang diikuti oleh seluruh karyawan dalam daftar ini.</p>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                  <!-- Dropdown Nama Kompetensi (Single-Select Combobox dengan Pencarian) -->
+                  <div class="flex flex-col gap-1.5">
+                    <span class="font-label-md text-label-md text-on-surface-variant font-semibold">Nama Kompetensi <span class="text-error">*</span></span>
+                    <div class="relative" id="cmpBatchCombobox">
+                      <button type="button" id="cmpBatchComboTrigger" onclick="toggleBatchCombo()" aria-haspopup="listbox" class="w-full min-h-[42px] px-3.5 rounded-lg bg-surface-container-lowest border border-outline-variant flex items-center justify-between gap-2 text-left focus:outline-none focus:ring-2 focus:ring-primary">
+                        <span id="cmpBatchComboLabel" class="font-body-md text-body-md truncate text-outline">Pilih kompetensi dari Master...</span>
+                        <span class="material-symbols-outlined text-[20px] text-on-surface-variant shrink-0">expand_more</span>
+                      </button>
+                      <div id="cmpBatchComboPanel" class="hidden absolute z-30 left-0 right-0 top-full mt-1 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-xl overflow-hidden">
+                        <div class="p-2 border-b border-outline-variant/60 relative">
+                          <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-[18px] pointer-events-none">search</span>
+                          <input id="cmpBatchComboSearch" oninput="filterBatchCombo(this.value)" type="text" placeholder="Ketik untuk mencari kompetensi..." autocomplete="off" class="w-full h-9 pl-9 pr-3 rounded-lg bg-surface-container-low border-0 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary">
+                        </div>
+                        <div id="cmpBatchComboList" role="listbox" class="max-h-60 overflow-y-auto py-1"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Tanggal Pelatihan (Dual Input: Paste / Kalender Dropdown) -->
+                  <div class="flex flex-col gap-1.5">
+                    <span class="font-label-md text-label-md text-on-surface-variant font-semibold">Tanggal Pelatihan <span class="font-normal text-outline">(opsional)</span></span>
+                    <div class="relative flex items-center">
+                      <input id="cmpBatchDateText" oninput="handleBatchDateInput(this.value)" onchange="handleBatchDateChange(this.value)" type="text" autocomplete="off" placeholder="dd/mm/yyyy atau paste tanggal..." class="w-full h-[42px] pl-3.5 pr-10 rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface font-body-md text-body-md placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary">
+                      <label class="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 w-8 rounded-md flex items-center justify-center cursor-pointer hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors" title="Pilih dari kalender dropdown">
+                        <span class="material-symbols-outlined text-[20px] pointer-events-none">calendar_month</span>
+                        <input id="cmpBatchDatePicker" onchange="handleBatchDatePickerChange(this.value)" type="date" min="1990-01-01" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+                      </label>
+                    </div>
+                    <div id="cmpBatchDateInfo" class="flex flex-wrap gap-1 font-label-sm text-[11px] text-on-surface-variant">
+                      <span class="text-outline">Opsional. Ketik, paste, atau klik ikon kalender</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Dokumen Bersama / Kolektif (Opsional) -->
+                <div class="flex flex-col gap-2 pt-2 border-t border-surface-container">
+                  <div class="flex items-center justify-between">
+                    <span class="font-label-md text-label-md text-on-surface-variant font-semibold">Dokumen / Sertifikat Kolektif <span class="font-normal text-outline">(opsional, berlaku untuk seluruh peserta tanpa file individu)</span></span>
+                    <span class="text-[11px] text-outline font-medium">Maks. 2 MB (JPG/PDF)</span>
+                  </div>
+                  <div class="flex flex-wrap items-center gap-3">
+                    <label class="h-10 px-4 rounded-lg bg-surface-container-low hover:bg-surface-container border border-outline-variant/60 cursor-pointer flex items-center gap-2 font-label-md text-label-md font-semibold text-primary transition-colors">
+                      <span class="material-symbols-outlined text-[18px]">upload_file</span>
+                      <span id="cmpBatchSharedFileBtnText">Pilih Dokumen Kolektif</span>
+                      <input id="cmpBatchSharedFileInput" onchange="handleBatchSharedFileUpload(event)" type="file" accept=".jpg,.jpeg,.pdf,image/jpeg,application/pdf" class="hidden">
+                    </label>
+                    <div id="cmpBatchSharedFileInfo" class="font-body-sm text-body-sm text-outline italic flex items-center gap-2">
+                      <span>Belum ada dokumen bersama</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 2: Tabel Peserta (Bisa Paste Excel) -->
+              <div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-surface-container flex flex-col gap-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between pb-3 border-b border-surface-container gap-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-primary-fixed flex items-center justify-center text-primary shrink-0">
+                      <span class="material-symbols-outlined text-[20px]">table_rows</span>
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <h2 class="font-title-md text-title-md text-on-surface font-semibold">2. Daftar Karyawan Penerima Kompetensi</h2>
+                        <span id="cmpBatchParticipantCountBadge" class="font-label-sm text-label-sm px-2 py-0.5 rounded bg-surface-container-high text-primary font-semibold border border-outline-variant/40">0 Karyawan</span>
+                      </div>
+                      <p class="font-body-sm text-body-sm text-on-surface-variant">Input langsung pada tabel di bawah atau gunakan tombol Quick Paste dari Microsoft Excel.</p>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-wrap items-center gap-2">
+                    <button type="button" onclick="toggleBatchExcelPasteArea()" class="h-9 px-3 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-sm text-label-sm flex items-center gap-1.5 border border-outline-variant/60 transition-colors">
+                      <span class="material-symbols-outlined text-[16px] text-primary">content_paste</span>
+                      <span>Paste dari Excel</span>
+                    </button>
+                    <button type="button" onclick="addBatchTableRow()" class="h-9 px-3 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-sm text-label-sm flex items-center gap-1.5 transition-all shadow-xs font-semibold">
+                      <span class="material-symbols-outlined text-[16px]">add</span>
+                      <span>+ Tambah Baris</span>
+                    </button>
+                    <button type="button" onclick="addMultipleBatchTableRows(5)" class="h-9 px-3 rounded-lg bg-surface-container-low hover:bg-surface-container text-primary font-label-sm text-label-sm flex items-center gap-1.5 border border-outline-variant/60 font-semibold transition-colors">
+                      <span class="material-symbols-outlined text-[16px]">group_add</span>
+                      <span>+ 5 Baris</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- EXCEL QUICK PASTE AREA UNTUK BATCH MODE -->
+                <div id="cmpBatchExcelPasteArea" class="hidden bg-surface-container-low p-4 rounded-xl border border-outline-variant flex flex-col gap-2.5 transition-all">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="material-symbols-outlined text-primary text-[18px]">info</span>
+                      <span class="font-label-md text-label-md text-on-surface font-semibold">Quick Paste dari Excel (Urutan 5 Kolom)</span>
+                    </div>
+                    <button type="button" onclick="toggleBatchExcelPasteArea(false)" class="text-outline hover:text-on-surface">
+                      <span class="material-symbols-outlined text-[18px]">close</span>
+                    </button>
+                  </div>
+                  <p class="font-body-sm text-body-sm text-on-surface-variant">Salin 5 kolom sel dari file Excel Anda (<b>NIK KTP atau Nomor HP (pilih salah satu) &rarr; Nama &rarr; Departemen &rarr; Jabatan &rarr; Position Title</b>), lalu tempelkan (Ctrl+V) di area bawah:</p>
+                  <textarea id="cmpBatchExcelPasteTextarea" class="w-full h-24 p-2.5 rounded-lg bg-surface-container-lowest border border-outline-variant font-mono text-[12px] text-on-surface focus:outline-none focus:ring-1 focus:ring-primary" placeholder="3201234567890123&#9;Ahmad Dhani&#9;Mining Operations&#9;Supervisor&#9;Mining Engineer&#10;081234567890&#9;Bunga Citra&#9;Metallurgy&#9;Specialist&#9;Process Metallurgist"></textarea>
+                  <div class="flex justify-between items-center pt-1">
+                    <button type="button" onclick="downloadBatchTemplateCsv()" class="text-primary hover:underline font-label-sm text-label-sm flex items-center gap-1">
+                      <span class="material-symbols-outlined text-[15px]">download</span>
+                      <span>Unduh Contoh Template Excel</span>
+                    </button>
+                    <div class="flex gap-2">
+                      <button type="button" onclick="toggleBatchExcelPasteArea(false)" class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm transition-colors">Tutup</button>
+                      <button type="button" onclick="applyBatchExcelPaste()" class="px-3.5 py-1.5 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-sm text-label-sm font-semibold transition-colors flex items-center gap-1.5 shadow-xs">
+                        <span class="material-symbols-outlined text-[16px]">system_update_alt</span>
+                        <span>Terapkan ke Tabel</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- TABEL DATA PESERTA BATCH -->
+                <div class="rounded-lg border border-outline-variant/80 overflow-hidden shadow-xs bg-surface-container-lowest">
+                  <div class="overflow-x-auto smooth-scroll-x">
+                    <table class="w-full text-left border-collapse" id="cmpBatchTable">
+                      <thead>
+                        <tr class="bg-surface-container-high/60 border-b border-outline-variant text-[12px] font-semibold text-on-surface-variant select-none">
+                          <th class="py-2 px-2 w-10 text-center border-r border-outline-variant/60 text-outline">#</th>
+                          <th class="py-2 px-3 min-w-[175px] border-r border-outline-variant/60">NIK KTP / NO. HP * <span class="font-normal text-[10.5px] text-outline block sm:inline">, pilih salah satu</span></th>
+                          <th class="py-2 px-3 min-w-[190px] border-r border-outline-variant/60">NAMA KARYAWAN *</th>
+                          <th class="py-2 px-3 min-w-[160px] border-r border-outline-variant/60">DEPARTEMEN *</th>
+                          <th class="py-2 px-3 min-w-[150px] border-r border-outline-variant/60">JABATAN *</th>
+                          <th class="py-2 px-3 min-w-[160px] border-r border-outline-variant/60">POSITION TITLE *</th>
+                          <th class="py-2 px-3 min-w-[180px] border-r border-outline-variant/60">DOKUMEN INDIVIDU (Opsional)</th>
+                          <th class="py-2 px-2 w-10 text-center text-outline"></th>
+                        </tr>
+                      </thead>
+                      <tbody id="cmpBatchTableBody" class="divide-y divide-outline-variant/40 font-body-sm text-body-sm"></tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- Table Bottom Controls -->
+                <div class="flex flex-wrap items-center justify-between pt-1 gap-2">
+                  <div class="flex items-center gap-2">
+                    <button type="button" onclick="addBatchTableRow()" class="h-8 px-3 rounded-lg bg-surface-container-low hover:bg-surface-container text-primary font-label-sm text-label-sm flex items-center gap-1 font-semibold transition-colors border border-outline-variant/40">
+                      <span class="material-symbols-outlined text-[15px]">add</span>
+                      <span>+ Tambah 1 Baris</span>
+                    </button>
+                    <button type="button" onclick="addMultipleBatchTableRows(5)" class="h-8 px-3 rounded-lg bg-surface-container-low hover:bg-surface-container text-primary font-label-sm text-label-sm flex items-center gap-1 font-semibold transition-colors border border-outline-variant/40">
+                      <span class="material-symbols-outlined text-[15px]">group_add</span>
+                      <span>+ 5 Baris</span>
+                    </button>
+                    <button type="button" onclick="clearBatchTableRows()" class="h-8 px-3 rounded-lg text-error hover:bg-error-container/40 font-label-sm text-label-sm flex items-center gap-1 transition-colors">
+                      <span class="material-symbols-outlined text-[15px]">delete_sweep</span>
+                      <span>Hapus Semua</span>
+                    </button>
+                  </div>
+                  <div class="text-[12px] text-on-surface-variant font-medium">
+                    <span id="cmpBatchTableSummary">0 peserta terdaftar</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Aksi Mode 2 -->
+              <div class="bg-surface-container-lowest rounded-xl p-4 sm:p-5 shadow-sm border border-surface-container flex flex-col lg:flex-row lg:items-center justify-between gap-3 sticky bottom-3 z-20">
+                <div class="flex flex-wrap items-center gap-2">
+                  <button type="button" onclick="resetBatchForm()" class="h-10 px-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container font-label-md text-label-md flex items-center gap-1.5 font-semibold transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">restart_alt</span><span>Reset Formulir Batch</span>
+                  </button>
+                </div>
+                <button type="button" id="cmpBtnSubmitBatch" onclick="submitBatchCompetency()" class="h-11 px-6 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg font-semibold inline-flex items-center justify-center gap-2 shadow-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                  <span class="material-symbols-outlined text-[20px]">send</span><span id="cmpBtnSubmitBatchText">Kirim Data Kolektif</span>
+                </button>
+              </div>
             </div>
 
           </div>
@@ -5142,6 +5351,7 @@
     }
     renderBanner();
     CMP.persons.forEach((p) => { updateTrigger(p); const panel = cardOf(p.uid)?.querySelector('[data-ms-panel]'); if (panel && !panel.classList.contains('hidden')) renderMsList(p); });
+    if (typeof renderBatchComboList === 'function' && $('cmpBatchComboPanel') && !$('cmpBatchComboPanel').classList.contains('hidden')) renderBatchComboList($('cmpBatchComboSearch')?.value || '');
   }
 
   function renderBanner() {
@@ -5162,9 +5372,10 @@
   /* ------------------------------ Render kartu karyawan ------------------------------ */
   const INPUT_CLS = 'w-full h-10 px-3 rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface font-body-md text-body-md placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary';
 
-  function fieldHtml(p, key, label, ph, extra) {
+  function fieldHtml(p, key, label, ph, extra, hint) {
+    const hintHtml = hint ? ' <span class="font-normal text-outline text-[12px]">' + hint + '</span>' : '';
     return '<label class="flex flex-col gap-1.5">' +
-      '<span class="font-label-md text-label-md text-on-surface-variant font-semibold">' + label + ' <span class="text-error">*</span></span>' +
+      '<span class="font-label-md text-label-md text-on-surface-variant font-semibold">' + label + ' <span class="text-error">*</span>' + hintHtml + '</span>' +
       '<input data-f="' + key + '" type="text" class="' + INPUT_CLS + '" value="' + esc(p[key]) + '" placeholder="' + esc(ph) + '" autocomplete="off" ' + (extra || '') + '>' +
       '</label>';
   }
@@ -5184,7 +5395,7 @@
       '</div>' +
       '<div class="p-5 sm:p-6 flex flex-col gap-5">' +
         '<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">' +
-          fieldHtml(p, 'nik', 'NIK KTP atau Nomor HP', '16 digit NIK / 08xxxxxxxxxx', 'inputmode="numeric"') +
+          fieldHtml(p, 'nik', 'NIK KTP atau Nomor HP', '16 digit NIK / 08xxxxxxxxxx', 'inputmode="numeric"', ', pilih salah satu') +
           fieldHtml(p, 'nama', 'Nama', 'Nama lengkap sesuai KTP') +
           fieldHtml(p, 'dept', 'Departemen', 'contoh: Mining Operations') +
           fieldHtml(p, 'jabatan', 'Jabatan', 'contoh: Supervisor') +
@@ -5576,6 +5787,676 @@
     box.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
+  /* ===========================================================================
+   * MODE 2: BATCH / KOLEKTIF (1 PELATIHAN -> BANYAK KARYAWAN)
+   * =========================================================================== */
+  const CMP_BATCH = {
+    mode: 'person', // 'person' | 'batch'
+    kompetensi: '',
+    date: '',
+    dateText: '',
+    sharedFile: null, // { origName, ext, mime, size, base64 }
+    rows: [],         // [{ id, nik, nama, dept, jabatan, title, file: null, err: '' }]
+    seq: 0,
+    busy: false
+  };
+
+  function switchCompetencyMode(mode) {
+    CMP_BATCH.mode = mode;
+    const isPerson = mode === 'person';
+    const tabPerson = $('cmpTabModePerson');
+    const tabBatch = $('cmpTabModeBatch');
+    const wrapPerson = $('cmpModePersonWrap');
+    const wrapBatch = $('cmpModeBatchWrap');
+    const hintText = $('cmpModeHintText');
+
+    if (isPerson) {
+      if (tabPerson) tabPerson.className = 'flex-1 md:flex-initial h-10 px-4 rounded-lg text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all bg-surface-container-lowest text-primary shadow-xs border border-outline-variant/40';
+      if (tabBatch) tabBatch.className = 'flex-1 md:flex-initial h-10 px-4 rounded-lg text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all text-on-surface-variant hover:text-on-surface';
+      if (wrapPerson) wrapPerson.classList.remove('hidden');
+      if (wrapBatch) wrapBatch.classList.add('hidden');
+      if (hintText) hintText.textContent = 'Cocok untuk karyawan mengisi riwayat sertifikasi mandiri.';
+      updateStats();
+    } else {
+      if (tabBatch) tabBatch.className = 'flex-1 md:flex-initial h-10 px-4 rounded-lg text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all bg-surface-container-lowest text-primary shadow-xs border border-outline-variant/40';
+      if (tabPerson) tabPerson.className = 'flex-1 md:flex-initial h-10 px-4 rounded-lg text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all text-on-surface-variant hover:text-on-surface';
+      if (wrapPerson) wrapPerson.classList.add('hidden');
+      if (wrapBatch) wrapBatch.classList.remove('hidden');
+      if (hintText) hintText.textContent = 'Cocok untuk PIC/L&D mencatat 1 pelatihan yang diikuti banyak karyawan sekaligus.';
+      if (!CMP_BATCH.rows.length) {
+        addMultipleBatchTableRows(3);
+      } else {
+        updateBatchTableStats();
+      }
+    }
+  }
+
+  /* ---------------- Combobox Batch (Single-Select) ---------------- */
+  function toggleBatchCombo(forceOpen) {
+    const panel = $('cmpBatchComboPanel');
+    if (!panel) return;
+    const willOpen = typeof forceOpen === 'boolean' ? forceOpen : panel.classList.contains('hidden');
+    panel.classList.toggle('hidden', !willOpen);
+    if (willOpen) {
+      const search = $('cmpBatchComboSearch');
+      if (search) {
+        search.value = '';
+        renderBatchComboList('');
+        setTimeout(() => search.focus({ preventScroll: true }), 30);
+      }
+    }
+  }
+
+  function filterBatchCombo(query) {
+    renderBatchComboList(query);
+  }
+
+  function renderBatchComboList(query) {
+    const listEl = $('cmpBatchComboList');
+    if (!listEl) return;
+    const q = String(query || '').toLowerCase().trim();
+    if (!CMP.master.length) {
+      listEl.innerHTML = '<div class="px-3 py-5 text-center font-body-sm text-body-sm text-outline">Daftar kompetensi sedang dimuat atau kosong...</div>';
+      return;
+    }
+    const filtered = [];
+    CMP.master.forEach((m, idx) => {
+      if (!q || m.nama.toLowerCase().includes(q) || m.jenis.toLowerCase().includes(q)) {
+        filtered.push({ nama: m.nama, jenis: m.jenis, idx });
+      }
+    });
+
+    if (!filtered.length) {
+      listEl.innerHTML = '<div class="px-3 py-5 text-center font-body-sm text-body-sm text-outline">Kompetensi tidak ditemukan.</div>';
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(item => {
+      const isSel = CMP_BATCH.kompetensi.toLowerCase() === item.nama.toLowerCase();
+      return '<button type="button" role="option" aria-selected="' + isSel + '" data-act="pick-batch-comp" data-ci="' + item.idx + '" class="w-full text-left px-3.5 py-2.5 flex items-start gap-2.5 hover:bg-surface-container-low transition-colors ' + (isSel ? 'bg-primary-fixed/40 font-semibold' : '') + '">' +
+        '<span class="mt-0.5 w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ' + (isSel ? 'bg-primary border-primary text-on-primary' : 'border-outline bg-surface-container-lowest') + '">' +
+          (isSel ? '<span class="material-symbols-outlined text-[12px]">check</span>' : '') +
+        '</span>' +
+        '<span class="min-w-0 flex-1">' +
+          '<span class="block font-body-md text-body-md text-on-surface leading-snug break-words">' + esc(item.nama) + '</span>' +
+          (item.jenis ? '<span class="block font-label-sm text-[11px] text-on-surface-variant mt-0.5">' + esc(item.jenis) + '</span>' : '') +
+        '</span>' +
+      '</button>';
+    }).join('');
+  }
+
+  function selectBatchCompetency(name) {
+    CMP_BATCH.kompetensi = name;
+    const label = $('cmpBatchComboLabel');
+    const trigger = $('cmpBatchComboTrigger');
+    if (label) {
+      label.textContent = name;
+      label.className = 'font-body-md text-body-md truncate text-on-surface font-semibold';
+    }
+    if (trigger) {
+      trigger.classList.remove('border-error', 'ring-1', 'ring-error');
+    }
+    toggleBatchCombo(false);
+  }
+
+  /* ---------------- Tanggal Batch Pelatihan ---------------- */
+  function renderBatchDateInfo() {
+    const el = $('cmpBatchDateInfo');
+    if (!el) return;
+    const d = parseYmd(CMP_BATCH.date);
+    const raw = (CMP_BATCH.dateText || '').trim();
+    if (d) {
+      el.innerHTML = '<span class="px-1.5 py-0.5 rounded bg-surface-container-high">Tanggal <b>' + d.d + '</b></span>' +
+                     '<span class="px-1.5 py-0.5 rounded bg-surface-container-high">Bulan <b>' + MONTH_NAMES[d.mo - 1] + '</b></span>' +
+                     '<span class="px-1.5 py-0.5 rounded bg-surface-container-high">Tahun <b>' + d.y + '</b></span>';
+    } else if (raw) {
+      el.innerHTML = '<span class="text-error font-medium">Format tanggal tidak dikenali. Contoh: 15/03/2025 atau 15 Maret 2025</span>';
+    } else {
+      el.innerHTML = '<span class="text-outline">Opsional. Ketik, paste, atau klik ikon kalender</span>';
+    }
+  }
+
+  function handleBatchDateInput(val) {
+    CMP_BATCH.dateText = val;
+    CMP_BATCH.date = parseDateText(val);
+    renderBatchDateInfo();
+    const picker = $('cmpBatchDatePicker');
+    if (picker) picker.value = CMP_BATCH.date || '';
+  }
+
+  function handleBatchDateChange(val) {
+    if (CMP_BATCH.date) {
+      CMP_BATCH.dateText = fmtDateText(CMP_BATCH.date);
+      const textInp = $('cmpBatchDateText');
+      if (textInp) textInp.value = CMP_BATCH.dateText;
+    }
+    renderBatchDateInfo();
+  }
+
+  function handleBatchDatePickerChange(val) {
+    if (val) {
+      CMP_BATCH.date = val;
+      CMP_BATCH.dateText = fmtDateText(val);
+      const textInp = $('cmpBatchDateText');
+      if (textInp) textInp.value = CMP_BATCH.dateText;
+      renderBatchDateInfo();
+    }
+  }
+
+  /* ---------------- Dokumen Kolektif / Shared File ---------------- */
+  function renderBatchSharedFileInfo() {
+    const el = $('cmpBatchSharedFileInfo');
+    const btnText = $('cmpBatchSharedFileBtnText');
+    if (!el) return;
+    if (CMP_BATCH.sharedFile) {
+      const f = CMP_BATCH.sharedFile;
+      if (btnText) btnText.textContent = 'Ganti Dokumen Kolektif';
+      el.className = 'font-body-sm text-body-sm flex items-center gap-2 text-primary font-medium';
+      el.innerHTML = '<span class="material-symbols-outlined text-[18px] text-primary">' + (f.ext === 'pdf' ? 'picture_as_pdf' : 'image') + '</span>' +
+                     '<span class="truncate max-w-[220px] sm:max-w-[320px]">' + esc(f.origName) + '</span>' +
+                     '<span class="text-on-surface-variant text-[11px] shrink-0">(' + fmtSize(f.size) + ')</span>' +
+                     '<button type="button" onclick="removeBatchSharedFile()" class="h-6 w-6 rounded text-error hover:bg-error-container/60 flex items-center justify-center shrink-0" title="Hapus dokumen kolektif">' +
+                     '<span class="material-symbols-outlined text-[16px]">close</span></button>';
+    } else {
+      if (btnText) btnText.textContent = 'Pilih Dokumen Kolektif';
+      el.className = 'font-body-sm text-body-sm text-outline italic flex items-center gap-2';
+      el.innerHTML = '<span>Belum ada dokumen bersama</span>';
+    }
+    updateBatchTableStats();
+  }
+
+  function handleBatchSharedFileUpload(event) {
+    const input = event.target;
+    const file = input.files && input.files[0];
+    if (!file) return;
+    const ext = /\.pdf$/i.test(file.name) ? 'pdf' : (/\.jpe?g$/i.test(file.name) ? 'jpg' : '');
+    const mimeOk = file.type === 'application/pdf' || file.type === 'image/jpeg' || file.type === '';
+    if (!ext || !mimeOk) {
+      showToast('warning', 'Format Berkas Ditolak', 'Hanya berkas JPG atau PDF yang diperbolehkan.');
+      input.value = '';
+      return;
+    }
+    if (file.size > MAX_BYTES) {
+      showToast('warning', 'Ukuran Berkas Terlalu Besar', 'Maksimal 2 MB per lampiran. Berkas Anda ' + fmtSize(file.size) + '.');
+      input.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = String(e.target.result || '').split(',')[1] || '';
+      const realPdf = base64.indexOf('JVBERi') === 0, realJpg = base64.indexOf('/9j/') === 0;
+      if ((ext === 'pdf' && !realPdf) || (ext === 'jpg' && !realJpg)) {
+        showToast('warning', 'Berkas Tidak Valid', 'Isi berkas tidak sesuai format ' + ext.toUpperCase() + '.');
+        input.value = '';
+        return;
+      }
+      CMP_BATCH.sharedFile = { origName: file.name, ext, mime: ext === 'pdf' ? 'application/pdf' : 'image/jpeg', size: file.size, base64 };
+      renderBatchSharedFileInfo();
+      showToast('success', 'Dokumen Kolektif Dipilih', esc(file.name) + ' (' + fmtSize(file.size) + ') siap dilampirkan.');
+    };
+    reader.onerror = () => showToast('warning', 'Gagal Membaca Berkas', 'Terjadi kesalahan saat membaca berkas.');
+    reader.readAsDataURL(file);
+  }
+
+  function removeBatchSharedFile() {
+    CMP_BATCH.sharedFile = null;
+    const input = $('cmpBatchSharedFileInput');
+    if (input) input.value = '';
+    renderBatchSharedFileInfo();
+  }
+
+  /* ---------------- Tabel Peserta Batch ---------------- */
+  const BATCH_ROW_INPUT_CLS = 'w-full h-8 px-2 rounded bg-surface-container-lowest border border-outline-variant text-[12px] text-on-surface placeholder:text-outline focus:outline-none focus:ring-1 focus:ring-primary';
+
+  function createBatchRow(prefill) {
+    return Object.assign({
+      id: 'br_' + (++CMP_BATCH.seq),
+      nik: '',
+      nama: '',
+      dept: '',
+      jabatan: '',
+      title: '',
+      file: null,
+      err: ''
+    }, prefill || {});
+  }
+
+  function renderBatchRowHtml(r, index) {
+    const fileHtml = r.file
+      ? '<div class="flex items-center gap-1 text-[11px] text-primary font-medium min-w-0">' +
+          '<span class="material-symbols-outlined text-[15px] shrink-0">' + (r.file.ext === 'pdf' ? 'picture_as_pdf' : 'image') + '</span>' +
+          '<span class="truncate max-w-[85px]" title="' + esc(r.file.origName) + '">' + esc(r.file.origName) + '</span>' +
+          '<button type="button" data-act="del-row-file" data-id="' + r.id + '" class="text-error hover:bg-error-container/60 rounded p-0.5 shrink-0" title="Hapus file"><span class="material-symbols-outlined text-[14px]">close</span></button>' +
+        '</div>'
+      : '<label class="h-7 px-2 rounded bg-surface-container-low hover:bg-surface-container border border-outline-variant/60 cursor-pointer inline-flex items-center gap-1 text-[11px] text-primary font-medium transition-colors">' +
+          '<span class="material-symbols-outlined text-[14px]">upload_file</span><span>Upload</span>' +
+          '<input type="file" accept=".jpg,.jpeg,.pdf,image/jpeg,application/pdf" data-act="upload-row-file" data-id="' + r.id + '" class="hidden">' +
+        '</label>';
+
+    return '<tr data-row-id="' + r.id + '" class="hover:bg-surface-container-low/30 transition-colors">' +
+      '<td class="py-1.5 px-2 text-center text-outline text-[12px] font-semibold border-r border-outline-variant/40" data-row-idx>' + (index + 1) + '</td>' +
+      '<td class="py-1.5 px-2 border-r border-outline-variant/40">' +
+        '<input type="text" data-f="nik" value="' + esc(r.nik) + '" placeholder="16 digit / 08..." class="' + BATCH_ROW_INPUT_CLS + '">' +
+      '</td>' +
+      '<td class="py-1.5 px-2 border-r border-outline-variant/40">' +
+        '<input type="text" data-f="nama" value="' + esc(r.nama) + '" placeholder="Nama lengkap..." class="' + BATCH_ROW_INPUT_CLS + '">' +
+      '</td>' +
+      '<td class="py-1.5 px-2 border-r border-outline-variant/40">' +
+        '<input type="text" data-f="dept" value="' + esc(r.dept) + '" placeholder="Departemen..." class="' + BATCH_ROW_INPUT_CLS + '">' +
+      '</td>' +
+      '<td class="py-1.5 px-2 border-r border-outline-variant/40">' +
+        '<input type="text" data-f="jabatan" value="' + esc(r.jabatan) + '" placeholder="Jabatan..." class="' + BATCH_ROW_INPUT_CLS + '">' +
+      '</td>' +
+      '<td class="py-1.5 px-2 border-r border-outline-variant/40">' +
+        '<input type="text" data-f="title" value="' + esc(r.title) + '" placeholder="Position title..." class="' + BATCH_ROW_INPUT_CLS + '">' +
+      '</td>' +
+      '<td class="py-1.5 px-2 border-r border-outline-variant/40" data-cell="file">' +
+        fileHtml +
+      '</td>' +
+      '<td class="py-1.5 px-1 text-center">' +
+        '<button type="button" data-act="del-row" data-id="' + r.id + '" class="w-7 h-7 rounded text-error hover:bg-error-container/60 inline-flex items-center justify-center transition-colors" title="Hapus baris">' +
+          '<span class="material-symbols-outlined text-[16px]">delete</span>' +
+        '</button>' +
+      '</td>' +
+    '</tr>';
+  }
+
+  function renderBatchTable() {
+    const tbody = $('cmpBatchTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = CMP_BATCH.rows.map((r, i) => renderBatchRowHtml(r, i)).join('');
+    updateBatchTableStats();
+  }
+
+  function updateBatchTableStats() {
+    const count = CMP_BATCH.rows.length;
+    const filledCount = CMP_BATCH.rows.filter(r => r.nik || r.nama || r.dept || r.jabatan || r.title).length;
+    const badge = $('cmpBatchParticipantCountBadge');
+    const summary = $('cmpBatchTableSummary');
+    if (badge) badge.textContent = count + ' Baris (' + filledCount + ' Terisi)';
+    if (summary) summary.textContent = count + ' peserta terdaftar (' + filledCount + ' terisi)';
+
+    if (CMP_BATCH.mode === 'batch') {
+      const ps = $('cmpStatPersons'), fs = $('cmpStatFiles');
+      if (ps) ps.textContent = filledCount;
+      if (fs) fs.textContent = (CMP_BATCH.sharedFile ? 1 : 0) + CMP_BATCH.rows.filter(r => r.file).length;
+    }
+  }
+
+  function addBatchTableRow(prefill) {
+    if (CMP_BATCH.rows.length >= 50) {
+      showToast('warning', 'Batas Maksimal', 'Maksimal 50 peserta per pengiriman kolektif.');
+      return;
+    }
+    const r = createBatchRow(prefill);
+    CMP_BATCH.rows.push(r);
+    const tbody = $('cmpBatchTableBody');
+    if (tbody) {
+      const tmp = document.createElement('tbody');
+      tmp.innerHTML = renderBatchRowHtml(r, CMP_BATCH.rows.length - 1);
+      tbody.appendChild(tmp.firstElementChild);
+      updateBatchTableStats();
+    } else {
+      renderBatchTable();
+    }
+  }
+
+  function addMultipleBatchTableRows(count) {
+    const remaining = 50 - CMP_BATCH.rows.length;
+    const toAdd = Math.min(count, remaining);
+    if (toAdd <= 0) {
+      showToast('warning', 'Batas Maksimal', 'Maksimal 50 peserta per pengiriman kolektif.');
+      return;
+    }
+    for (let i = 0; i < toAdd; i++) {
+      CMP_BATCH.rows.push(createBatchRow());
+    }
+    renderBatchTable();
+  }
+
+  function deleteBatchTableRow(rowId) {
+    CMP_BATCH.rows = CMP_BATCH.rows.filter(r => r.id !== rowId);
+    if (!CMP_BATCH.rows.length) {
+      CMP_BATCH.rows.push(createBatchRow());
+    }
+    renderBatchTable();
+  }
+
+  function clearBatchTableRows() {
+    const dirty = CMP_BATCH.rows.some(r => r.nik || r.nama || r.dept || r.jabatan || r.title);
+    if (dirty && !window.confirm('Hapus semua baris peserta dari tabel?')) return;
+    CMP_BATCH.rows = [];
+    addMultipleBatchTableRows(3);
+  }
+
+  function handleBatchRowFile(rowId, input) {
+    const file = input.files && input.files[0];
+    input.value = '';
+    if (!file) return;
+    const r = CMP_BATCH.rows.find(x => x.id === rowId);
+    if (!r) return;
+
+    const ext = /\.pdf$/i.test(file.name) ? 'pdf' : (/\.jpe?g$/i.test(file.name) ? 'jpg' : '');
+    const mimeOk = file.type === 'application/pdf' || file.type === 'image/jpeg' || file.type === '';
+    if (!ext || !mimeOk) {
+      showToast('warning', 'Format Berkas Ditolak', 'Hanya berkas JPG atau PDF yang diperbolehkan.');
+      return;
+    }
+    if (file.size > MAX_BYTES) {
+      showToast('warning', 'Ukuran Berkas Terlalu Besar', 'Maksimal 2 MB per lampiran. Berkas Anda ' + fmtSize(file.size) + '.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = String(e.target.result || '').split(',')[1] || '';
+      const realPdf = base64.indexOf('JVBERi') === 0, realJpg = base64.indexOf('/9j/') === 0;
+      if ((ext === 'pdf' && !realPdf) || (ext === 'jpg' && !realJpg)) {
+        showToast('warning', 'Berkas Tidak Valid', 'Isi berkas tidak sesuai format ' + ext.toUpperCase() + '.');
+        return;
+      }
+      r.file = { origName: file.name, ext, mime: ext === 'pdf' ? 'application/pdf' : 'image/jpeg', size: file.size, base64 };
+      const tr = document.querySelector('tr[data-row-id="' + rowId + '"]');
+      if (tr) {
+        const cell = tr.querySelector('[data-cell="file"]');
+        if (cell) {
+          cell.innerHTML = '<div class="flex items-center gap-1 text-[11px] text-primary font-medium min-w-0">' +
+            '<span class="material-symbols-outlined text-[15px] shrink-0">' + (r.file.ext === 'pdf' ? 'picture_as_pdf' : 'image') + '</span>' +
+            '<span class="truncate max-w-[85px]" title="' + esc(r.file.origName) + '">' + esc(r.file.origName) + '</span>' +
+            '<button type="button" data-act="del-row-file" data-id="' + r.id + '" class="text-error hover:bg-error-container/60 rounded p-0.5 shrink-0" title="Hapus file"><span class="material-symbols-outlined text-[14px]">close</span></button>' +
+          '</div>';
+        }
+      }
+      updateBatchTableStats();
+    };
+    reader.onerror = () => showToast('warning', 'Gagal Membaca Berkas', 'Terjadi kesalahan saat membaca berkas.');
+    reader.readAsDataURL(file);
+  }
+
+  function removeBatchRowFile(rowId) {
+    const r = CMP_BATCH.rows.find(x => x.id === rowId);
+    if (!r) return;
+    r.file = null;
+    const tr = document.querySelector('tr[data-row-id="' + rowId + '"]');
+    if (tr) {
+      const cell = tr.querySelector('[data-cell="file"]');
+      if (cell) {
+        cell.innerHTML = '<label class="h-7 px-2 rounded bg-surface-container-low hover:bg-surface-container border border-outline-variant/60 cursor-pointer inline-flex items-center gap-1 text-[11px] text-primary font-medium transition-colors">' +
+          '<span class="material-symbols-outlined text-[14px]">upload_file</span><span>Upload</span>' +
+          '<input type="file" accept=".jpg,.jpeg,.pdf,image/jpeg,application/pdf" data-act="upload-row-file" data-id="' + r.id + '" class="hidden">' +
+        '</label>';
+      }
+    }
+    updateBatchTableStats();
+  }
+
+  /* ---------------- Quick Paste Excel ---------------- */
+  function toggleBatchExcelPasteArea(forceState) {
+    const el = $('cmpBatchExcelPasteArea');
+    if (!el) return;
+    const willShow = typeof forceState === 'boolean' ? forceState : el.classList.contains('hidden');
+    el.classList.toggle('hidden', !willShow);
+    if (willShow) {
+      const ta = $('cmpBatchExcelPasteTextarea');
+      if (ta) {
+        ta.value = '';
+        setTimeout(() => ta.focus(), 30);
+      }
+    }
+  }
+
+  function applyBatchExcelPaste() {
+    const ta = $('cmpBatchExcelPasteTextarea');
+    if (!ta) return;
+    const raw = ta.value.trim();
+    if (!raw) {
+      showToast('warning', 'Area Paste Kosong', 'Tempelkan (paste) baris data dari Excel terlebih dahulu.');
+      return;
+    }
+
+    const lines = raw.split(/\r\n|\n|\r/).map(l => l.trim()).filter(Boolean);
+    const parsed = [];
+    for (let line of lines) {
+      let cols = [];
+      if (line.includes('\t')) {
+        cols = line.split('\t');
+      } else if (line.includes(';')) {
+        cols = line.split(';');
+      } else {
+        cols = line.split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/);
+      }
+      const cleanCols = cols.map(c => c.replace(/^["']|["']$/g, '').trim());
+      const first = (cleanCols[0] || '').toLowerCase();
+      // Lewati baris header jika ada
+      if (first === 'nik' || first === 'nik ktp' || first.includes('nik /') || first.includes('no. hp') || first === 'no') continue;
+      if (cleanCols.length >= 2) {
+        parsed.push({
+          nik: cleanCols[0] || '',
+          nama: cleanCols[1] || '',
+          dept: cleanCols[2] || '',
+          jabatan: cleanCols[3] || '',
+          title: cleanCols[4] || ''
+        });
+      }
+    }
+
+    if (!parsed.length) {
+      showToast('warning', 'Format Tidak Sesuai', 'Pastikan data yang di-paste memiliki minimal kolom NIK dan Nama.');
+      return;
+    }
+
+    // Jika baris yang ada saat ini semuanya masih kosong, ganti seluruhnya
+    const allBlank = CMP_BATCH.rows.every(r => !r.nik && !r.nama && !r.dept && !r.jabatan && !r.title && !r.file);
+    if (allBlank) {
+      CMP_BATCH.rows = [];
+    }
+
+    const remaining = 50 - CMP_BATCH.rows.length;
+    const toAdd = parsed.slice(0, remaining);
+    toAdd.forEach(p => {
+      CMP_BATCH.rows.push(createBatchRow(p));
+    });
+
+    renderBatchTable();
+    toggleBatchExcelPasteArea(false);
+
+    if (parsed.length > remaining) {
+      showToast('warning', 'Batas Maksimal 50', toAdd.length + ' baris ditambahkan. ' + (parsed.length - remaining) + ' baris dilewati karena batas 50 peserta per pengiriman.');
+    } else {
+      showToast('success', 'Data Excel Diterapkan', toAdd.length + ' baris peserta berhasil ditambahkan ke tabel.');
+    }
+  }
+
+  function downloadBatchTemplateCsv() {
+    const header = 'NIK KTP / NO HP,NAMA KARYAWAN,DEPARTEMEN,JABATAN,POSITION TITLE\r\n';
+    const sample1 = '3201234567890123,Ahmad Pratama,Mining Operations,Supervisor,Mining Engineer\r\n';
+    const sample2 = '081234567890,Bunga Lestari,Metallurgy,Specialist,Process Metallurgist\r\n';
+    const sample3 = '7101234567890001,Charlie Simanjuntak,Human Resources,Officer,HR Specialist\r\n';
+    const blob = new Blob([header + sample1 + sample2 + sample3], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Template_Peserta_Kompetensi_Massal.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  /* ---------------- Validasi & Kirim Mode 2 Batch ---------------- */
+  function validateBatchSubmission() {
+    const errors = [];
+    if (!CMP_BATCH.kompetensi.trim()) {
+      errors.push('Nama kompetensi belum dipilih.');
+      const trigger = $('cmpBatchComboTrigger');
+      if (trigger) trigger.classList.add('border-error', 'ring-1', 'ring-error');
+    }
+
+    const today = todayStr();
+    if (CMP_BATCH.dateText.trim() && !CMP_BATCH.date) {
+      errors.push('Format tanggal pelatihan tidak dikenali.');
+    } else if (CMP_BATCH.date) {
+      if (parseYmd(CMP_BATCH.date).y < 1990) errors.push('Tahun pelatihan tidak valid.');
+      if (CMP_BATCH.date > today) errors.push('Tanggal pelatihan tidak boleh di masa depan.');
+    }
+
+    // Ambil baris yang tidak sepenuhnya kosong
+    const nonBlankRows = CMP_BATCH.rows.filter(r => r.nik || r.nama || r.dept || r.jabatan || r.title || r.file);
+    if (!nonBlankRows.length) {
+      errors.push('Tabel peserta masih kosong. Masukkan minimal 1 karyawan.');
+    } else if (nonBlankRows.length > 50) {
+      errors.push('Maksimal 50 peserta per pengiriman kolektif.');
+    }
+
+    const seenNik = new Set();
+    nonBlankRows.forEach((r, idx) => {
+      const n = idx + 1;
+      const tr = document.querySelector('tr[data-row-id="' + r.id + '"]');
+      const id = normId(r.nik);
+      const idOk = isValidId(id);
+      if (!idOk) {
+        errors.push('Baris #' + n + ': NIK KTP (16 digit) atau Nomor HP tidak valid.');
+        if (tr) {
+          const inp = tr.querySelector('input[data-f="nik"]');
+          if (inp) inp.classList.add('border-error', 'ring-1', 'ring-error');
+        }
+      }
+      ['nama', 'dept', 'jabatan', 'title'].forEach(f => {
+        if (!r[f].trim()) {
+          errors.push('Baris #' + n + ': ' + f.toUpperCase() + ' wajib diisi.');
+          if (tr) {
+            const inp = tr.querySelector('input[data-f="' + f + '"]');
+            if (inp) inp.classList.add('border-error', 'ring-1', 'ring-error');
+          }
+        }
+      });
+      if (idOk) {
+        if (seenNik.has(id)) {
+          errors.push('Baris #' + n + ': NIK/HP ' + id + ' terdaftar ganda di tabel.');
+          if (tr) {
+            const inp = tr.querySelector('input[data-f="nik"]');
+            if (inp) inp.classList.add('border-error', 'ring-1', 'ring-error');
+          }
+        }
+        seenNik.add(id);
+      }
+    });
+
+    return { ok: errors.length === 0, errors, nonBlankRows };
+  }
+
+  async function submitBatchCompetency() {
+    if (CMP_BATCH.busy) return;
+    if (CMP.state !== 'ready') {
+      showToast('warning', 'Belum Siap', 'Daftar kompetensi belum termuat. Muat ulang halaman.');
+      return;
+    }
+    const resultBox = $('cmpResultBox');
+    if (resultBox) resultBox.classList.add('hidden');
+
+    const v = validateBatchSubmission();
+    if (!v.ok) {
+      showToast('warning', 'Data Belum Lengkap', v.errors.slice(0, 3).join(' '));
+      const firstBad = document.querySelector('#cmpModeBatchWrap .border-error');
+      if (firstBad) firstBad.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    const btnSubmit = $('cmpBtnSubmitBatch');
+    const btnText = $('cmpBtnSubmitBatchText');
+    CMP_BATCH.busy = true;
+    if (btnSubmit) btnSubmit.disabled = true;
+    if (btnText) btnText.textContent = 'Menyimpan...';
+
+    const idSubmit = 'KMP-BCH-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 6).toUpperCase();
+    const payload = {
+      action: 'submit_competency_batch',
+      id_submit: idSubmit,
+      kompetensi: CMP_BATCH.kompetensi,
+      tanggal: CMP_BATCH.date || '',
+      shared_file_data: CMP_BATCH.sharedFile ? CMP_BATCH.sharedFile.base64 : '',
+      peserta: v.nonBlankRows.map(r => ({
+        nik_nohp: normId(r.nik),
+        nama: r.nama.trim(),
+        departemen: r.dept.trim(),
+        jabatan: r.jabatan.trim(),
+        position_title: r.title.trim(),
+        file_data: r.file ? r.file.base64 : ''
+      }))
+    };
+
+    showSoftLoader({
+      type: 'submit',
+      noRotate: true,
+      icon: '👥',
+      tag: 'Pengisian Massal (Batch)',
+      title: 'Menyimpan data kompetensi kolektif...',
+      desc: 'Menyimpan ' + v.nonBlankRows.length + ' peserta untuk pelatihan "' + CMP_BATCH.kompetensi + '" ke database...',
+      notice: 'Mohon jangan menutup atau me-refresh halaman sampai proses selesai.'
+    });
+
+    try {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 120000);
+      let res, data;
+      try {
+        res = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          signal: ctrl.signal
+        });
+        if (!res.ok) throw new Error('Server mengembalikan HTTP ' + res.status);
+        data = await res.json();
+      } finally {
+        clearTimeout(t);
+      }
+
+      if (data && data.status === 'success') {
+        const box = $('cmpResultBox');
+        const txt = $('cmpResultText');
+        if (box && txt) {
+          txt.innerHTML = '<b>Berhasil!</b> Kompetensi <b>' + esc(CMP_BATCH.kompetensi) + '</b> untuk <b>' + v.nonBlankRows.length + '</b> karyawan berhasil disimpan ke database.';
+          box.classList.remove('hidden');
+          box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        showToast('success', 'Data Kolektif Tersimpan', 'Berhasil mencatat ' + v.nonBlankRows.length + ' peserta untuk ' + CMP_BATCH.kompetensi + '.');
+        CMP_BATCH.rows = [];
+        addMultipleBatchTableRows(3);
+      } else {
+        const msg = (data && data.message) || 'Gagal menyimpan data kompetensi kolektif.';
+        showToast('warning', 'Gagal Menyimpan', msg);
+      }
+    } catch (e) {
+      showToast('warning', 'Kendala Jaringan', e && e.name === 'AbortError' ? 'Koneksi timeout. Data mungkin sudah tersimpan, silakan periksa.' : (e.message || 'Gagal terhubung ke server.'));
+    } finally {
+      hideSoftLoader();
+      CMP_BATCH.busy = false;
+      if (btnSubmit) btnSubmit.disabled = false;
+      if (btnText) btnText.textContent = 'Kirim Data Kolektif';
+    }
+  }
+
+  function resetBatchForm(skipConfirm) {
+    const dirty = CMP_BATCH.kompetensi || CMP_BATCH.dateText || CMP_BATCH.sharedFile || CMP_BATCH.rows.some(r => r.nik || r.nama);
+    if (dirty && !skipConfirm && !window.confirm('Reset formulir mode batch? Semua data yang belum dikirim akan dihapus.')) return;
+    CMP_BATCH.kompetensi = '';
+    const label = $('cmpBatchComboLabel');
+    if (label) {
+      label.textContent = 'Pilih kompetensi dari Master...';
+      label.className = 'font-body-md text-body-md truncate text-outline';
+    }
+    CMP_BATCH.date = '';
+    CMP_BATCH.dateText = '';
+    const dateInp = $('cmpBatchDateText');
+    if (dateInp) dateInp.value = '';
+    const datePicker = $('cmpBatchDatePicker');
+    if (datePicker) datePicker.value = '';
+    renderBatchDateInfo();
+    removeBatchSharedFile();
+    CMP_BATCH.rows = [];
+    addMultipleBatchTableRows(3);
+  }
+
   /* ------------------------------ Event wiring ------------------------------ */
   function init() {
     const list = $('cmpPersonList');
@@ -5664,17 +6545,111 @@
     $('cmpBtnSubmit').addEventListener('click', submitAll);
     $('cmpMasterBanner').addEventListener('click', (e) => { if (e.target.closest('[data-cmp-retry]')) loadMaster(); });
 
-    document.addEventListener('click', (e) => {
-      // composedPath dihitung saat event dimulai, sehingga tetap benar walau target sudah dirender ulang.
-      const inside = e.composedPath().some((n) => n.nodeType === 1 && n.hasAttribute('data-ms'));
-      if (!inside) closeAllMs(null);
-    });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAllMs(null); });
-    window.addEventListener('beforeunload', (e) => { if (CMP.busy) { e.preventDefault(); e.returnValue = ''; } });
+    // Wiring untuk Tabel Mode Batch
+    const batchTbody = $('cmpBatchTableBody');
+    if (batchTbody) {
+      batchTbody.addEventListener('input', (e) => {
+        const inp = e.target;
+        if (!inp.dataset.f) return;
+        const tr = inp.closest('tr[data-row-id]');
+        if (!tr) return;
+        const r = CMP_BATCH.rows.find(x => x.id === tr.dataset.rowId);
+        if (!r) return;
+        r[inp.dataset.f] = inp.value;
+        inp.classList.remove('border-error', 'ring-1', 'ring-error');
+        updateBatchTableStats();
+      });
 
+      batchTbody.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-act]');
+        if (!btn) return;
+        const rowId = btn.dataset.id;
+        if (btn.dataset.act === 'del-row') {
+          deleteBatchTableRow(rowId);
+        } else if (btn.dataset.act === 'del-row-file') {
+          removeBatchRowFile(rowId);
+        }
+      });
+
+      batchTbody.addEventListener('change', (e) => {
+        const inp = e.target;
+        if (inp.dataset.act === 'upload-row-file') {
+          handleBatchRowFile(inp.dataset.id, inp);
+        }
+      });
+    }
+
+    // Wiring untuk List Combobox Batch
+    const batchComboList = $('cmpBatchComboList');
+    if (batchComboList) {
+      batchComboList.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-act="pick-batch-comp"]');
+        if (!btn) return;
+        const ci = +btn.dataset.ci;
+        if (CMP.master[ci]) {
+          selectBatchCompetency(CMP.master[ci].nama);
+        }
+      });
+    }
+
+    // Date picker showPicker support untuk Mode 2
+    const batchDatePicker = $('cmpBatchDatePicker');
+    if (batchDatePicker) {
+      batchDatePicker.addEventListener('click', (e) => {
+        if (typeof e.target.showPicker === 'function') {
+          try { e.target.showPicker(); } catch (err) {}
+        }
+      });
+    }
+
+    // Outside click untuk multi-select dan batch combobox
+    document.addEventListener('click', (e) => {
+      const insideMs = e.composedPath().some((n) => n.nodeType === 1 && n.hasAttribute('data-ms'));
+      if (!insideMs) closeAllMs(null);
+
+      const insideBatch = e.composedPath().some((n) => n.nodeType === 1 && (n.id === 'cmpBatchCombobox' || (n.hasAttribute && n.hasAttribute('data-batch-combo'))));
+      if (!insideBatch) toggleBatchCombo(false);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeAllMs(null);
+        toggleBatchCombo(false);
+      }
+    });
+
+    window.addEventListener('beforeunload', (e) => {
+      if (CMP.busy || CMP_BATCH.busy) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    });
+
+    // Inisialisasi awal
     addPerson();
+    addMultipleBatchTableRows(3);
     loadMaster();
   }
+
+  // Ekspos fungsi global untuk event atribut HTML
+  window.switchCompetencyMode = switchCompetencyMode;
+  window.toggleBatchCombo = toggleBatchCombo;
+  window.filterBatchCombo = filterBatchCombo;
+  window.selectBatchCompetency = selectBatchCompetency;
+  window.handleBatchDateInput = handleBatchDateInput;
+  window.handleBatchDateChange = handleBatchDateChange;
+  window.handleBatchDatePickerChange = handleBatchDatePickerChange;
+  window.handleBatchSharedFileUpload = handleBatchSharedFileUpload;
+  window.removeBatchSharedFile = removeBatchSharedFile;
+  window.toggleBatchExcelPasteArea = toggleBatchExcelPasteArea;
+  window.applyBatchExcelPaste = applyBatchExcelPaste;
+  window.downloadBatchTemplateCsv = downloadBatchTemplateCsv;
+  window.addBatchTableRow = addBatchTableRow;
+  window.addMultipleBatchTableRows = addMultipleBatchTableRows;
+  window.deleteBatchTableRow = deleteBatchTableRow;
+  window.clearBatchTableRows = clearBatchTableRows;
+  window.resetBatchForm = resetBatchForm;
+  window.submitBatchCompetency = submitBatchCompetency;
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
