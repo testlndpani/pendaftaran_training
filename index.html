@@ -240,15 +240,15 @@
                class="h-8 w-auto object-contain" 
                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbUcqW5ZE_xo0PbCRcHYjV9AaTV0o2y3TdZWiUvnJzhLCvTkGg0uRdr4E52J6qgVNOLvTwo3pYTPUo9GyUB_z0tD5n1fSHaL2-ggSFzwdtcRQ6UMSpdo9SXj8uQO5K_H2o6Pz4jI0ns8AnAEpSWJDYqTsaKqLz_bmx4HWXRnoWnlRXk_o8-nbZOJizFuZrfS-xPtFlfi1q4cy7H-8Y37AvigPjoTSxNzvR6K4whVfm_S6vznlIh_WX"
                onerror="this.onerror=null;this.src='refrensi tampilan halaman pendaftaran/logo_mgr_long_default.png/screen.png';">
-          <span class="hidden md:inline-block w-px h-5 bg-outline-variant/60"></span>
-          <div class="hidden md:flex flex-col">
+          <span class="hidden 2xl:inline-block w-px h-5 bg-outline-variant/60"></span>
+          <div class="hidden 2xl:flex flex-col whitespace-nowrap">
             <span class="font-title-sm text-title-sm font-bold text-primary leading-tight">Pendaftaran Training</span>
             <span class="text-[10px] text-on-surface-variant tracking-wider uppercase font-medium">L&amp;D Pani Gold Project</span>
           </div>
         </div>
 
         <!-- Desktop Navigation Tabs (SPA View Switcher) -->
-        <nav class="hidden lg:flex items-center gap-7">
+        <nav class="hidden lg:flex items-center gap-4 2xl:gap-7 whitespace-nowrap">
           <button type="button" id="nav-btn-beranda" onclick="switchPageTab('beranda')" class="font-label-lg text-label-lg transition-all text-on-surface-variant hover:text-primary flex items-center gap-1.5 cursor-pointer">
             <span class="material-symbols-outlined text-[18px]">home</span>
             <span>Beranda</span>
@@ -261,6 +261,10 @@
             <span class="material-symbols-outlined text-[18px]">calendar_month</span>
             <span>Jadwal Kalender Pelatihan</span>
           </button>
+          <button type="button" id="nav-btn-kompetensi" onclick="switchPageTab('kompetensi')" class="font-label-lg text-label-lg transition-all text-on-surface-variant hover:text-primary flex items-center gap-1.5 cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">workspace_premium</span>
+            <span>Pencatatan Kompetensi</span>
+          </button>
         </nav>
       </div>
 
@@ -269,12 +273,13 @@
         <button type="button" id="mobile-nav-beranda" onclick="switchPageTab('beranda')" class="px-2.5 sm:px-3 py-1 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all">Beranda</button>
         <button type="button" id="mobile-nav-pendaftaran" onclick="switchPageTab('pendaftaran')" class="px-2.5 sm:px-3 py-1 rounded-lg text-xs font-semibold bg-primary text-on-primary shadow-xs transition-all">Pendaftaran</button>
         <button type="button" id="mobile-nav-jadwal" onclick="switchPageTab('jadwal')" class="px-2.5 sm:px-3 py-1 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all">Jadwal</button>
+        <button type="button" id="mobile-nav-kompetensi" onclick="switchPageTab('kompetensi')" class="px-2.5 sm:px-3 py-1 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all">Kompetensi</button>
       </div>
 
       <!-- Right Side: Search, Help & Profile -->
       <div class="flex items-center gap-2 sm:gap-4">
         <!-- Header Quick Search -->
-        <div class="relative hidden sm:flex items-center w-44 md:w-56 lg:w-64">
+        <div class="relative hidden sm:flex items-center w-36 lg:w-32 xl:w-44 2xl:w-64 shrink-0">
           <span class="material-symbols-outlined absolute left-3 text-outline text-[18px]">search</span>
           <input id="header-quick-search" class="w-full h-9 pl-9 pr-3 bg-surface-container-low rounded-xl font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary shadow-none border-0" placeholder="Cari modul, NIP..." type="text">
         </div>
@@ -302,6 +307,7 @@
               <div class="flex flex-col sm:flex-row flex-wrap gap-2.5 sm:gap-3 pt-1">
                 <button type="button" onclick="switchPageTab('pendaftaran')" class="w-full sm:w-auto h-11 px-5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg font-semibold inline-flex items-center justify-center gap-2 transition-colors"><span class="material-symbols-outlined text-[20px]">how_to_reg</span>Daftarkan Peserta</button>
                 <button type="button" onclick="switchPageTab('jadwal')" class="w-full sm:w-auto h-11 px-5 rounded-lg border border-outline-variant bg-surface-container-lowest hover:bg-surface-container-low text-on-surface font-label-lg text-label-lg font-semibold inline-flex items-center justify-center gap-2 transition-colors"><span class="material-symbols-outlined text-[20px]">calendar_month</span>Lihat Jadwal</button>
+                <button type="button" onclick="switchPageTab('kompetensi')" class="w-full sm:w-auto h-11 px-5 rounded-lg border border-outline-variant bg-surface-container-lowest hover:bg-surface-container-low text-on-surface font-label-lg text-label-lg font-semibold inline-flex items-center justify-center gap-2 transition-colors"><span class="material-symbols-outlined text-[20px]">workspace_premium</span>Catat Kompetensi</button>
               </div>
             </div>
             <div class="relative h-[340px] sm:h-[430px] lg:h-auto lg:min-h-[500px]">
@@ -1567,12 +1573,89 @@
 </div>
 
       </section>
+      <!-- TAB 4: PENCATATAN KOMPETENSI KARYAWAN (SELF-SERVICE) -->
+      <section id="section-kompetensi" class="w-full px-4 sm:px-6 lg:px-8 py-2 hidden transition-all duration-200">
+        <div class="flex flex-col w-full max-w-[1240px] mx-auto px-4 md:px-8 py-8">
+          <div class="flex flex-col gap-6 pb-16">
+
+            <!-- Header -->
+            <div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-surface-container flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div class="flex flex-col gap-1.5">
+                <div class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm">
+                  <span class="flex items-center gap-1 hover:text-primary transition-colors cursor-pointer" onclick="switchPageTab('beranda')">
+                    <span class="material-symbols-outlined text-[16px]">home</span> Beranda
+                  </span>
+                  <span class="text-outline">/</span>
+                  <span class="text-primary font-medium">Pencatatan Kompetensi</span>
+                </div>
+                <h1 class="font-headline-sm text-headline-sm text-on-surface font-bold tracking-tight">Pencatatan Kompetensi Karyawan</h1>
+                <p class="font-body-sm text-body-sm text-on-surface-variant max-w-2xl">Catat riwayat training atau sertifikasi secara mandiri. Bisa untuk satu orang maupun banyak karyawan sekaligus: tambahkan kartu karyawan sebanyak yang dibutuhkan, lalu kirim sekali jalan.</p>
+              </div>
+              <div class="flex flex-wrap items-center gap-3 self-start md:self-center">
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary-fixed border border-primary-fixed-dim">
+                  <span class="material-symbols-outlined text-primary text-[18px]">groups</span>
+                  <div class="flex flex-col">
+                    <span class="font-label-sm text-[11px] text-on-primary-fixed-variant leading-none">Karyawan</span>
+                    <span class="font-label-md text-label-md text-primary font-bold" id="cmpStatPersons">0</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface-container border border-outline-variant/60">
+                  <span class="material-symbols-outlined text-primary text-[18px]">attach_file</span>
+                  <div class="flex flex-col">
+                    <span class="font-label-sm text-[11px] text-on-surface-variant leading-none">Lampiran</span>
+                    <span class="font-label-md text-label-md text-primary font-bold" id="cmpStatFiles">0</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ketentuan -->
+            <div class="rounded-xl border border-outline-variant/60 bg-surface-container-low px-4 sm:px-5 py-3.5 flex flex-col sm:flex-row gap-x-8 gap-y-2 font-body-sm text-body-sm text-on-surface-variant">
+              <div class="flex items-start gap-2"><span class="material-symbols-outlined text-primary text-[18px] shrink-0">description</span><span>Dokumen <b>JPG / PDF</b> bersifat opsional, maksimal <b>2 MB</b> per lampiran.</span></div>
+              <div class="flex items-start gap-2"><span class="material-symbols-outlined text-primary text-[18px] shrink-0">drive_file_rename_outline</span><span>Nama file (bila ada dokumen) otomatis diubah menjadi <b>NIK/NOHP_NAMA KOMPETENSI_BULAN_TAHUN</b>.</span></div>
+              <div class="flex items-start gap-2"><span class="material-symbols-outlined text-primary text-[18px] shrink-0">event_note</span><span>Tanggal pelatihan bersifat opsional: bisa di-copy paste langsung dari dokumen atau dipilih lewat kalender dropdown.</span></div>
+            </div>
+
+            <!-- Status daftar kompetensi -->
+            <div id="cmpMasterBanner" class="hidden px-4 py-3 rounded-lg border text-body-sm font-body-sm flex items-center justify-between gap-3"></div>
+
+            <!-- Hasil pengiriman -->
+            <div id="cmpResultBox" class="hidden px-4 py-3 rounded-lg bg-emerald-50 border border-emerald-300 text-emerald-950 font-body-sm text-body-sm flex items-start gap-2.5">
+              <span class="material-symbols-outlined text-emerald-700 text-[20px] shrink-0">check_circle</span>
+              <span id="cmpResultText" class="flex-1"></span>
+              <button type="button" onclick="document.getElementById('cmpResultBox').classList.add('hidden')" class="text-emerald-800 hover:text-emerald-950" aria-label="Tutup"><span class="material-symbols-outlined text-[16px]">close</span></button>
+            </div>
+
+            <!-- Kartu karyawan -->
+            <div id="cmpPersonList" class="flex flex-col gap-5"></div>
+
+            <!-- Aksi -->
+            <div class="bg-surface-container-lowest rounded-xl p-4 sm:p-5 shadow-sm border border-surface-container flex flex-col lg:flex-row lg:items-center justify-between gap-3 sticky bottom-3 z-20">
+              <div class="flex flex-wrap items-center gap-2">
+                <button type="button" id="cmpBtnAdd" class="h-10 px-3.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-primary font-label-md text-label-md flex items-center gap-1.5 font-semibold border border-outline-variant/60 transition-colors">
+                  <span class="material-symbols-outlined text-[18px]">person_add</span><span>Tambah Karyawan</span>
+                </button>
+                <button type="button" id="cmpBtnAdd5" class="h-10 px-3.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-primary font-label-md text-label-md flex items-center gap-1.5 font-semibold border border-outline-variant/60 transition-colors">
+                  <span class="material-symbols-outlined text-[18px]">group_add</span><span>+ 5 Karyawan</span>
+                </button>
+                <button type="button" id="cmpBtnReset" class="h-10 px-3.5 rounded-lg text-on-surface-variant hover:bg-surface-container font-label-md text-label-md flex items-center gap-1.5 font-semibold transition-colors">
+                  <span class="material-symbols-outlined text-[18px]">restart_alt</span><span>Reset Formulir</span>
+                </button>
+              </div>
+              <button type="button" id="cmpBtnSubmit" class="h-11 px-6 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-lg text-label-lg font-semibold inline-flex items-center justify-center gap-2 shadow-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                <span class="material-symbols-outlined text-[20px]">send</span><span id="cmpBtnSubmitText">Kirim Data Kompetensi</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </section>
     </main>
 
     <!-- =========================================================================== -->
     <!-- FOOTER RESMI MERDEKA COPPER GOLD & PANI GOLD PROJECT                         -->
     <!-- =========================================================================== -->
-    <footer class="mt-auto relative bg-surface-container-low/80 border-t border-outline-variant/40 text-on-surface transition-colors">
+    <footer id="main-footer" class="mt-auto relative bg-surface-container-low/80 border-t border-outline-variant/40 text-on-surface transition-colors">
       <!-- Top Decorative Corporate Brand Bar -->
       <div class="h-1 w-full bg-gradient-to-r from-primary via-secondary-container to-amber-500"></div>
 
@@ -1644,6 +1727,12 @@
               <button type="button" onclick="switchPageTab('jadwal'); window.scrollTo({top:0, behavior:'smooth'});" class="hover:text-primary transition-colors flex items-center gap-1.5 text-left">
                 <span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span>
                 <span>Kalender Pelatihan</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" onclick="switchPageTab('kompetensi'); window.scrollTo({top:0, behavior:'smooth'});" class="hover:text-primary transition-colors flex items-center gap-1.5 text-left">
+                <span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span>
+                <span>Pencatatan Kompetensi</span>
               </button>
             </li>
             <li>
@@ -2268,7 +2357,7 @@
   };
 
   function switchPageTab(tabName) {
-    const tabs = ['beranda', 'pendaftaran', 'jadwal'];
+    const tabs = ['beranda', 'pendaftaran', 'jadwal', 'kompetensi'];
     if (!tabs.includes(tabName)) tabName = 'beranda';
     const activeNav = "font-label-lg text-label-lg transition-all text-primary font-bold border-b-2 border-primary pb-0.5 flex items-center gap-1.5 cursor-pointer";
     const inactiveNav = "font-label-lg text-label-lg transition-all text-on-surface-variant hover:text-primary flex items-center gap-1.5 cursor-pointer";
@@ -2283,6 +2372,8 @@
       const mb = document.getElementById('mobile-nav-' + t);
       if (mb) mb.className = on ? activeMob : inactiveMob;
     });
+    const mainFooter = document.getElementById('main-footer');
+    if (mainFooter) mainFooter.classList.toggle('hidden', tabName !== 'beranda');
     try { history.replaceState(null, null, '#' + tabName); } catch (e) {}
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (tabName === 'beranda') renderHome();
@@ -4933,5 +5024,661 @@
 </script>
 
   </div>
+<script>
+/* ===========================================================================
+ * PENCATATAN KOMPETENSI KARYAWAN (SELF-SERVICE, INDIVIDUAL & KOLEKTIF)
+ * - Dropdown kompetensi : sheet Master_Competency kolom C (via API GAS, fallback gviz)
+ * - Simpan data         : sheet Submit_Manpower_Competency (via API GAS)
+ * - Simpan lampiran     : folder Google Drive kompetensi (via API GAS)
+ * - Nama file otomatis  : NIK/NOHP_NAMA KOMPETENSI_BULAN_TAHUN.ext
+ * =========================================================================== */
+(function () {
+  'use strict';
+
+  const SPREADSHEET_ID = '1Y5IQUSN84p2Os1e9wxraDIfZF6UfOql4Y5EdXbv850A';
+  const MAX_BYTES = 2 * 1024 * 1024;   // 2 MB per lampiran
+  const CHUNK_SIZE = 3;                // maks lampiran per request ke server (server: 5)
+  const MAX_PERSONS = 100;
+
+  const CMP = { master: [], state: 'idle', persons: [], seq: 0, busy: false };
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => escapeHtml(s == null ? '' : String(s));
+
+  /* ------------------------------ Helper ------------------------------ */
+  const normId = (v) => String(v || '').replace(/[\s\-().]/g, '');
+  const isValidId = (v) => /^\d{16}$/.test(v) || /^(\+?62|0)8\d{7,12}$/.test(v);
+  const safePart = (s) => String(s == null ? '' : s).replace(/[\\\/:*?"<>|#%]+/g, '-').replace(/\s+/g, ' ').trim();
+  const pad2 = (n) => String(n).padStart(2, '0');
+
+  function todayStr() {
+    const t = new Date();
+    return t.getFullYear() + '-' + pad2(t.getMonth() + 1) + '-' + pad2(t.getDate());
+  }
+  function parseYmd(s) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || '');
+    if (!m) return null;
+    const y = +m[1], mo = +m[2], d = +m[3], dt = new Date(y, mo - 1, d);
+    if (dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return null;
+    return { y, mo, d };
+  }
+  /**
+   * Mengenali tanggal hasil copy-paste (Excel/dokumen) dan mengembalikan 'yyyy-mm-dd' atau ''.
+   * Format: 15/03/2025, 15-03-2025, 15.03.2025, 2025-03-15, 15 Maret 2025, 15 Mar 2025, 15 March 2025
+   * (angka dengan pemisah dibaca hari-bulan-tahun). Jam di belakang tanggal diabaikan.
+   */
+  function parseDateText(raw) {
+    let s = String(raw == null ? '' : raw).trim().replace(/[T\s]+\d{1,2}:\d{2}.*$/i, '').trim();
+    if (!s) return '';
+    let y, mo, d, m;
+    if ((m = /^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})$/.exec(s))) { y = +m[1]; mo = +m[2]; d = +m[3]; }
+    else if ((m = /^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/.exec(s))) { d = +m[1]; mo = +m[2]; y = +m[3]; }
+    else if ((m = /^(\d{1,2})[\s\-\/.]+([A-Za-z]+)\.?,?[\s\-\/.]+(\d{4})$/.exec(s))) {
+      const names = { jan: 1, feb: 2, mar: 3, apr: 4, mei: 5, may: 5, jun: 6, jul: 7, agu: 8, agt: 8, aug: 8, ags: 8, sep: 9, okt: 10, oct: 10, nov: 11, des: 12, dec: 12 };
+      mo = names[m[2].toLowerCase().slice(0, 3)]; d = +m[1]; y = +m[3];
+      if (!mo) return '';
+    } else return '';
+    const iso = y + '-' + pad2(mo) + '-' + pad2(d);
+    return parseYmd(iso) ? iso : '';
+  }
+  function fmtDateText(iso) { const d = parseYmd(iso); return d ? pad2(d.d) + '/' + pad2(d.mo) + '/' + d.y : ''; }
+
+  // Nama file: NIK/NOHP_NAMA KOMPETENSI_BULAN_TAHUN.ext (bagian bulan/tahun dilewati bila tanggal kosong)
+  function buildFileName(p, c) {
+    const d = parseYmd(c.date), id = normId(p.nik);
+    if (!isValidId(id) || !c.file) return '';
+    const parts = [id, c.name];
+    if (d) parts.push(MONTH_NAMES[d.mo - 1], d.y);
+    return safePart(parts.join('_')) + '.' + c.file.ext;
+  }
+  function fmtSize(b) { return b >= 1048576 ? (b / 1048576).toFixed(2) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
+  function newSid() { return 'KMP-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 6).toUpperCase(); }
+
+  function newPerson(pre) {
+    const p = { uid: 'p' + (++CMP.seq), sid: newSid(), nik: '', nama: '', dept: '', jabatan: '', title: '', comps: [], cseq: 0, error: '' };
+    return Object.assign(p, pre || {});
+  }
+  const getPerson = (uid) => CMP.persons.find((p) => p.uid === uid);
+  const cardOf = (uid) => document.querySelector('#cmpPersonList [data-uid="' + uid + '"]');
+
+  /* ------------------------------ Master kompetensi ------------------------------ */
+  async function loadMasterViaGviz() {
+    const url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&headers=1&sheet=Master_Competency&tq=' + encodeURIComponent('select C, D');
+    const txt = await (await fetch(url)).text();
+    const json = JSON.parse(txt.substring(txt.indexOf('{'), txt.lastIndexOf('}') + 1));
+    return (json.table.rows || []).map((r) => ({
+      nama: r.c && r.c[0] && r.c[0].v != null ? String(r.c[0].v) : '',
+      jenis: r.c && r.c[1] && r.c[1].v != null ? String(r.c[1].v) : ''
+    }));
+  }
+
+  async function loadMaster() {
+    CMP.state = 'loading';
+    renderBanner();
+    let list = null;
+    try {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 20000);
+      try {
+        const r = await fetch(API_URL + '?action=competencies', { signal: ctrl.signal });
+        const j = await r.json();
+        if (j && Array.isArray(j.competencies)) list = j.competencies;
+      } finally { clearTimeout(t); }
+    } catch (e) { console.warn('API kompetensi gagal, mencoba gviz:', e); }
+    if (!list) {
+      try { list = await loadMasterViaGviz(); } catch (e) { console.warn('gviz kompetensi gagal:', e); }
+    }
+    if (list && list.length) {
+      const seen = new Set();
+      CMP.master = [];
+      list.forEach((c) => {
+        const nama = String(c.nama || '').replace(/\s+/g, ' ').trim();
+        if (!nama || seen.has(nama.toLowerCase())) return;
+        seen.add(nama.toLowerCase());
+        CMP.master.push({ nama, jenis: String(c.jenis || '').trim() });
+      });
+      CMP.state = CMP.master.length ? 'ready' : 'error';
+    } else {
+      CMP.state = 'error';
+    }
+    renderBanner();
+    CMP.persons.forEach((p) => { updateTrigger(p); const panel = cardOf(p.uid)?.querySelector('[data-ms-panel]'); if (panel && !panel.classList.contains('hidden')) renderMsList(p); });
+  }
+
+  function renderBanner() {
+    const el = $('cmpMasterBanner');
+    if (!el) return;
+    if (CMP.state === 'ready') { el.classList.add('hidden'); return; }
+    el.classList.remove('hidden');
+    if (CMP.state === 'loading' || CMP.state === 'idle') {
+      el.className = 'px-4 py-3 rounded-lg border text-body-sm font-body-sm flex items-center justify-between gap-3 bg-primary-fixed/50 border-primary-fixed-dim text-on-surface';
+      el.innerHTML = '<span class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[18px] animate-spin">progress_activity</span>Memuat daftar kompetensi dari database...</span>';
+    } else {
+      el.className = 'px-4 py-3 rounded-lg border text-body-sm font-body-sm flex items-center justify-between gap-3 bg-amber-50 border-amber-300 text-amber-950';
+      el.innerHTML = '<span class="flex items-center gap-2"><span class="material-symbols-outlined text-amber-700 text-[18px]">warning</span>Daftar kompetensi belum dapat dimuat. Periksa koneksi lalu coba lagi.</span>' +
+        '<button type="button" data-cmp-retry class="h-8 px-3 rounded-lg bg-amber-100 hover:bg-amber-200 font-label-md text-label-md font-semibold">Muat Ulang</button>';
+    }
+  }
+
+  /* ------------------------------ Render kartu karyawan ------------------------------ */
+  const INPUT_CLS = 'w-full h-10 px-3 rounded-lg bg-surface-container-lowest border border-outline-variant text-on-surface font-body-md text-body-md placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary';
+
+  function fieldHtml(p, key, label, ph, extra) {
+    return '<label class="flex flex-col gap-1.5">' +
+      '<span class="font-label-md text-label-md text-on-surface-variant font-semibold">' + label + ' <span class="text-error">*</span></span>' +
+      '<input data-f="' + key + '" type="text" class="' + INPUT_CLS + '" value="' + esc(p[key]) + '" placeholder="' + esc(ph) + '" autocomplete="off" ' + (extra || '') + '>' +
+      '</label>';
+  }
+
+  function personHtml(p) {
+    return '<div class="bg-surface-container-lowest rounded-xl shadow-sm border border-surface-container" data-uid="' + p.uid + '">' +
+      '<div class="flex items-center justify-between gap-3 px-5 sm:px-6 py-3 border-b border-surface-container">' +
+        '<div class="flex items-center gap-3 min-w-0">' +
+          '<div class="w-9 h-9 rounded-lg bg-primary-fixed flex items-center justify-center text-primary shrink-0"><span class="material-symbols-outlined text-[20px]">badge</span></div>' +
+          '<div class="min-w-0"><h2 class="font-title-md text-title-md text-on-surface font-semibold">Karyawan <span data-idx></span></h2>' +
+          '<p class="font-body-sm text-body-sm text-on-surface-variant truncate" data-summary>Belum diisi</p></div>' +
+        '</div>' +
+        '<div class="flex items-center gap-1.5 shrink-0">' +
+          '<button type="button" data-act="dup-person" title="Duplikat: salin departemen, jabatan & kompetensi ke karyawan baru" class="h-9 px-2.5 rounded-lg text-on-surface-variant hover:bg-surface-container flex items-center gap-1 font-label-md text-label-md font-semibold"><span class="material-symbols-outlined text-[18px]">content_copy</span><span class="hidden sm:inline">Duplikat</span></button>' +
+          '<button type="button" data-act="remove-person" title="Hapus karyawan ini" class="h-9 px-2.5 rounded-lg text-error hover:bg-error-container/60 flex items-center gap-1 font-label-md text-label-md font-semibold"><span class="material-symbols-outlined text-[18px]">delete</span><span class="hidden sm:inline">Hapus</span></button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="p-5 sm:p-6 flex flex-col gap-5">' +
+        '<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">' +
+          fieldHtml(p, 'nik', 'NIK KTP atau Nomor HP', '16 digit NIK / 08xxxxxxxxxx', 'inputmode="numeric"') +
+          fieldHtml(p, 'nama', 'Nama', 'Nama lengkap sesuai KTP') +
+          fieldHtml(p, 'dept', 'Departemen', 'contoh: Mining Operations') +
+          fieldHtml(p, 'jabatan', 'Jabatan', 'contoh: Supervisor') +
+          fieldHtml(p, 'title', 'Position Title', 'contoh: Mining Engineer') +
+        '</div>' +
+        '<div class="flex flex-col gap-1.5">' +
+          '<span class="font-label-md text-label-md text-on-surface-variant font-semibold">Nama Kompetensi <span class="text-error">*</span> <span class="font-normal text-outline">(boleh pilih lebih dari satu)</span></span>' +
+          '<div class="relative" data-ms>' +
+            '<button type="button" data-act="toggle-ms" aria-haspopup="listbox" class="w-full min-h-[40px] px-3 rounded-lg bg-surface-container-lowest border border-outline-variant flex items-center justify-between gap-2 text-left focus:outline-none focus:ring-2 focus:ring-primary">' +
+              '<span data-ms-label class="font-body-md text-body-md truncate text-outline">Pilih kompetensi...</span>' +
+              '<span class="material-symbols-outlined text-[20px] text-on-surface-variant shrink-0">expand_more</span>' +
+            '</button>' +
+            '<div data-ms-panel class="hidden absolute z-30 left-0 right-0 top-full mt-1 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-xl overflow-hidden">' +
+              '<div class="p-2 border-b border-outline-variant/60 relative">' +
+                '<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-[18px] pointer-events-none">search</span>' +
+                '<input data-ms-search type="text" placeholder="Cari kompetensi..." autocomplete="off" class="w-full h-9 pl-9 pr-3 rounded-lg bg-surface-container-low border-0 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary">' +
+              '</div>' +
+              '<div data-ms-list role="listbox" aria-multiselectable="true" class="max-h-64 overflow-y-auto py-1"></div>' +
+              '<div class="px-3 py-2 border-t border-outline-variant/60 flex items-center justify-between bg-surface-container-low/60">' +
+                '<span data-ms-count class="font-label-md text-label-md text-on-surface-variant"></span>' +
+                '<button type="button" data-act="close-ms" class="h-8 px-3 rounded-lg bg-primary text-on-primary font-label-md text-label-md font-semibold">Selesai</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div data-comps class="flex flex-col gap-3"></div>' +
+        '<div data-perr class="hidden px-3.5 py-2.5 rounded-lg bg-error-container/70 border border-error/40 text-on-error-container font-body-sm text-body-sm"></div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  function dateInfoHtml(c) {
+    const d = parseYmd(c.date), raw = (c.dateText || '').trim();
+    if (d) return '<span class="px-1.5 py-0.5 rounded bg-surface-container-high">Tanggal <b>' + d.d + '</b></span><span class="px-1.5 py-0.5 rounded bg-surface-container-high">Bulan <b>' + MONTH_NAMES[d.mo - 1] + '</b></span><span class="px-1.5 py-0.5 rounded bg-surface-container-high">Tahun <b>' + d.y + '</b></span>';
+    if (raw) return '<span class="text-error">Format tanggal tidak dikenali. Contoh: 15/03/2025 atau 15 Maret 2025</span>';
+    return '<span class="text-outline">Opsional. Ketik, paste, atau klik ikon kalender</span>';
+  }
+  function compRowHtml(p, c) {
+    const d = parseYmd(c.date);
+    const fname = buildFileName(p, c);
+    const master = CMP.master.find((m) => m.nama === c.name);
+    const dateInfo = dateInfoHtml(c);
+    const fileInfo = c.file
+      ? '<span class="flex items-center gap-1.5 text-primary font-medium min-w-0"><span class="material-symbols-outlined text-[16px] shrink-0">' + (c.file.ext === 'pdf' ? 'picture_as_pdf' : 'image') + '</span><span class="truncate">' + esc(c.file.origName) + '</span><span class="text-on-surface-variant shrink-0">(' + fmtSize(c.file.size) + ')</span><button type="button" data-act="remove-file" title="Hapus dokumen" aria-label="Hapus dokumen" class="shrink-0 text-error hover:bg-error-container/60 rounded"><span class="material-symbols-outlined text-[16px]">close</span></button></span>'
+      : '<span class="text-outline">Tanpa dokumen</span>';
+    return '<div class="rounded-lg border ' + (c.err ? 'border-error bg-error-container/20' : 'border-outline-variant/60 bg-surface-container-low/40') + ' p-3.5 flex flex-col gap-3 lg:grid lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1.5fr)_auto] lg:items-start lg:gap-4" data-cid="' + c.cid + '">' +
+      '<div class="min-w-0"><div class="flex items-start gap-2"><span class="material-symbols-outlined text-primary text-[18px] mt-0.5 shrink-0">workspace_premium</span>' +
+        '<div class="min-w-0"><div class="font-title-sm text-title-sm text-on-surface font-semibold leading-snug break-words">' + esc(c.name) + '</div>' +
+        (master && master.jenis ? '<div class="font-label-sm text-[11px] text-on-surface-variant mt-0.5">' + esc(master.jenis) + '</div>' : '') + '</div></div></div>' +
+      '<div class="flex flex-col gap-1.5"><span class="font-label-md text-label-md text-on-surface-variant font-semibold">Tanggal Pelatihan <span class="font-normal text-outline">(opsional)</span></span>' +
+        '<div class="relative flex items-center">' +
+          '<input data-cf="date" type="text" inputmode="text" autocomplete="off" placeholder="dd/mm/yyyy atau paste..." value="' + esc(c.dateText) + '" class="' + INPUT_CLS + ' pr-10">' +
+          '<label class="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-md flex items-center justify-center cursor-pointer hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors" title="Pilih dari kalender dropdown">' +
+            '<span class="material-symbols-outlined text-[20px] pointer-events-none">calendar_month</span>' +
+            '<input data-cf="date-picker" type="date" min="1990-01-01" max="' + todayStr() + '" value="' + esc(c.date) + '" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">' +
+          '</label>' +
+        '</div>' +
+        '<div data-dateinfo class="flex flex-wrap gap-1 font-label-sm text-[11px] text-on-surface-variant">' + dateInfo + '</div></div>' +
+      '<div class="flex flex-col gap-1.5 min-w-0"><span class="font-label-md text-label-md text-on-surface-variant font-semibold">Upload Dokumen <span class="font-normal text-outline">(opsional, JPG/PDF, maks 2 MB)</span></span>' +
+        '<div class="flex items-center gap-2 min-w-0">' +
+          '<label class="h-10 px-3 rounded-lg bg-surface-container-lowest hover:bg-surface-container border border-outline-variant cursor-pointer flex items-center gap-1.5 font-label-md text-label-md font-semibold text-primary shrink-0 transition-colors">' +
+            '<span class="material-symbols-outlined text-[18px]">upload_file</span><span>' + (c.file ? 'Ganti' : 'Pilih File') + '</span>' +
+            '<input data-cf="file" type="file" accept=".jpg,.jpeg,.pdf,image/jpeg,application/pdf" class="hidden"></label>' +
+          '<div class="font-body-sm text-body-sm min-w-0 flex">' + fileInfo + '</div>' +
+        '</div>' +
+        '<div class="font-label-sm text-[11px] text-on-surface-variant break-all" data-preview>' + (fname ? 'Disimpan sebagai: <b class="text-on-surface">' + esc(fname) + '</b>' : 'Nama file otomatis: NIK/NOHP_NAMA KOMPETENSI_BULAN_TAHUN') + '</div></div>' +
+      '<button type="button" data-act="remove-comp" title="Hapus kompetensi ini" aria-label="Hapus kompetensi" class="h-9 w-9 rounded-lg text-error hover:bg-error-container/60 flex items-center justify-center self-end lg:self-start"><span class="material-symbols-outlined text-[20px]">close</span></button>' +
+      (c.err ? '<p class="lg:col-span-4 text-error font-body-sm text-body-sm flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">error</span>' + esc(c.err) + '</p>' : '') +
+    '</div>';
+  }
+
+  function renderComps(p) {
+    const card = cardOf(p.uid);
+    if (!card) return;
+    card.querySelector('[data-comps]').innerHTML = p.comps.map((c) => compRowHtml(p, c)).join('');
+    updateTrigger(p);
+    updateStats();
+  }
+  function refreshRow(p, c) {
+    const card = cardOf(p.uid);
+    const row = card && card.querySelector('[data-cid="' + c.cid + '"]');
+    if (!row) return;
+    const tmp = document.createElement('div');
+    tmp.innerHTML = compRowHtml(p, c);
+    row.replaceWith(tmp.firstElementChild);
+    updateStats();
+  }
+  function refreshPreviews(p) {
+    const card = cardOf(p.uid);
+    if (!card) return;
+    p.comps.forEach((c) => {
+      const row = card.querySelector('[data-cid="' + c.cid + '"] [data-preview]');
+      if (!row) return;
+      const fname = buildFileName(p, c);
+      row.innerHTML = fname ? 'Disimpan sebagai: <b class="text-on-surface">' + esc(fname) + '</b>' : 'Nama file otomatis: NIK/NOHP_NAMA KOMPETENSI_BULAN_TAHUN';
+    });
+  }
+  function updateTrigger(p) {
+    const card = cardOf(p.uid);
+    if (!card) return;
+    const lbl = card.querySelector('[data-ms-label]');
+    const n = p.comps.length;
+    if (CMP.state === 'loading' || CMP.state === 'idle') { lbl.textContent = 'Memuat daftar kompetensi...'; lbl.className = 'font-body-md text-body-md truncate text-outline'; }
+    else if (CMP.state === 'error') { lbl.textContent = 'Daftar kompetensi gagal dimuat'; lbl.className = 'font-body-md text-body-md truncate text-error'; }
+    else if (!n) { lbl.textContent = 'Pilih kompetensi...'; lbl.className = 'font-body-md text-body-md truncate text-outline'; }
+    else { lbl.textContent = n + ' kompetensi dipilih'; lbl.className = 'font-body-md text-body-md truncate text-on-surface font-medium'; }
+    const sum = card.querySelector('[data-summary]');
+    if (sum) sum.textContent = (p.nama.trim() || 'Belum diisi') + (n ? ' · ' + n + ' kompetensi' : '');
+  }
+  function renumber() {
+    document.querySelectorAll('#cmpPersonList [data-uid] [data-idx]').forEach((el, i) => { el.textContent = '#' + (i + 1); });
+    updateStats();
+  }
+  function updateStats() {
+    const ps = $('cmpStatPersons'), fs = $('cmpStatFiles');
+    if (ps) ps.textContent = CMP.persons.length;
+    if (fs) fs.textContent = CMP.persons.reduce((a, p) => a + p.comps.filter((c) => c.file).length, 0);
+  }
+  function showPersonError(p) {
+    const card = cardOf(p.uid);
+    if (!card) return;
+    const box = card.querySelector('[data-perr]');
+    box.textContent = p.error || '';
+    box.classList.toggle('hidden', !p.error);
+  }
+  function markFields(p) {
+    const card = cardOf(p.uid);
+    if (!card) return;
+    card.querySelectorAll('input[data-f]').forEach((inp) => {
+      const k = inp.dataset.f;
+      let bad = !String(p[k]).trim();
+      if (k === 'nik') bad = !isValidId(normId(p.nik));
+      inp.classList.toggle('border-error', bad);
+      inp.classList.toggle('ring-1', bad);
+      inp.classList.toggle('ring-error', bad);
+      if (bad) inp.dataset.invalid = '1'; else delete inp.dataset.invalid;
+    });
+    const trig = card.querySelector('[data-act="toggle-ms"]');
+    const noComp = !p.comps.length;
+    trig.classList.toggle('border-error', noComp);
+    if (noComp) trig.dataset.invalid = '1'; else delete trig.dataset.invalid;
+  }
+
+  function addPerson(pre, focus) {
+    if (CMP.persons.length >= MAX_PERSONS) { showToast('warning', 'Batas Tercapai', 'Maksimal ' + MAX_PERSONS + ' karyawan per pengiriman.'); return null; }
+    const p = newPerson(pre);
+    CMP.persons.push(p);
+    $('cmpPersonList').insertAdjacentHTML('beforeend', personHtml(p));
+    renderComps(p);
+    renumber();
+    if (focus) { const card = cardOf(p.uid); card.scrollIntoView({ behavior: 'smooth', block: 'center' }); const i = card.querySelector('input[data-f="nik"]'); if (i) setTimeout(() => i.focus({ preventScroll: true }), 300); }
+    return p;
+  }
+  function removePerson(uid) {
+    const p = getPerson(uid);
+    if (!p) return;
+    const filled = p.nik || p.nama || p.comps.length;
+    if (filled && !window.confirm('Hapus data karyawan ini dari formulir?')) return;
+    CMP.persons = CMP.persons.filter((x) => x.uid !== uid);
+    const card = cardOf(uid); if (card) card.remove();
+    if (!CMP.persons.length) addPerson();
+    renumber();
+  }
+  function dupPerson(uid) {
+    const p = getPerson(uid);
+    if (!p) return;
+    const q = addPerson({ dept: p.dept, jabatan: p.jabatan, title: p.title }, true);
+    if (!q) return;
+    p.comps.forEach((c) => q.comps.push({ cid: ++q.cseq, ci: c.ci, name: c.name, date: c.date, dateText: c.dateText, file: null, err: '' }));
+    const card = cardOf(q.uid);
+    ['dept', 'jabatan', 'title'].forEach((k) => { const el = card.querySelector('[data-f="' + k + '"]'); if (el) el.value = q[k]; });
+    renderComps(q);
+    showToast('info', 'Karyawan Diduplikat', 'Departemen, jabatan & kompetensi disalin. Lengkapi NIK/HP, nama, dan unggah dokumen masing-masing.');
+  }
+  function resetAll(skipConfirm) {
+    const dirty = CMP.persons.some((p) => p.nik || p.nama || p.comps.length);
+    if (dirty && !skipConfirm && !window.confirm('Reset formulir? Semua data yang belum dikirim akan dihapus.')) return;
+    CMP.persons = [];
+    $('cmpPersonList').innerHTML = '';
+    addPerson();
+  }
+
+  /* ------------------------------ Multi-select kompetensi ------------------------------ */
+  function closeAllMs(exceptUid) {
+    document.querySelectorAll('#cmpPersonList [data-ms-panel]').forEach((panel) => {
+      const uid = panel.closest('[data-uid]').dataset.uid;
+      if (uid !== exceptUid) panel.classList.add('hidden');
+    });
+  }
+  function openMs(p) {
+    if (CMP.state !== 'ready') {
+      if (CMP.state === 'error') loadMaster();
+      showToast('info', 'Daftar Kompetensi', CMP.state === 'error' ? 'Mencoba memuat ulang daftar kompetensi...' : 'Daftar kompetensi masih dimuat, mohon tunggu sebentar.');
+      return;
+    }
+    const card = cardOf(p.uid), panel = card.querySelector('[data-ms-panel]');
+    const willOpen = panel.classList.contains('hidden');
+    closeAllMs(willOpen ? p.uid : null);
+    panel.classList.toggle('hidden', !willOpen);
+    if (willOpen) {
+      const s = panel.querySelector('[data-ms-search]'); s.value = '';
+      renderMsList(p);
+      setTimeout(() => s.focus({ preventScroll: true }), 30);
+    }
+  }
+  function renderMsList(p) {
+    const card = cardOf(p.uid);
+    if (!card) return;
+    const q = card.querySelector('[data-ms-search]').value.toLowerCase().trim();
+    const picked = new Set(p.comps.map((c) => c.ci));
+    const items = [];
+    CMP.master.forEach((m, i) => {
+      if (q && m.nama.toLowerCase().indexOf(q) === -1 && m.jenis.toLowerCase().indexOf(q) === -1) return;
+      const on = picked.has(i);
+      items.push('<button type="button" role="option" aria-selected="' + on + '" data-act="pick" data-ci="' + i + '" class="w-full text-left px-3 py-2 flex items-start gap-2.5 hover:bg-surface-container-low ' + (on ? 'bg-primary-fixed/40' : '') + '">' +
+        '<span class="mt-0.5 w-[18px] h-[18px] rounded border flex items-center justify-center shrink-0 ' + (on ? 'bg-primary border-primary text-on-primary' : 'border-outline bg-surface-container-lowest') + '">' + (on ? '<span class="material-symbols-outlined text-[14px]">check</span>' : '') + '</span>' +
+        '<span class="min-w-0"><span class="block font-body-md text-body-md text-on-surface leading-snug">' + esc(m.nama) + '</span>' + (m.jenis ? '<span class="block font-label-sm text-[11px] text-on-surface-variant">' + esc(m.jenis) + '</span>' : '') + '</span></button>');
+    });
+    const list = card.querySelector('[data-ms-list]');
+    const scroll = list.scrollTop;
+    list.innerHTML = items.length ? items.join('') : '<div class="px-3 py-6 text-center font-body-sm text-body-sm text-on-surface-variant">Kompetensi tidak ditemukan.</div>';
+    list.scrollTop = scroll;
+    card.querySelector('[data-ms-count]').textContent = p.comps.length + ' dipilih';
+  }
+  function togglePick(p, ci) {
+    const m = CMP.master[ci];
+    if (!m) return;
+    const at = p.comps.findIndex((c) => c.ci === ci);
+    if (at >= 0) p.comps.splice(at, 1);
+    else p.comps.push({ cid: ++p.cseq, ci, name: m.nama, date: '', dateText: '', file: null, err: '' });
+    renderComps(p);
+    renderMsList(p);
+    const trig = cardOf(p.uid).querySelector('[data-act="toggle-ms"]');
+    trig.classList.remove('border-error'); delete trig.dataset.invalid;
+  }
+
+  /* ------------------------------ Upload berkas ------------------------------ */
+  function handleFile(p, c, input) {
+    const file = input.files && input.files[0];
+    input.value = '';
+    if (!file) return;
+    const ext = /\.pdf$/i.test(file.name) ? 'pdf' : (/\.jpe?g$/i.test(file.name) ? 'jpg' : '');
+    const mimeOk = file.type === 'application/pdf' || file.type === 'image/jpeg' || file.type === '';
+    if (!ext || !mimeOk || (ext === 'pdf' && file.type === 'image/jpeg') || (ext === 'jpg' && file.type === 'application/pdf')) {
+      showToast('warning', 'Format Berkas Ditolak', 'Hanya berkas JPG atau PDF yang diperbolehkan.');
+      return;
+    }
+    if (file.size > MAX_BYTES) {
+      showToast('warning', 'Ukuran Berkas Terlalu Besar', 'Maksimal 2 MB per lampiran. Berkas Anda ' + fmtSize(file.size) + '.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = String(e.target.result || '').split(',')[1] || '';
+      const realPdf = base64.indexOf('JVBERi') === 0, realJpg = base64.indexOf('/9j/') === 0;
+      if ((ext === 'pdf' && !realPdf) || (ext === 'jpg' && !realJpg)) {
+        showToast('warning', 'Berkas Tidak Valid', 'Isi berkas tidak sesuai dengan format ' + ext.toUpperCase() + '.');
+        return;
+      }
+      c.file = { origName: file.name, ext, mime: ext === 'pdf' ? 'application/pdf' : 'image/jpeg', size: file.size, base64 };
+      c.err = '';
+      refreshRow(p, c);
+    };
+    reader.onerror = () => showToast('warning', 'Gagal Membaca Berkas', 'Terjadi kesalahan saat membaca berkas.');
+    reader.readAsDataURL(file);
+  }
+
+  /* ------------------------------ Validasi & kirim ------------------------------ */
+  function validateAll() {
+    let problems = 0;
+    const seen = new Set(), today = todayStr();
+    CMP.persons.forEach((p) => {
+      const msgs = [], id = normId(p.nik), idOk = isValidId(id);
+      if (!idOk) msgs.push('NIK KTP harus 16 digit atau Nomor HP valid (08xxxxxxxxxx / +62...).');
+      const miss = [['nama', 'Nama'], ['dept', 'Departemen'], ['jabatan', 'Jabatan'], ['title', 'Position Title']].filter((f) => !String(p[f[0]]).trim()).map((f) => f[1]);
+      if (miss.length) msgs.push('Wajib diisi: ' + miss.join(', ') + '.');
+      if (!p.comps.length) msgs.push('Pilih minimal 1 kompetensi.');
+      p.comps.forEach((c) => {
+        let e = '';
+        const d = parseYmd(c.date);
+        const raw = (c.dateText || '').trim();
+        if (raw && !c.date) e = 'Format tanggal tidak dikenali. Contoh: 15/03/2025 atau 15 Maret 2025 (atau kosongkan).';
+        else if (c.date && parseYmd(c.date).y < 1990) e = 'Tahun pelatihan tidak valid.';
+        else if (c.date > today) e = 'Tanggal pelatihan tidak boleh di masa depan.';
+        if (!e && idOk) {
+          const key = id + '|' + c.ci + '|' + (d ? d.y + '-' + d.mo : 'x');
+          if (seen.has(key)) e = 'Duplikat: NIK/HP, kompetensi, bulan & tahun yang sama sudah diisi pada kartu lain.';
+          seen.add(key);
+        }
+        c.err = e;
+        if (e) problems++;
+        refreshRow(p, c);
+      });
+      p.error = msgs.join(' ');
+      problems += msgs.length;
+      showPersonError(p);
+      markFields(p);
+    });
+    return problems;
+  }
+
+  async function postChunk(p, chunk) {
+    const payload = {
+      action: 'submit_competency',
+      id_submit: p.sid + '-' + chunk[0].cid,
+      nik_nohp: normId(p.nik),
+      nama: p.nama.trim(),
+      departemen: p.dept.trim(),
+      jabatan: p.jabatan.trim(),
+      position_title: p.title.trim(),
+      items: chunk.map((c) => ({ kompetensi: c.name, tanggal: c.date || '', file_name: buildFileName(p, c), file_type: c.file ? c.file.mime : '', file_data: c.file ? c.file.base64 : '' }))
+    };
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 120000);
+    try {
+      const r = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' }, signal: ctrl.signal });
+      if (!r.ok) throw new Error('Server mengembalikan HTTP ' + r.status);
+      let j;
+      try { j = await r.json(); } catch (x) { throw new Error('Respons server tidak valid. Coba kirim ulang (aman, tidak akan ganda).'); }
+      if (j.status === 'success') return { ok: true };
+      return { ok: false, message: (j.message || 'Gagal menyimpan data.') + (j.code ? ' [' + j.code + ']' : '') };
+    } catch (e) {
+      return { ok: false, message: e && e.name === 'AbortError' ? 'Server terlalu lama merespons. Data mungkin sudah tersimpan; kirim ulang (aman, tidak akan ganda).' : ((e && e.message) || 'Kendala jaringan.') };
+    } finally { clearTimeout(t); }
+  }
+
+  function setBusy(b) {
+    CMP.busy = b;
+    ['cmpBtnSubmit', 'cmpBtnAdd', 'cmpBtnAdd5', 'cmpBtnReset'].forEach((id) => { const el = $(id); if (el) el.disabled = b; });
+    const t = $('cmpBtnSubmitText'); if (t) t.textContent = b ? 'Mengirim...' : 'Kirim Data Kompetensi';
+  }
+
+  async function submitAll() {
+    if (CMP.busy) return;
+    if (CMP.state !== 'ready') { showToast('warning', 'Belum Siap', 'Daftar kompetensi belum termuat. Muat ulang halaman atau coba lagi.'); return; }
+    $('cmpResultBox').classList.add('hidden');
+    const problems = validateAll();
+    if (problems) {
+      showToast('warning', 'Data Belum Lengkap', 'Periksa ' + problems + ' isian yang ditandai merah, lalu kirim kembali.');
+      const bad = document.querySelector('#cmpPersonList [data-invalid], #cmpPersonList .border-error');
+      if (bad) bad.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    setBusy(true);
+    const queue = CMP.persons.slice(), totalFiles = queue.reduce((a, p) => a + p.comps.length, 0);
+    let okPersons = 0, okFiles = 0, failPersons = 0;
+    showSoftLoader({ type: 'submit', noRotate: true, icon: '📤', tag: 'Unggah Dokumen & Simpan Data',
+      title: 'Sedang mengunggah dokumen kompetensi...',
+      desc: 'Karyawan 1 dari ' + queue.length + ' · ' + totalFiles + ' kompetensi akan disimpan (dokumen diunggah ke Google Drive).',
+      notice: 'Mohon jangan menutup atau me-refresh halaman sampai proses selesai.' });
+    try {
+      for (let i = 0; i < queue.length; i++) {
+        const p = queue[i];
+        if (i > 0) { const d = $('soft-loader-desc'); if (d) d.textContent = 'Karyawan ' + (i + 1) + ' dari ' + queue.length + ': ' + p.nama.trim() + ' · ' + okFiles + '/' + totalFiles + ' kompetensi tersimpan.'; }
+        let failed = false;
+        while (p.comps.length) {
+          const chunk = p.comps.slice(0, CHUNK_SIZE);
+          const res = await postChunk(p, chunk);
+          if (!res.ok) { p.error = 'Gagal menyimpan: ' + res.message; failed = true; break; }
+          okFiles += chunk.length;
+          const done = new Set(chunk.map((c) => c.cid));
+          p.comps = p.comps.filter((c) => !done.has(c.cid));
+        }
+        if (failed) {
+          failPersons++;
+          renderComps(p); showPersonError(p);
+        } else {
+          okPersons++;
+          CMP.persons = CMP.persons.filter((x) => x.uid !== p.uid);
+          const card = cardOf(p.uid); if (card) card.remove();
+        }
+      }
+    } finally {
+      hideSoftLoader();
+      setBusy(false);
+    }
+    if (!CMP.persons.length) addPerson();
+    renumber();
+    const box = $('cmpResultBox'), txt = $('cmpResultText');
+    if (failPersons === 0) {
+      txt.innerHTML = '<b>Berhasil!</b> ' + okFiles + ' kompetensi dari ' + okPersons + ' karyawan telah tersimpan.';
+      box.classList.remove('hidden');
+      showToast('success', 'Data Tersimpan', okFiles + ' kompetensi dari ' + okPersons + ' karyawan berhasil dikirim.');
+    } else {
+      txt.innerHTML = '<b>' + okPersons + ' karyawan tersimpan</b> (' + okFiles + ' kompetensi). <b>' + failPersons + ' karyawan gagal</b> dan tetap ada di formulir; periksa pesan merah pada kartu, lalu kirim ulang.';
+      box.classList.remove('hidden');
+      showToast('warning', 'Sebagian Gagal', failPersons + ' karyawan belum tersimpan. Silakan periksa dan kirim ulang.');
+    }
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  /* ------------------------------ Event wiring ------------------------------ */
+  function init() {
+    const list = $('cmpPersonList');
+    if (!list) return;
+
+    list.addEventListener('input', (e) => {
+      const t = e.target, card = t.closest('[data-uid]');
+      if (!card) return;
+      const p = getPerson(card.dataset.uid);
+      if (!p) return;
+      if (t.dataset.f) {
+        p[t.dataset.f] = t.value;
+        if (t.dataset.f === 'nik') refreshPreviews(p);
+        if (t.dataset.f === 'nama') updateTrigger(p);
+        t.classList.remove('border-error', 'ring-1', 'ring-error'); delete t.dataset.invalid;
+        if (p.error) { p.error = ''; showPersonError(p); }
+      } else if (t.matches('[data-ms-search]')) {
+        renderMsList(p);
+      } else if (t.dataset.cf === 'date') {
+        // Pembaruan langsung tanpa merender ulang baris (agar fokus ketik tidak hilang).
+        const row = t.closest('[data-cid]'), c = p.comps.find((x) => String(x.cid) === row.dataset.cid);
+        if (!c) return;
+        c.dateText = t.value;
+        c.date = parseDateText(t.value);
+        c.err = '';
+        row.querySelector('[data-dateinfo]').innerHTML = dateInfoHtml(c);
+        const pv = row.querySelector('[data-preview]'), fname = buildFileName(p, c);
+        pv.innerHTML = fname ? 'Disimpan sebagai: <b class="text-on-surface">' + esc(fname) + '</b>' : 'Nama file otomatis: NIK/NOHP_NAMA KOMPETENSI_BULAN_TAHUN';
+        const picker = row.querySelector('[data-cf="date-picker"]');
+        if (picker) picker.value = c.date || '';
+      }
+    });
+
+    list.addEventListener('change', (e) => {
+      const t = e.target, row = t.closest('[data-cid]'), card = t.closest('[data-uid]');
+      if (!row || !card || !t.dataset.cf) return;
+      const p = getPerson(card.dataset.uid), c = p && p.comps.find((x) => String(x.cid) === row.dataset.cid);
+      if (!c) return;
+      if (t.dataset.cf === 'date-picker') {
+        if (t.value) {
+          c.date = t.value;
+          c.dateText = fmtDateText(t.value);
+          c.err = '';
+          refreshRow(p, c);
+        }
+      } else if (t.dataset.cf === 'date') {
+        // Normalisasi (mis. "15 Maret 2025" -> "15/03/2025") setelah selesai mengetik/paste.
+        c.dateText = c.date ? fmtDateText(c.date) : t.value.trim();
+        c.err = '';
+        refreshRow(p, c);
+      }
+      else if (t.dataset.cf === 'file') handleFile(p, c, t);
+    });
+
+    list.addEventListener('click', (e) => {
+      if (e.target.matches('[data-cf="date-picker"]') && typeof e.target.showPicker === 'function') {
+        try { e.target.showPicker(); } catch (err) {}
+      }
+      const btn = e.target.closest('[data-act]');
+      if (!btn) return;
+      const card = btn.closest('[data-uid]'), p = card && getPerson(card.dataset.uid);
+      if (!p) return;
+      switch (btn.dataset.act) {
+        case 'toggle-ms': openMs(p); break;
+        case 'close-ms': closeAllMs(null); break;
+        case 'pick': togglePick(p, +btn.dataset.ci); break;
+        case 'remove-comp': {
+          const cid = btn.closest('[data-cid]').dataset.cid;
+          p.comps = p.comps.filter((c) => String(c.cid) !== cid);
+          renderComps(p);
+          break;
+        }
+        case 'remove-file': {
+          const row = btn.closest('[data-cid]'), c = p.comps.find((x) => String(x.cid) === row.dataset.cid);
+          if (c) { c.file = null; c.err = ''; refreshRow(p, c); }
+          break;
+        }
+        case 'remove-person': removePerson(p.uid); break;
+        case 'dup-person': dupPerson(p.uid); break;
+      }
+    });
+
+    $('cmpBtnAdd').addEventListener('click', () => addPerson(null, true));
+    $('cmpBtnAdd5').addEventListener('click', () => { for (let i = 0; i < 5; i++) addPerson(null, i === 0); });
+    $('cmpBtnReset').addEventListener('click', () => resetAll(false));
+    $('cmpBtnSubmit').addEventListener('click', submitAll);
+    $('cmpMasterBanner').addEventListener('click', (e) => { if (e.target.closest('[data-cmp-retry]')) loadMaster(); });
+
+    document.addEventListener('click', (e) => {
+      // composedPath dihitung saat event dimulai, sehingga tetap benar walau target sudah dirender ulang.
+      const inside = e.composedPath().some((n) => n.nodeType === 1 && n.hasAttribute('data-ms'));
+      if (!inside) closeAllMs(null);
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAllMs(null); });
+    window.addEventListener('beforeunload', (e) => { if (CMP.busy) { e.preventDefault(); e.returnValue = ''; } });
+
+    addPerson();
+    loadMaster();
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
 </body>
 </html>
