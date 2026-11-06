@@ -678,23 +678,23 @@
                         <span id="programComboboxArrow" class="material-symbols-outlined text-outline text-[20px] shrink-0 transition-transform duration-200">expand_more</span>
                       </button>
 
-                      <!-- Searchable Popover Dropdown Panel -->
-                      <div id="programComboboxPanel" class="hidden absolute top-full left-0 right-0 mt-1.5 bg-surface-container-lowest rounded-xl shadow-2xl border border-outline-variant/70 z-50 overflow-hidden flex flex-col max-h-80">
+                      <!-- Searchable Popover Dropdown Panel (Tampilan Luas & Leluasa) -->
+                      <div id="programComboboxPanel" class="hidden absolute top-full left-0 right-0 mt-2 bg-surface-container-lowest rounded-2xl shadow-2xl border border-outline-variant/80 z-50 overflow-hidden flex flex-col max-h-[520px] sm:max-h-[560px]">
                         <!-- Search Box inside Popover -->
-                        <div class="p-2.5 border-b border-outline-variant/40 bg-surface-container-low/40 flex items-center gap-2 shrink-0">
-                          <span class="material-symbols-outlined text-outline text-[18px]">search</span>
-                          <input type="text" id="programComboboxSearch" oninput="filterProgramCombobox(this.value)" onkeydown="handleComboboxSearchKeydown(event)" placeholder="Cari nama modul, batch, kode jadwal..." class="w-full bg-transparent border-0 font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none" autocomplete="off">
+                        <div class="p-3 border-b border-outline-variant/40 bg-surface-container-low/50 flex items-center gap-2.5 shrink-0">
+                          <span class="material-symbols-outlined text-primary text-[20px]">search</span>
+                          <input type="text" id="programComboboxSearch" oninput="filterProgramCombobox(this.value)" onkeydown="handleComboboxSearchKeydown(event)" placeholder="Ketik untuk mencari nama modul, batch, ruangan, atau tanggal..." class="w-full bg-transparent border-0 font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none" autocomplete="off">
                           <button type="button" onclick="clearProgramComboboxSearch()" id="programComboboxClearBtn" class="text-outline hover:text-on-surface hidden p-1">
-                            <span class="material-symbols-outlined text-[16px]">close</span>
+                            <span class="material-symbols-outlined text-[18px]">close</span>
                           </button>
                         </div>
                         <!-- Status Bar -->
-                        <div class="px-3 py-1.5 bg-surface-container-low/20 border-b border-outline-variant/30 flex items-center justify-between text-[11px] text-on-surface-variant shrink-0">
-                          <span id="programComboboxCount">Memuat data pelatihan...</span>
-                          <span class="text-[10px] text-outline font-medium hidden sm:inline">Hanya kuota tersedia yang dapat dipilih</span>
+                        <div class="px-4 py-2 bg-surface-container-low/30 border-b border-outline-variant/30 flex items-center justify-between text-[11px] text-on-surface-variant shrink-0">
+                          <span id="programComboboxCount" class="font-medium text-on-surface">Memuat data pelatihan...</span>
+                          <span class="text-[11px] text-outline font-normal hidden sm:inline">Pilih kartu jadwal yang diinginkan</span>
                         </div>
-                        <!-- Options List -->
-                        <div id="programComboboxList" role="listbox" class="overflow-y-auto divide-y divide-outline-variant/20 flex-1 p-1">
+                        <!-- Options List (2 Kolom di Desktop agar Leluasa & Tidak Sempit) -->
+                        <div id="programComboboxList" role="listbox" class="overflow-y-auto flex-1 p-2.5 sm:p-3 grid grid-cols-1 md:grid-cols-2 gap-2.5 bg-surface-container-low/10">
                           <!-- Populated dynamically via JS -->
                         </div>
                       </div>
@@ -795,7 +795,7 @@
                   </div>
                   <div>
                     <h2 class="font-title-lg text-title-lg text-on-surface font-semibold">4. PIC &amp; Dokumen Pendukung</h2>
-                    <p class="font-body-sm text-body-sm text-on-surface-variant">Data penanggung jawab pelatihan dan lampiran surat persetujuan dari divisi pengirim.</p>
+                    <p class="font-body-sm text-body-sm text-on-surface-variant">Data penanggung jawab pelatihan dan lampiran surat persetujuan dari divisi pengirim (opsional).</p>
                   </div>
                 </div>
 
@@ -811,13 +811,16 @@
                   </div>
 
                   <div class="md:col-span-2 flex flex-col gap-1.5">
-                    <label class="font-label-sm text-label-sm text-on-surface font-medium">Lampiran Surat Persetujuan / Memo Internal <span class="text-error">*</span></label>
+                    <label class="font-label-sm text-label-sm text-on-surface font-medium flex items-center justify-between">
+                      <span>Lampiran Surat Persetujuan / Memo Internal</span>
+                      <span class="text-[11px] text-on-surface-variant font-normal tracking-wide">(Opsional)</span>
+                    </label>
                     <div class="px-4 py-2.5 rounded-lg bg-surface-container-low border border-surface-container flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div class="flex items-center gap-2.5 overflow-hidden">
                         <span class="material-symbols-outlined text-primary text-[22px]" id="uploadedDocIcon">picture_as_pdf</span>
                         <div class="flex flex-col truncate">
                           <span class="font-body-sm text-body-sm text-outline italic truncate" id="uploadedDocName">Belum ada berkas dipilih</span>
-                          <span class="font-label-sm text-label-sm text-on-surface-variant" id="uploadedDocHint">Khusus Format PDF (Maksimal 2 MB)</span>
+                          <span class="font-label-sm text-label-sm text-on-surface-variant" id="uploadedDocHint">Opsional • Format PDF (Maksimal 2 MB)</span>
                         </div>
                       </div>
                       <div class="flex items-center gap-2 shrink-0">
@@ -1026,6 +1029,7 @@
 <option value="open">Pendaftaran Buka</option>
 <option value="full">Kuota Penuh</option>
 <option value="running">Sedang Berlangsung</option>
+<option value="past">Sudah Selesai</option>
 </select>
 <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-outline text-[18px] pointer-events-none">expand_more</span>
 </div>
@@ -2744,10 +2748,18 @@
 
   // Pilih modul dari kalender / modal detail dan langsung arahkan ke form pendaftaran
   function selectScheduleAndRegister(idJadwal, agendaTitle) {
+    const target = (LIVE_SCHEDULES || []).find(s => s.id_jadwal === idJadwal || s.agenda === agendaTitle);
+    if (target && isSchedulePast(target)) {
+      closeTrainingDetailModal();
+      switchPageTab('pendaftaran');
+      showToast('info', 'Jadwal Sudah Terlewat', `Pelatihan "${target.agenda}" telah lewat tanggalnya. Anda dialihkan ke formulir Request di Luar Jadwal.`);
+      setCustomTrainingMode(true, target.agenda);
+      return;
+    }
+
     if (typeof setCustomTrainingMode === 'function') {
       setCustomTrainingMode(false);
     }
-    const target = (LIVE_SCHEDULES || []).find(s => s.id_jadwal === idJadwal || s.agenda === agendaTitle);
     const sisa = target ? Number(target.sisa_kuota) : NaN;
     const isFull = target ? ((!isNaN(sisa) && sisa <= 0) || /penuh/i.test(target.status)) : false;
 
@@ -2762,16 +2774,27 @@
     if (select) {
       let foundIdx = -1;
       for (let i = 0; i < select.options.length; i++) {
-        if (select.options[i].getAttribute('data-id') === idJadwal || select.options[i].value === agendaTitle) {
+        if (select.options[i].getAttribute('data-id') === idJadwal) {
           foundIdx = i;
           break;
         }
       }
+      if (foundIdx === -1 && agendaTitle) {
+        for (let i = 0; i < select.options.length; i++) {
+          if (select.options[i].value === agendaTitle) {
+            foundIdx = i;
+            break;
+          }
+        }
+      }
       if (foundIdx !== -1) {
         select.selectedIndex = foundIdx;
-        select.value = select.options[foundIdx].value;
+        window.currentSelectedScheduleId = select.options[foundIdx].getAttribute('data-id') || idJadwal;
+      } else {
+        window.currentSelectedScheduleId = idJadwal;
       }
       updateTrainingInfo();
+      if (typeof updateProgramComboboxTrigger === 'function') updateProgramComboboxTrigger();
     }
 
     // Scroll halus ke tabel pendaftaran
@@ -3036,13 +3059,17 @@
       if (monthItems.length > 0) {
         modulePillHtml = `
           <div class="flex flex-col gap-1 mt-1">
-            ${monthItems.slice(0, 2).map(it => `
-              <div onclick="event.stopPropagation(); openTrainingDetailModal(${jsArg(it.id_jadwal)})" class="px-2 py-1 rounded bg-surface-container text-[11px] font-medium text-on-surface truncate flex items-center gap-1.5 hover:bg-primary-fixed hover:text-primary transition-colors cursor-pointer" title="${escapeHtml(it.agenda)}">
-                <span class="w-1.5 h-1.5 rounded-full bg-primary shrink-0"></span>
-                ${it.start_hour ? `<span class="font-mono text-[9px] font-bold text-primary shrink-0">[${escapeHtml(it.start_hour)}]</span>` : ''}
+            ${monthItems.slice(0, 2).map(it => {
+              const itPast = isSchedulePast(it);
+              return `
+              <div onclick="event.stopPropagation(); openTrainingDetailModal(${jsArg(it.id_jadwal)})" class="px-2 py-1 rounded bg-surface-container text-[11px] font-medium ${itPast ? 'opacity-50 text-outline' : 'text-on-surface'} truncate flex items-center gap-1.5 hover:bg-primary-fixed hover:text-primary transition-colors cursor-pointer" title="${escapeHtml(it.agenda)} ${itPast ? '(Selesai)' : ''}">
+                <span class="w-1.5 h-1.5 rounded-full ${itPast ? 'bg-outline' : 'bg-primary'} shrink-0"></span>
+                ${it.start_hour ? `<span class="font-mono text-[9px] font-bold ${itPast ? 'text-outline' : 'text-primary'} shrink-0">[${escapeHtml(it.start_hour)}]</span>` : ''}
                 <span class="truncate">${escapeHtml(it.agenda)}</span>
+                ${itPast ? '<span class="text-[9px] text-outline ml-auto shrink-0 font-normal">(Selesai)</span>' : ''}
               </div>
-            `).join('')}
+              `;
+            }).join('')}
             ${monthItems.length > 2 ? `<span class="text-[10px] text-primary font-semibold pl-1">+${monthItems.length - 2} modul lainnya</span>` : ''}
           </div>
         `;
@@ -3144,25 +3171,33 @@
     }
 
     // 2. Sel hari bulan yang aktif
+    const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+
     for (let d = 1; d <= daysInMonth; d++) {
+      const cellDate = new Date(year, month, d).getTime();
       const isToday = (isCurrentMonthReal && d === todayDate);
+      const isPastDay = cellDate < todayMidnight;
       const dayOfWeek = (firstDayIndex + d - 1) % 7;
       const isWeekend = (dayOfWeek === 5 || dayOfWeek === 6);
 
       const cellClass = isToday
         ? 'min-h-[72px] sm:min-h-[105px] p-1.5 sm:p-2.5 flex flex-col justify-between bg-primary/[0.04] ring-2 ring-primary ring-inset rounded-lg'
-        : `min-h-[72px] sm:min-h-[105px] p-1.5 sm:p-2.5 flex flex-col justify-between ${isWeekend ? 'bg-surface-container-low/25' : ''} hover:bg-surface-container-low/40 transition-colors`;
+        : isPastDay
+          ? `min-h-[72px] sm:min-h-[105px] p-1.5 sm:p-2.5 flex flex-col justify-between bg-surface-container-low/35 opacity-70 hover:opacity-100 hover:bg-surface-container-low/60 transition-all ${isWeekend ? 'bg-surface-container-low/45' : ''}`
+          : `min-h-[72px] sm:min-h-[105px] p-1.5 sm:p-2.5 flex flex-col justify-between ${isWeekend ? 'bg-surface-container-low/25' : ''} hover:bg-surface-container-low/40 transition-colors`;
 
       const numClass = isToday
         ? 'font-title-sm text-title-sm text-primary font-extrabold'
-        : `font-title-sm text-title-sm ${isWeekend ? 'text-on-surface-variant font-semibold' : 'text-on-surface font-bold'}`;
+        : isPastDay
+          ? 'font-title-sm text-title-sm text-outline/70 font-medium'
+          : `font-title-sm text-title-sm ${isWeekend ? 'text-on-surface-variant font-semibold' : 'text-on-surface font-bold'}`;
 
       const todayBadge = isToday
         ? `<span class="text-[9px] sm:text-[10px] bg-primary text-on-primary px-1 sm:px-1.5 py-0.2 rounded font-semibold">Hari Ini</span>`
         : '';
 
       html += `
-        <div class="${cellClass}">
+        <div class="${cellClass}" data-date="${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}" ${isPastDay ? 'data-past="true"' : ''}>
           <div class="flex items-center justify-between">
             <span class="${numClass}">${d}</span>
             ${todayBadge}
@@ -3215,12 +3250,22 @@
       if (status === 'open') {
         const sisa = parseInt(item.sisa_kuota, 10);
         if (!isNaN(sisa) && sisa <= 0) return false;
+        if (isSchedulePast(item)) return false;
       } else if (status === 'almost') {
         const sisa = parseInt(item.sisa_kuota, 10);
         if (isNaN(sisa) || sisa > 5 || sisa <= 0) return false;
+        if (isSchedulePast(item)) return false;
       } else if (status === 'full') {
         const sisa = parseInt(item.sisa_kuota, 10);
         if (!isNaN(sisa) && sisa > 0) return false;
+        if (isSchedulePast(item)) return false;
+      } else if (status === 'running') {
+        const r = itemRange(item);
+        if (!r) return false;
+        const nowMs = new Date().getTime();
+        if (nowMs < r[0].getTime() || nowMs > (r[1].getTime() + 864e5)) return false;
+      } else if (status === 'past') {
+        if (!isSchedulePast(item)) return false;
       }
 
       return true;
@@ -3441,10 +3486,11 @@
           syncLabel.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Database Sistem: Terhubung (${timeStr} WIB • ${LIVE_SCHEDULES.length} Pelatihan Aktif)`;
         }
 
-        // 3. Populate Dropdown Pendaftaran
+        // 3. Populate Dropdown Pendaftaran (Hanya jadwal aktif yang belum terlewat)
         if (select) {
           select.innerHTML = '';
-          fetchedJadwalList.forEach((item, idx) => {
+          const activeSchedules = fetchedJadwalList.filter(item => !isSchedulePast(item));
+          activeSchedules.forEach((item, idx) => {
             const opt = document.createElement('option');
             opt.value = item.agenda;
             opt.setAttribute('data-id', item.id_jadwal);
@@ -3461,6 +3507,12 @@
           if (select.options.length > 0) {
             select.selectedIndex = 0;
             select.value = select.options[0].value;
+            window.currentSelectedScheduleId = select.options[0].getAttribute('data-id') || null;
+          } else {
+            const opt = document.createElement('option');
+            opt.value = '';
+            opt.textContent = 'Tidak ada jadwal pelatihan aktif mendatang (Ajukan Request di Luar Jadwal)';
+            select.appendChild(opt);
           }
           updateTrainingInfo();
         }
@@ -3587,10 +3639,17 @@
       return;
     }
 
+    const selOpt = select && select.selectedOptions && select.selectedOptions[0];
+    const currentSelectedId = window.currentSelectedScheduleId || (selOpt ? selOpt.getAttribute('data-id') : null);
     const currentSelectedVal = select ? select.value : '';
     const q = (query || '').toLowerCase().trim();
 
-    let list = (Array.isArray(LIVE_SCHEDULES) && LIVE_SCHEDULES.length > 0) ? LIVE_SCHEDULES : (Array.isArray(fetchedJadwalList) ? fetchedJadwalList : []);
+    const rawList = (Array.isArray(LIVE_SCHEDULES) && LIVE_SCHEDULES.length > 0) ? LIVE_SCHEDULES : (Array.isArray(fetchedJadwalList) ? fetchedJadwalList : []);
+    
+    // Jangan tampilkan pelatihan yang tanggalnya sudah terlewat
+    const activeUpcomingList = rawList.filter(item => !isSchedulePast(item));
+    let list = activeUpcomingList;
+
     if (q) {
       list = list.filter(item => {
         const agenda = String(item.agenda || '').toLowerCase();
@@ -3603,18 +3662,17 @@
       });
     }
 
-    const totalAll = (LIVE_SCHEDULES && LIVE_SCHEDULES.length) || (fetchedJadwalList && fetchedJadwalList.length) || 0;
     if (countLabel) {
-      countLabel.textContent = `Menampilkan ${list.length} dari ${totalAll} jadwal`;
+      countLabel.textContent = `Menampilkan ${list.length} dari ${activeUpcomingList.length} jadwal aktif`;
     }
 
     if (list.length === 0) {
       listContainer.innerHTML = `
-        <div class="p-6 text-center text-outline flex flex-col items-center gap-2 select-none">
-          <span class="material-symbols-outlined text-[28px] opacity-40">search_off</span>
-          <span class="font-medium text-body-sm text-on-surface-variant">Tidak ada pelatihan yang cocok</span>
-          <span class="text-[11px] text-outline">Modul atau tanggal yang dicari tidak tersedia di jadwal resmi?</span>
-          <button type="button" onclick="setCustomTrainingMode(true, ${jsArg(query)}); toggleProgramCombobox(false);" class="mt-1 px-3.5 py-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary font-label-xs text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer">
+        <div class="col-span-full p-8 text-center text-outline flex flex-col items-center gap-2 select-none">
+          <span class="material-symbols-outlined text-[32px] opacity-40">event_busy</span>
+          <span class="font-medium text-body-sm text-on-surface-variant">${q ? 'Tidak ada pelatihan yang cocok' : 'Tidak ada jadwal pelatihan aktif mendatang'}</span>
+          <span class="text-[11px] text-outline">${q ? 'Modul atau tanggal yang dicari tidak tersedia di jadwal aktif mendatang.' : 'Semua tanggal di jadwal resmi telah terlewat.'}</span>
+          <button type="button" onclick="setCustomTrainingMode(true, ${jsArg(query)}); toggleProgramCombobox(false);" class="mt-1 px-4 py-2 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary font-label-xs text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer">
             <span class="material-symbols-outlined text-[16px]">edit_calendar</span>
             Ajukan Request di Luar Jadwal
           </button>
@@ -3626,29 +3684,40 @@
     listContainer.innerHTML = list.map(item => {
       const sisa = Number(item.sisa_kuota);
       const isFull = (!isNaN(sisa) && sisa <= 0) || /penuh/i.test(item.status);
-      const isSelected = item.agenda === currentSelectedVal;
+      
+      // PERBAIKAN: Identifikasi unik menggunakan id_jadwal agar jika ada modul dengan judul sama di batch/tanggal berbeda,
+      // hanya satu jadwal spesifik yang bertanda Terpilih (tidak double select)
+      const isSelected = currentSelectedId
+        ? (item.id_jadwal === currentSelectedId)
+        : (item.agenda === currentSelectedVal);
+
       const dateStr = formatSmartDateRange(item.start, item.end);
       const timeStr = item.start_hour ? `Pukul ${item.start_hour} WIB` : '';
-      const batchBadge = item.batch ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-surface-container text-on-surface-variant border border-outline-variant/40">${escapeHtml(item.batch)}</span>` : '';
+      const batchBadge = item.batch ? `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-surface-container text-on-surface-variant border border-outline-variant/40 shrink-0">${escapeHtml(item.batch)}</span>` : '';
       const kuotaBadge = isFull
         ? `<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Kuota Penuh (Verifikasi L&amp;D)</span>`
         : `<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full"><span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> Sisa ${item.sisa_kuota || 0} Kursi</span>`;
 
       return `
-        <button type="button" onclick="selectComboboxProgram('${escapeHtml(item.id_jadwal || item.agenda)}')" class="w-full p-3 text-left hover:bg-surface-container-low transition-colors flex items-start justify-between gap-3 group cursor-pointer border-b border-outline-variant/20 last:border-b-0 ${isSelected ? 'bg-primary/5 ring-1 ring-inset ring-primary/40' : ''}">
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-semibold text-body-sm ${isSelected ? 'text-primary' : 'text-on-surface'} group-hover:text-primary transition-colors">${escapeHtml(item.agenda)}</span>
-              ${batchBadge}
-              ${kuotaBadge}
+        <button type="button" onclick="selectComboboxProgram(${jsArg(item.id_jadwal || item.agenda)})" class="w-full p-3 sm:p-3.5 rounded-xl border text-left transition-all flex flex-col justify-between gap-2.5 group cursor-pointer ${isSelected ? 'bg-primary/5 border-primary ring-2 ring-primary/25 shadow-xs' : 'bg-surface-container-lowest border-outline-variant/50 hover:bg-surface-container-low hover:border-primary/50 shadow-xs'}">
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="font-bold text-body-sm ${isSelected ? 'text-primary' : 'text-on-surface'} group-hover:text-primary transition-colors leading-snug">${escapeHtml(item.agenda)}</span>
+                ${batchBadge}
+              </div>
+              <div class="mt-1.5 flex items-center gap-x-2.5 gap-y-1 text-[11px] text-on-surface-variant flex-wrap">
+                <span class="inline-flex items-center gap-1 text-on-surface font-medium"><span class="material-symbols-outlined text-[14px] text-primary">calendar_today</span> ${dateStr}</span>
+                ${timeStr ? `<span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-outline">schedule</span> ${timeStr}</span>` : ''}
+                <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-outline">meeting_room</span> ${escapeHtml(item.room || '-')}</span>
+              </div>
             </div>
-            <div class="mt-1 flex items-center gap-3 text-[11px] text-on-surface-variant flex-wrap">
-              <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-outline">calendar_today</span> ${dateStr}</span>
-              ${timeStr ? `<span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-outline">schedule</span> ${timeStr}</span>` : ''}
-              <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-outline">meeting_room</span> ${escapeHtml(item.room || '-')}</span>
-            </div>
+            <span class="material-symbols-outlined ${isSelected ? 'text-primary font-bold' : 'text-outline/40 group-hover:text-primary'} text-[22px] shrink-0 mt-0.5 transition-colors">${isSelected ? 'check_circle' : 'radio_button_unchecked'}</span>
           </div>
-          <span class="material-symbols-outlined ${isSelected ? 'text-primary font-bold' : 'text-outline/40 group-hover:text-primary'} text-[20px] shrink-0 mt-0.5 transition-colors">${isSelected ? 'check_circle' : 'chevron_right'}</span>
+          <div class="pt-2 border-t border-outline-variant/30 flex items-center justify-between gap-2">
+            ${kuotaBadge}
+            <span class="text-[11px] font-semibold shrink-0 ${isSelected ? 'text-primary' : 'text-outline group-hover:text-primary'} transition-colors">${isSelected ? 'Terpilih \u2713' : 'Pilih \u2192'}</span>
+          </div>
         </button>
       `;
     }).join('');
@@ -3662,20 +3731,33 @@
     const item = (list || []).find(s => s.id_jadwal === idJadwal || s.agenda === idJadwal);
     if (!item) return;
 
+    window.currentSelectedScheduleId = item.id_jadwal;
+
     const select = document.getElementById('trainingProgramSelect');
     if (select) {
-      let opt = Array.from(select.options).find(o => o.getAttribute('data-id') === item.id_jadwal || o.value === item.agenda);
+      let opt = Array.from(select.options).find(o => o.getAttribute('data-id') === item.id_jadwal);
+      if (!opt) {
+        opt = Array.from(select.options).find(o => o.value === item.agenda && o.getAttribute('data-date') === item.start);
+      }
+      if (!opt) {
+        opt = Array.from(select.options).find(o => o.value === item.agenda);
+      }
       if (!opt) {
         opt = document.createElement('option');
         opt.value = item.agenda;
         opt.setAttribute('data-id', item.id_jadwal);
+        opt.setAttribute('data-date', item.start || '');
         opt.textContent = item.agenda;
         select.appendChild(opt);
       }
-      select.value = item.agenda;
+      const optIdx = Array.from(select.options).indexOf(opt);
+      if (optIdx !== -1) {
+        select.selectedIndex = optIdx;
+      }
       updateTrainingInfo();
     }
     toggleProgramCombobox(false);
+    updateProgramComboboxTrigger();
 
     const sisa = Number(item.sisa_kuota);
     const isFull = (!isNaN(sisa) && sisa <= 0) || /penuh/i.test(item.status);
@@ -3701,7 +3783,7 @@
     }
 
     const opt = select.selectedOptions && select.selectedOptions[0];
-    const selId = opt ? opt.getAttribute('data-id') : null;
+    const selId = window.currentSelectedScheduleId || (opt ? opt.getAttribute('data-id') : null);
     const list = (Array.isArray(LIVE_SCHEDULES) && LIVE_SCHEDULES.length > 0) ? LIVE_SCHEDULES : fetchedJadwalList;
     const match = (selId ? (list || []).find(s => s.id_jadwal === selId) : null) || (list || []).find(s => s.agenda === val);
 
@@ -3979,8 +4061,10 @@
   function generateRegNumber() {
     const today = new Date();
     const y = today.getFullYear();
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const d = String(today.getDate()).padStart(2, '0');
     const rand = Math.floor(1000 + Math.random() * 9000);
-    const regNo = `REG-${y}-${rand}`;
+    const regNo = `REG-${y}${m}${d}-${rand}`;
 
     const regInput = document.getElementById('regRefNo');
     const regDisplay = document.getElementById('regRefNoDisplay');
@@ -4000,6 +4084,9 @@
 
   function setCustomTrainingMode(isCustom, initialName = '') {
     isCustomTrainingModeActive = !!isCustom;
+    if (isCustomTrainingModeActive) {
+      window.currentSelectedScheduleId = null;
+    }
 
     const tabResmi = document.getElementById('tabModeJadwalResmi');
     const tabKhusus = document.getElementById('tabModeRequestKhusus');
@@ -4210,6 +4297,9 @@
 
     const selectedOpt = select.selectedOptions && select.selectedOptions[0];
     const selectedId = selectedOpt ? selectedOpt.getAttribute('data-id') : null;
+    if (selectedId) {
+      window.currentSelectedScheduleId = selectedId;
+    }
     const match = (selectedId ? fetchedJadwalList.find(j => j.id_jadwal === selectedId) : null) || fetchedJadwalList.find(j => j.agenda === val);
     if (match) {
       if (match.room && venueInput) venueInput.value = match.room;
@@ -4357,7 +4447,7 @@
     }
     const hintEl = document.getElementById('uploadedDocHint');
     if (hintEl) {
-      hintEl.textContent = 'Khusus Format PDF (Maksimal 2 MB)';
+      hintEl.textContent = 'Opsional • Format PDF (Maksimal 2 MB)';
       hintEl.className = 'font-label-sm text-label-sm text-on-surface-variant';
     }
     const btnText = document.getElementById('btnUploadText');
@@ -4385,7 +4475,10 @@
     }
 
     const select = document.getElementById('trainingProgramSelect');
-    if (select) select.selectedIndex = 0;
+    if (select) {
+      select.selectedIndex = 0;
+      window.currentSelectedScheduleId = select.options[0] ? select.options[0].getAttribute('data-id') : null;
+    }
 
     const startDateInput = document.getElementById('startDateInput');
     if (startDateInput) startDateInput.value = '';
@@ -4779,17 +4872,30 @@
       const terisi = Math.max(0, kuota - sisa);
       const pct = Math.min(100, Math.round((terisi / (kuota || 1)) * 100));
 
+      const isPast = isSchedulePast(item);
       const isFull = sisa <= 0;
-      const statusText = isFull ? 'Kuota Penuh (Verifikasi L&amp;D)' : (item.status || 'Buka Pendaftaran');
-      const statusBg = isFull ? 'bg-amber-50 text-amber-800' : 'bg-emerald-50 text-emerald-800';
-      const statusIcon = isFull ? 'info' : 'check_circle';
+      let statusText = isFull ? 'Kuota Penuh (Verifikasi L&amp;D)' : (item.status || 'Buka Pendaftaran');
+      let statusBg = isFull ? 'bg-amber-50 text-amber-800' : 'bg-emerald-50 text-emerald-800';
+      let statusIcon = isFull ? 'info' : 'check_circle';
+
+      if (isPast) {
+        statusText = 'Selesai Pelaksanaan';
+        statusBg = 'bg-slate-100 text-slate-700';
+        statusIcon = 'task_alt';
+      }
+
+      const cardContainerClass = isPast
+        ? 'p-4 sm:p-6 bg-surface-container-low/30 rounded-2xl shadow-none border border-outline-variant/30 opacity-75 hover:opacity-100 transition-all flex flex-col gap-4 relative overflow-hidden group'
+        : 'p-4 sm:p-6 bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/40 hover:shadow-md transition-shadow flex flex-col gap-4 relative overflow-hidden group';
+
+      const barColorClass = isPast ? 'bg-slate-400' : 'bg-primary';
 
       return `
-      <div class="p-4 sm:p-6 bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/40 hover:shadow-md transition-shadow flex flex-col gap-4 relative overflow-hidden group">
-        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary"></div>
+      <div class="${cardContainerClass}">
+        <div class="absolute left-0 top-0 bottom-0 w-1.5 ${barColorClass}"></div>
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
-            <span class="px-2.5 py-1 rounded-md bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm font-bold">${escapeHtml(item.batch || item.id_jadwal)}</span>
+            <span class="px-2.5 py-1 rounded-md ${isPast ? 'bg-surface-container-high text-on-surface-variant' : 'bg-primary-fixed text-on-primary-fixed'} font-label-sm text-label-sm font-bold">${escapeHtml(item.batch || item.id_jadwal)}</span>
             <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full ${statusBg} font-label-sm text-label-sm font-semibold">
               <span class="material-symbols-outlined text-[14px]">${statusIcon}</span>
               ${statusText}
@@ -4800,17 +4906,17 @@
             </span>
           </div>
           <div class="flex items-center gap-1.5 text-on-surface-variant font-label-md text-label-md">
-            <span class="material-symbols-outlined text-[18px] text-primary">pin_drop</span>
+            <span class="material-symbols-outlined text-[18px] ${isPast ? 'text-outline' : 'text-primary'}">pin_drop</span>
             <span>${escapeHtml(item.room || 'Ruang Diklat Utama')}</span>
           </div>
         </div>
         <div class="flex flex-col md:flex-row gap-4 items-start justify-between">
           <div class="flex gap-3 sm:gap-4 w-full">
-            <div class="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-xl bg-primary text-on-primary flex items-center justify-center shrink-0 shadow-xs">
+            <div class="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-xl ${isPast ? 'bg-slate-600' : 'bg-primary'} text-on-primary flex items-center justify-center shrink-0 shadow-xs">
               <span class="material-symbols-outlined text-[26px] sm:text-[32px] md:text-[36px]">school</span>
             </div>
             <div class="flex flex-col gap-1 min-w-0 flex-1">
-              <span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-bold">Program L&amp;D Pani Gold Project</span>
+              <span class="font-label-sm text-label-sm uppercase tracking-wider ${isPast ? 'text-outline' : 'text-primary'} font-bold">Program L&amp;D Pani Gold Project</span>
               <h3 onclick="openTrainingDetailModal(${jsArg(item.id_jadwal)})" class="font-headline-sm text-headline-sm text-on-surface font-semibold group-hover:text-primary transition-colors cursor-pointer break-words">
                 ${escapeHtml(item.agenda)}
               </h3>
@@ -4820,7 +4926,7 @@
                   <span class="material-symbols-outlined text-[16px] text-outline">date_range</span> ${escapeHtml(formatSmartDateRange(item.start, item.end))}
                 </span>
                 ${item.start_hour ? `
-                <span class="flex items-center gap-1 text-primary font-semibold">
+                <span class="flex items-center gap-1 ${isPast ? 'text-on-surface-variant' : 'text-primary'} font-semibold">
                   <span class="material-symbols-outlined text-[16px]">schedule</span> Pukul ${escapeHtml(item.start_hour)} WIB
                 </span>` : ''}
                 <span class="flex items-center gap-1">
@@ -4835,7 +4941,7 @@
         </div>
         <div class="p-3.5 rounded-xl bg-surface-container-low flex flex-col md:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-3 w-full md:w-auto">
-            <div class="w-9 h-9 rounded-full bg-primary-fixed text-primary flex items-center justify-center font-title-sm text-title-sm font-bold">
+            <div class="w-9 h-9 rounded-full ${isPast ? 'bg-surface-container-high text-on-surface-variant' : 'bg-primary-fixed text-primary'} flex items-center justify-center font-title-sm text-title-sm font-bold">
               ${escapeHtml(getInitials(item.pic || 'Trainer'))}
             </div>
             <div class="flex flex-col">
@@ -4849,10 +4955,10 @@
               <span class="font-bold text-on-surface">${terisi} <span class="text-on-surface-variant font-normal">/ ${kuota} Terisi (${pct}%)</span></span>
             </div>
             <div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
-              <div class="h-full bg-primary rounded-full" style="width: ${pct}%"></div>
+              <div class="h-full ${isPast ? 'bg-slate-400' : 'bg-primary'} rounded-full" style="width: ${pct}%"></div>
             </div>
-            <span class="text-right font-label-sm text-label-sm ${sisa > 0 ? 'text-primary' : 'text-error'} font-semibold">
-              ${sisa > 0 ? `Sisa ${sisa} Kursi Tersedia` : 'Pendaftaran Penuh'}
+            <span class="text-right font-label-sm text-label-sm ${isPast ? 'text-slate-600' : sisa > 0 ? 'text-primary' : 'text-error'} font-semibold">
+              ${isPast ? 'Pelatihan Selesai' : sisa > 0 ? `Sisa ${sisa} Kursi Tersedia` : 'Pendaftaran Penuh'}
             </span>
           </div>
         </div>
@@ -4863,9 +4969,14 @@
           </span>
           <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto">
             <button type="button" onclick="openTrainingDetailModal(${jsArg(item.id_jadwal)})" class="flex-1 sm:flex-none h-10 sm:h-9 px-4 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md transition-colors justify-center flex items-center cursor-pointer">
-              Lihat Detail &amp; Silabus
+              ${isPast ? 'Lihat Dokumentasi &amp; Silabus' : 'Lihat Detail &amp; Silabus'}
             </button>
-            ${isFull ? `
+            ${isPast ? `
+            <button type="button" onclick="openTrainingDetailModal(${jsArg(item.id_jadwal)})" class="flex-1 sm:flex-none h-10 sm:h-9 px-5 rounded-xl bg-surface-container-highest hover:bg-surface-container text-on-surface-variant font-label-md text-label-md shadow-xs transition-all flex items-center justify-center gap-1.5 font-semibold cursor-pointer">
+              <span class="material-symbols-outlined text-[16px]">task_alt</span>
+              Pelatihan Selesai
+            </button>
+            ` : isFull ? `
             <button type="button" onclick="selectScheduleAndRegister(${jsArg(item.id_jadwal)}, ${jsArg(item.agenda)})" class="flex-1 sm:flex-none h-10 sm:h-9 px-5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-label-md text-label-md shadow-sm transition-all flex items-center justify-center gap-1.5 font-semibold cursor-pointer" title="Kuota penuh - tetap dapat mendaftar (diverifikasi Tim L&amp;D)">
               <span class="material-symbols-outlined text-[16px]">how_to_reg</span>
               + Daftar (Verifikasi L&amp;D)
@@ -4972,6 +5083,18 @@
     }
     return [a, b];
   }
+
+  function isSchedulePast(item) {
+    if (!item) return false;
+    if (/tutup|selesai|closed|batal/i.test(item.status || '')) return true;
+    const r = itemRange(item);
+    if (!r || !r[1]) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    // Jadwal dianggap terlewat jika tanggal selesainya lebih awal dari hari ini
+    return r[1].getTime() < today.getTime();
+  }
+  window.isSchedulePast = isSchedulePast;
 
   /**
    * Mengurai jam mulai pelatihan (Start Hour) ke dalam format HH:MM dan menit total.
@@ -5129,15 +5252,26 @@
         const minB = b.it.start_minutes != null ? b.it.start_minutes : 9999;
         return minA - minB;
       });
+      const today = new Date();
+      const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+
       const heads = DAY.map((n, i) => {
         const d = new Date(ws.getFullYear(), ws.getMonth(), ws.getDate() + i);
-        return `<div class="text-center text-[11px] ${i > 4 ? 'text-outline' : 'text-on-surface-variant'} ${d.getMonth() !== m ? 'opacity-50' : ''}"><span class="font-semibold">${n}</span> ${d.getDate()}</div>`;
+        const isPastHead = d.getTime() < todayMidnight;
+        return `<div class="text-center text-[11px] ${isPastHead ? 'text-outline/70 opacity-70' : (i > 4 ? 'text-outline' : 'text-on-surface-variant')} ${d.getMonth() !== m ? 'opacity-40' : ''}"><span class="font-semibold">${n}</span> ${d.getDate()}</div>`;
       }).join('');
       const bars = inWeek.map(x => {
         const a = Math.max(0, Math.round((x.r[0] - ws) / 864e5)), b = Math.min(6, Math.round((x.r[1] - ws) / 864e5));
         const sisa = Number(x.it.sisa_kuota);
         const timeStr = x.it.start_hour ? `${escapeHtml(x.it.start_hour)} \u2022 ` : '';
-        return `<button type="button" onclick="openTrainingDetailModal(${jsArg(x.it.id_jadwal)})" style="grid-column:${a + 1} / ${b + 2}" class="${colorFor(x.it.agenda)} rounded-lg px-2.5 py-1.5 text-left text-[12px] leading-tight shadow-xs hover:opacity-90 transition-opacity min-w-0"><span class="block font-bold truncate">${escapeHtml(x.it.agenda)}</span><span class="block text-[10px] opacity-90 truncate">${timeStr}${escapeHtml(x.it.room || '')} &bull; ${!isNaN(sisa) && sisa <= 0 ? 'Penuh' : 'Sisa ' + (isNaN(sisa) ? '-' : sisa) + ' kursi'}</span></button>`;
+        const isPast = isSchedulePast(x.it) || (x.r && x.r[1] && x.r[1].getTime() < todayMidnight);
+        const barStyle = isPast
+          ? `${colorFor(x.it.agenda)} opacity-40 hover:opacity-95 filter grayscale-[55%] hover:grayscale-0 shadow-none border border-black/10`
+          : `${colorFor(x.it.agenda)} shadow-xs hover:opacity-90`;
+        const subLabel = isPast
+          ? `${timeStr}Selesai \u2022 ${escapeHtml(x.it.room || '')}`
+          : `${timeStr}${escapeHtml(x.it.room || '')} &bull; ${!isNaN(sisa) && sisa <= 0 ? 'Penuh' : 'Sisa ' + (isNaN(sisa) ? '-' : sisa) + ' kursi'}`;
+        return `<button type="button" onclick="openTrainingDetailModal(${jsArg(x.it.id_jadwal)})" style="grid-column:${a + 1} / ${b + 2}" class="${barStyle} rounded-lg px-2.5 py-1.5 text-left text-[12px] leading-tight transition-all min-w-0 cursor-pointer"><span class="block font-bold truncate">${escapeHtml(x.it.agenda)}</span><span class="block text-[10px] opacity-90 truncate">${subLabel}</span></button>`;
       }).join('');
       html += `<div class="min-w-[640px]"><div class="text-label-md font-semibold text-on-surface mb-2">${short(ws)} - ${short(we)}</div><div class="grid grid-cols-7 gap-1 pb-1 border-b border-surface-container">${heads}</div><div class="grid grid-cols-7 gap-1 pt-2">${bars || '<div class="col-span-7 text-center text-[12px] text-outline py-2">Tidak ada sesi</div>'}</div></div>`;
     }
@@ -5150,6 +5284,8 @@
     if (month === undefined) month = currentCalendarMonth;
     document.querySelectorAll('.day-events-container').forEach(c => { c.innerHTML = ''; });
     const monthStart = new Date(year, month, 1), monthEnd = new Date(year, month + 1, 0);
+    const today = new Date();
+    const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
     let count = 0;
 
     // Kumpulkan seluruh pelatihan per hari
@@ -5172,6 +5308,9 @@
       const c = document.querySelector(`[data-day-container="${d}"]`);
       if (!c) return;
 
+      const cellDate = new Date(year, month, d).getTime();
+      const isPastDay = cellDate < todayMidnight;
+
       dayMap[d].sort((a, b) => {
         const minA = a.item.start_minutes != null ? a.item.start_minutes : 9999;
         const minB = b.item.start_minutes != null ? b.item.start_minutes : 9999;
@@ -5180,18 +5319,32 @@
       });
 
       dayMap[d].forEach(({ item, isStart }) => {
+        const isPast = isPastDay || isSchedulePast(item);
         const badge = document.createElement('div');
         badge.setAttribute('data-schedule-id', item.id_jadwal);
-        badge.className = `mt-0.5 sm:mt-1 p-1 sm:p-1.5 rounded-md sm:rounded-lg ${colorFor(item.agenda)} text-[10px] sm:text-[11px] leading-tight shadow-xs cursor-pointer hover:opacity-90 hover:scale-[1.01] transition-all`;
+
+        if (isPast) {
+          badge.className = `mt-0.5 sm:mt-1 p-1 sm:p-1.5 rounded-md sm:rounded-lg ${colorFor(item.agenda)} opacity-40 hover:opacity-95 filter grayscale-[55%] hover:grayscale-0 text-[10px] sm:text-[11px] leading-tight cursor-pointer transition-all border border-black/10`;
+          badge.title = `${item.agenda} (Selesai) - Klik untuk melihat detail & dokumentasi`;
+        } else {
+          badge.className = `mt-0.5 sm:mt-1 p-1 sm:p-1.5 rounded-md sm:rounded-lg ${colorFor(item.agenda)} text-[10px] sm:text-[11px] leading-tight shadow-xs cursor-pointer hover:opacity-90 hover:scale-[1.01] transition-all`;
+          badge.title = `${item.agenda} - Klik untuk mendaftar atau melihat detail`;
+        }
         badge.onclick = () => openTrainingDetailModal(item.id_jadwal);
 
         const timePill = item.start_hour
-          ? `<span class="inline-block px-1 py-0.2 rounded bg-black/20 text-[8.5px] sm:text-[9px] font-mono font-bold mr-1 shrink-0">${escapeHtml(item.start_hour)}</span>`
+          ? `<span class="inline-block px-1 py-0.2 rounded ${isPast ? 'bg-black/30 text-white/80' : 'bg-black/20'} text-[8.5px] sm:text-[9px] font-mono font-bold mr-1 shrink-0">${escapeHtml(item.start_hour)}</span>`
           : '';
 
-        badge.innerHTML = isStart
-          ? `<div class="font-bold truncate flex items-center">${timePill}<span class="truncate">${escapeHtml(item.agenda)}</span></div><div class="text-[9.5px] sm:text-[10px] opacity-90 truncate">${escapeHtml(item.batch || 'Batch')} &bull; Sisa ${item.sisa_kuota || 0} Kursi</div>`
-          : `<div class="font-semibold truncate opacity-90 flex items-center">${timePill}<span class="truncate">&#8627; ${escapeHtml(item.agenda)}</span></div>`;
+        if (isPast) {
+          badge.innerHTML = isStart
+            ? `<div class="font-bold truncate flex items-center">${timePill}<span class="truncate">${escapeHtml(item.agenda)}</span></div><div class="text-[9px] sm:text-[9.5px] opacity-85 truncate flex items-center gap-1 mt-0.5"><span class="inline-block w-1.5 h-1.5 rounded-full bg-white/70"></span> Selesai &bull; ${escapeHtml(item.batch || 'Batch')}</div>`
+            : `<div class="font-semibold truncate opacity-85 flex items-center">${timePill}<span class="truncate">&#8627; ${escapeHtml(item.agenda)} <span class="text-[9px] font-normal opacity-75">(Selesai)</span></span></div>`;
+        } else {
+          badge.innerHTML = isStart
+            ? `<div class="font-bold truncate flex items-center">${timePill}<span class="truncate">${escapeHtml(item.agenda)}</span></div><div class="text-[9.5px] sm:text-[10px] opacity-90 truncate">${escapeHtml(item.batch || 'Batch')} &bull; Sisa ${item.sisa_kuota || 0} Kursi</div>`
+            : `<div class="font-semibold truncate opacity-90 flex items-center">${timePill}<span class="truncate">&#8627; ${escapeHtml(item.agenda)}</span></div>`;
+        }
         c.appendChild(badge);
       });
     });
@@ -5325,6 +5478,7 @@
     // Hitung peserta terdaftar riil tanpa dibatasi kuota (misal pendaftar 96 dari kuota 50)
     const terdaftarCount = list.length || Number(item.total_terdaftar) || Math.max(0, kuota - sisa);
     const pct = Math.min(100, Math.round((terdaftarCount / (kuota || 1)) * 100));
+    const isPast = isSchedulePast(item);
     const isFull = (sisa <= 0) || (terdaftarCount >= kuota) || /penuh/i.test(item.status);
 
     const titleEl = document.getElementById('modal-training-title');
@@ -5335,8 +5489,13 @@
 
     const statusEl = document.getElementById('modal-status-badge');
     if (statusEl) {
-      statusEl.className = 'inline-flex items-center gap-1.5 font-semibold ' + (isFull ? 'text-amber-700' : 'text-emerald-700');
-      statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${isFull ? 'bg-amber-500' : 'bg-emerald-600'}"></span>${escapeHtml(isFull ? 'Kuota Penuh (Verifikasi L&amp;D)' : (item.status || 'Buka'))}`;
+      if (isPast) {
+        statusEl.className = 'inline-flex items-center gap-1.5 font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-full';
+        statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>Selesai Pelaksanaan';
+      } else {
+        statusEl.className = 'inline-flex items-center gap-1.5 font-semibold ' + (isFull ? 'text-amber-700' : 'text-emerald-700');
+        statusEl.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${isFull ? 'bg-amber-500' : 'bg-emerald-600'}"></span>${escapeHtml(isFull ? 'Kuota Penuh (Verifikasi L&amp;D)' : (item.status || 'Buka'))}`;
+      }
     }
 
     const dateEl = document.getElementById('modal-date-display');
@@ -5368,16 +5527,33 @@
     if (terdaftarEl) terdaftarEl.innerHTML = `${terdaftarCount} <span class="text-label-md font-normal text-on-surface-variant">Peserta</span>`;
 
     const sisaEl = document.getElementById('modal-kpi-sisa');
-    if (sisaEl) sisaEl.innerHTML = `${sisa} <span class="text-label-md font-normal ${isFull ? 'text-amber-700 font-semibold' : 'text-emerald-700'}">Kursi</span>`;
+    if (sisaEl) {
+      if (isPast) {
+        sisaEl.innerHTML = `0 <span class="text-label-md font-normal text-slate-500 font-semibold">(Selesai)</span>`;
+      } else {
+        sisaEl.innerHTML = `${sisa} <span class="text-label-md font-normal ${isFull ? 'text-amber-700 font-semibold' : 'text-emerald-700'}">Kursi</span>`;
+      }
+    }
 
     const pctBadge = document.getElementById('modal-kpi-percent-badge');
     if (pctBadge) pctBadge.textContent = `${pct}% terisi`;
 
     const barTerisi = document.getElementById('modal-bar-terisi');
-    if (barTerisi) { barTerisi.style.width = `${pct}%`; barTerisi.classList.toggle('bg-amber-500', isFull); barTerisi.classList.toggle('bg-primary', !isFull); }
+    if (barTerisi) {
+      barTerisi.style.width = `${pct}%`;
+      barTerisi.classList.toggle('bg-slate-400', isPast);
+      barTerisi.classList.toggle('bg-amber-500', !isPast && isFull);
+      barTerisi.classList.toggle('bg-primary', !isPast && !isFull);
+    }
 
     const barText = document.getElementById('modal-bar-keterisian-text');
-    if (barText) barText.textContent = `${terdaftarCount} Peserta Terdaftar (Kapasitas ${kuota} Kursi • ${isFull ? 'Kuota Penuh (Verifikasi Tim L&D)' : 'Sisa ' + sisa + ' Tersedia'})`;
+    if (barText) {
+      if (isPast) {
+        barText.textContent = `${terdaftarCount} Peserta Terdaftar (Pelatihan Telah Selesai Dilaksanakan)`;
+      } else {
+        barText.textContent = `${terdaftarCount} Peserta Terdaftar (Kapasitas ${kuota} Kursi • ${isFull ? 'Kuota Penuh (Verifikasi Tim L&D)' : 'Sisa ' + sisa + ' Tersedia'})`;
+      }
+    }
 
     // Reset pencarian peserta modal & Render SEMUA peserta terdaftar (walaupun kuota penuh)
     const mSearch = document.getElementById('modal-participant-search');
@@ -5388,17 +5564,29 @@
     currentModalParticipantsList = list;
     renderModalParticipantRows(list);
 
-    // Update tombol daftarkan karyawan di dalam modal: selalu aktif walaupun kuota penuh
+    // Update tombol daftarkan karyawan di dalam modal
     const regBtn = document.getElementById('modal-btn-register');
     if (regBtn) {
       regBtn.disabled = false;
-      regBtn.className = 'w-full sm:w-auto h-10 px-5 rounded-xl bg-primary text-on-primary hover:bg-primary-container font-label-md text-label-md font-semibold inline-flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer';
-      if (isFull) {
-        regBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">how_to_reg</span><span>Daftarkan Peserta (Verifikasi L&amp;D)</span>';
+      if (isPast) {
+        regBtn.className = 'w-full sm:w-auto h-10 px-5 rounded-xl bg-surface-container-highest text-on-surface hover:bg-primary hover:text-on-primary font-label-md text-label-md font-semibold inline-flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer';
+        regBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">add_circle</span><span>Ajukan Request Jadwal Baru</span>';
+        regBtn.onclick = () => {
+          closeTrainingDetailModal();
+          switchTab('pendaftaran');
+          setCustomTrainingMode(true);
+          const customInput = document.getElementById('customTrainingAgenda');
+          if (customInput) customInput.value = item.agenda || '';
+        };
       } else {
-        regBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">how_to_reg</span><span>Daftarkan Peserta</span>';
+        regBtn.className = 'w-full sm:w-auto h-10 px-5 rounded-xl bg-primary text-on-primary hover:bg-primary-container font-label-md text-label-md font-semibold inline-flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer';
+        if (isFull) {
+          regBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">how_to_reg</span><span>Daftarkan Peserta (Verifikasi L&amp;D)</span>';
+        } else {
+          regBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">how_to_reg</span><span>Daftarkan Peserta</span>';
+        }
+        regBtn.onclick = () => selectScheduleAndRegister(item.id_jadwal, item.agenda);
       }
-      regBtn.onclick = () => selectScheduleAndRegister(item.id_jadwal, item.agenda);
     }
 
     modal.classList.remove('hidden');
