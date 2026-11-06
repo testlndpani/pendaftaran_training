@@ -3623,7 +3623,7 @@
       return;
     }
 
-    const itemsHtml = list.map(item => {
+    listContainer.innerHTML = list.map(item => {
       const sisa = Number(item.sisa_kuota);
       const isFull = (!isNaN(sisa) && sisa <= 0) || /penuh/i.test(item.status);
       const isSelected = item.agenda === currentSelectedVal;
@@ -3652,23 +3652,6 @@
         </button>
       `;
     }).join('');
-
-    const footerHtml = `
-      <div class="p-2 border-t border-outline-variant/30 bg-surface-container-low/60 shrink-0 sticky bottom-0">
-        <button type="button" onclick="setCustomTrainingMode(true, ${jsArg(query)}); toggleProgramCombobox(false);" class="w-full p-2.5 rounded-lg border border-primary/30 bg-primary/5 hover:bg-primary/10 text-primary transition-colors flex items-center justify-between text-left group cursor-pointer">
-          <div class="flex items-center gap-2 min-w-0">
-            <span class="material-symbols-outlined text-[18px] shrink-0 text-primary">add_circle</span>
-            <div class="flex flex-col min-w-0">
-              <span class="text-xs font-semibold truncate text-primary">Butuh pelatihan atau tanggal lain?</span>
-              <span class="text-[10px] text-on-surface-variant truncate">Ajukan Request di Luar Jadwal (Tulis Nama &amp; Tanggal Manual)</span>
-            </div>
-          </div>
-          <span class="material-symbols-outlined text-[16px] text-primary shrink-0 group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
-        </button>
-      </div>
-    `;
-
-    listContainer.innerHTML = itemsHtml + footerHtml;
   }
 
   function selectComboboxProgram(idJadwal) {
