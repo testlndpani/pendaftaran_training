@@ -2254,6 +2254,10 @@
         <span class="font-semibold text-right text-primary font-medium" id="modalCompany">-</span>
       </div>
       <div class="flex justify-between">
+        <span class="text-on-surface-variant">Penanggung Jawab (PIC):</span>
+        <span class="font-semibold text-right" id="modalPicInfo">-</span>
+      </div>
+      <div class="flex justify-between">
         <span class="text-on-surface-variant">Program:</span>
         <span class="font-semibold text-right" id="modalCourse">Pilih Program</span>
       </div>
@@ -3366,7 +3370,7 @@
                     perusahaan: String(getC(7)),
                     id_jadwal: idJad,
                     nama_pelatihan: namaPel,
-                    validasi: String(getC(13) || 'Tervalidasi')
+                    validasi: String(getC(13) || 'OK')
                   };
                   if (idJad) { (regsByKey[idJad] = regsByKey[idJad] || []).push(pObj); }
                   if (namaPel && namaPel !== idJad) { (regsByKey[namaPel] = regsByKey[namaPel] || []).push(pObj); }
@@ -4533,6 +4537,7 @@
     const startDate = document.getElementById('startDateInput').value;
     const endDate = document.getElementById('endDateInput').value;
     const picName = document.getElementById('picNameInput').value.trim();
+    const picPhone = (document.getElementById('picPhoneInput')?.value || '').trim();
 
     const company = getSelectedCompany();
     if (!company) {
@@ -4564,7 +4569,15 @@
       return;
     }
     if (!picName) {
-      showToast('warning', 'PIC Wajib Diisi', 'Masukkan nama PIC pendaftaran Anda.');
+      showToast('warning', 'PIC Wajib Diisi', 'Masukkan nama PIC penanggung jawab pendaftaran Anda.');
+      const picNameEl = document.getElementById('picNameInput');
+      if (picNameEl) { picNameEl.focus(); picNameEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+      return;
+    }
+    if (!picPhone) {
+      showToast('warning', 'Kontak PIC Wajib Diisi', 'Masukkan nomor HP / WhatsApp PIC pendaftaran yang dapat dihubungi.');
+      const picPhoneEl = document.getElementById('picPhoneInput');
+      if (picPhoneEl) { picPhoneEl.focus(); picPhoneEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
       return;
     }
 
@@ -4601,6 +4614,8 @@
     document.getElementById('modalRegNo').textContent = reg;
     const modalCompEl = document.getElementById('modalCompany');
     if (modalCompEl) modalCompEl.textContent = company;
+    const modalPicEl = document.getElementById('modalPicInfo');
+    if (modalPicEl) modalPicEl.textContent = `${picName} (${picPhone})`;
     document.getElementById('modalEmpName').textContent = `${peserta.length} Peserta (${peserta[0].nama_karyawan}${peserta.length > 1 ? ' dkk.' : ''})`;
     document.getElementById('modalCourse').textContent = course + (isCustom ? ' (Request di Luar Jadwal)' : '');
 
@@ -4732,6 +4747,7 @@
     const startDate = document.getElementById('startDateInput').value;
     const endDate = document.getElementById('endDateInput').value;
     const picName = document.getElementById('picNameInput').value.trim();
+    const picPhone = (document.getElementById('picPhoneInput')?.value || '').trim();
     const venue = (document.getElementById('trainingVenueInput')?.value || '').trim() || (isCustom ? 'Tentatif (Request Khusus)' : '-');
     const startHour = (document.getElementById('trainingHourInput')?.value || '').trim() || '08:00 WIB (Tentatif)';
 
@@ -4752,7 +4768,8 @@
           no_hp: hp,
           jabatan: jabatan,
           departement: dept,
-          perusahaan: getSelectedCompany() || "PT Pani Bersama Tambang"
+          perusahaan: getSelectedCompany() || "PT Pani Bersama Tambang",
+          validasi: "OK"
         });
       }
     });
@@ -4778,7 +4795,11 @@
       ruangan: venue,
       waktu_mulai: startHour,
       is_custom: isCustom,
-      pic_pendaftaran: picName,
+      pic_pendaftaran: picPhone ? `${picName} (${picPhone})` : picName,
+      pic_name: picName,
+      pic_phone: picPhone,
+      no_hp_pic: picPhone,
+      status_validasi: "OK",
       perusahaan: selectedCompany,
       catatan: document.getElementById('notesInput')?.value?.trim() || '',
       file_name: uploadedFileObj ? uploadedFileObj.name : '',
@@ -4814,7 +4835,7 @@
         
         const statusBadge = document.getElementById('statusRegistrasiLabel');
         if (statusBadge) {
-          statusBadge.textContent = isCustom ? 'Request Diajukan (Menunggu Validasi L&D)' : 'Terkirim (Menunggu Verifikasi)';
+          statusBadge.textContent = 'Terkirim (Status: OK)';
           statusBadge.className = 'font-label-md text-label-md text-emerald-700 font-bold';
         }
 
@@ -5429,7 +5450,7 @@
           </td>
           <td class="py-2.5 px-3 text-on-surface-variant hidden sm:table-cell text-body-sm">${maskedCompany}</td>
           <td class="py-2.5 px-3 text-on-surface-variant hidden sm:table-cell text-body-sm">${maskedDept}</td>
-          <td class="py-2.5 px-4 sm:px-6 text-right"><span class="inline-flex items-center gap-1.5 text-[12px] font-medium ${wait ? 'text-amber-700' : 'text-emerald-700'}"><span class="w-1.5 h-1.5 rounded-full ${wait ? 'bg-amber-500' : 'bg-emerald-600'}"></span>${escapeHtml(p.validasi || 'Tervalidasi')}</span></td>
+          <td class="py-2.5 px-4 sm:px-6 text-right"><span class="inline-flex items-center gap-1.5 text-[12px] font-medium ${wait ? 'text-amber-700' : 'text-emerald-700'}"><span class="w-1.5 h-1.5 rounded-full ${wait ? 'bg-amber-500' : 'bg-emerald-600'}"></span>${escapeHtml(p.validasi || 'OK')}</span></td>
         </tr>`;
       }).join('');
     } else {
