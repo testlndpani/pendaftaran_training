@@ -629,7 +629,31 @@
                   <span class="hidden sm:inline-flex font-label-sm text-label-sm px-2.5 py-1 rounded bg-surface-container text-on-surface-variant font-medium" id="durationSummaryBadge">-</span>
                 </div>
 
+                <!-- TIPE / MODE JADWAL PELATIHAN: JADWAL RESMI VS REQUEST DI LUAR JADWAL -->
+                <div class="p-3 bg-surface-container-low/70 border border-outline-variant/40 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                      <span class="material-symbols-outlined text-[18px]">calendar_month</span>
+                    </div>
+                    <div class="flex flex-col">
+                      <span class="text-xs font-semibold text-on-surface">Opsi Jadwal Pelatihan</span>
+                      <span class="text-[11px] text-on-surface-variant">Pilih jadwal resmi yang tersedia atau ajukan permintaan khusus di luar kalender</span>
+                    </div>
+                  </div>
+                  <div class="inline-flex p-1 bg-surface-container rounded-lg border border-outline-variant/40 text-xs shrink-0 self-start sm:self-auto">
+                    <button type="button" id="tabModeJadwalResmi" onclick="setCustomTrainingMode(false)" class="px-3 py-1.5 rounded-md font-semibold transition-all bg-surface-container-lowest text-primary shadow-xs flex items-center gap-1.5 cursor-pointer">
+                      <span class="material-symbols-outlined text-[15px]">event_available</span>
+                      Jadwal Tersedia
+                    </button>
+                    <button type="button" id="tabModeRequestKhusus" onclick="setCustomTrainingMode(true)" class="px-3 py-1.5 rounded-md font-medium text-on-surface-variant hover:text-on-surface transition-all flex items-center gap-1.5 cursor-pointer">
+                      <span class="material-symbols-outlined text-[15px]">edit_calendar</span>
+                      Request di Luar Jadwal
+                    </button>
+                  </div>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <!-- MODE 1: PILIH JADWAL TERSEDIA (COMBOBOX) -->
                   <div class="md:col-span-2 flex flex-col gap-1.5" id="training-program-combobox-container">
                     <div class="flex items-center justify-between">
                       <label class="font-label-sm text-label-sm text-on-surface font-medium" for="programComboboxTrigger">Program Pelatihan <span class="text-error">*</span></label>
@@ -677,23 +701,86 @@
                     </div>
                   </div>
 
-                  <div class="flex flex-col gap-1.5">
-                    <label class="font-label-sm text-label-sm text-on-surface font-medium" for="startDateInput">Tanggal Mulai <span class="text-error">*</span></label>
-                    <input class="w-full h-10 px-3 rounded-lg bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary shadow-sm" id="startDateInput" onchange="calculateDuration()" required="" type="date" value="">
+                  <!-- MODE 2: REQUEST PELATIHAN DI LUAR JADWAL (MANUAL INPUT) -->
+                  <div class="md:col-span-2 hidden flex flex-col gap-2.5" id="custom-training-name-container">
+                    <div class="flex items-center justify-between">
+                      <label class="font-label-sm text-label-sm text-on-surface font-medium" for="customTrainingNameInput">
+                        Nama Program Pelatihan (Permintaan Khusus) <span class="text-error">*</span>
+                      </label>
+                      <span class="text-label-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 inline-flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Request di Luar Jadwal
+                      </span>
+                    </div>
+                    <div class="relative">
+                      <span class="material-symbols-outlined absolute left-3 top-2.5 text-outline text-[18px]">edit_note</span>
+                      <input type="text" id="customTrainingNameInput" list="suggestedTrainingsList" oninput="filterSuggestedTrainingChips(this.value)" placeholder="Ketik nama modul pelatihan atau pilih saran judul di bawah..." class="w-full h-10 pl-9 pr-3 rounded-lg bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary shadow-sm" autocomplete="off">
+                      <datalist id="suggestedTrainingsList"></datalist>
+                    </div>
+
+                    <!-- BOX SARAN NAMA PELATIHAN DARI JADWAL YANG PERNAH ADA -->
+                    <div id="custom-training-suggestions-box" class="flex flex-col gap-1.5 p-3 rounded-xl bg-surface-container-low/80 border border-outline-variant/40">
+                      <div class="flex items-center justify-between text-[11px]">
+                        <span class="font-semibold text-primary inline-flex items-center gap-1">
+                          <span class="material-symbols-outlined text-[15px]">recommend</span>
+                          Saran Nama Pelatihan dari Jadwal Resmi:
+                        </span>
+                        <span class="text-[10px] text-outline">Klik judul agar penulisan seragam</span>
+                      </div>
+                      <div id="suggestedTrainingChips" class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1">
+                        <!-- Populated dynamically via JS -->
+                      </div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-[11px] text-on-surface-variant">
+                      <span>Anda dapat memilih salah satu saran di atas atau mengetik nama baru secara bebas.</span>
+                      <button type="button" onclick="setCustomTrainingMode(false)" class="text-primary hover:underline font-medium inline-flex items-center gap-0.5 cursor-pointer">
+                        <span class="material-symbols-outlined text-[13px]">arrow_back</span> Kembali ke Jadwal Tersedia
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- NOTICE BANNER REQUEST DI LUAR JADWAL -->
+                  <div id="custom-schedule-notice" class="md:col-span-2 hidden p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-950 flex items-start gap-2.5 text-xs leading-relaxed">
+                    <span class="material-symbols-outlined text-amber-600 text-[18px] shrink-0 mt-0.5">info</span>
+                    <div>
+                      <span class="font-bold">Permintaan Pelatihan di Luar Jadwal:</span>
+                      <span class="text-on-surface-variant block mt-0.5">Tentukan tanggal pelaksanaan dengan date picker. Lokasi default diatur di <strong>Gold Room</strong> dan waktu mulai default pukul <strong>08:00 WIB</strong> (nantinya akan ditentukan/dikonfirmasi kembali oleh Admin Tim L&amp;D).</span>
+                    </div>
                   </div>
 
                   <div class="flex flex-col gap-1.5">
-                    <label class="font-label-sm text-label-sm text-on-surface font-medium" for="endDateInput">Tanggal Selesai <span class="text-error">*</span></label>
-                    <input class="w-full h-10 px-3 rounded-lg bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary shadow-sm" id="endDateInput" onchange="calculateDuration()" required="" type="date" value="">
+                    <div class="flex items-center justify-between">
+                      <label class="font-label-sm text-label-sm text-on-surface font-medium" for="startDateInput">Tanggal Mulai <span class="text-error">*</span></label>
+                      <span id="startDateHelper" class="text-[11px] text-primary font-medium hidden">(Bebas Date Pick)</span>
+                    </div>
+                    <div class="relative">
+                      <input class="w-full h-10 px-3 rounded-lg bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary shadow-sm cursor-pointer" id="startDateInput" onchange="calculateDuration()" oninput="calculateDuration()" onclick="if(!this.readOnly){try{this.showPicker()}catch(e){}}" required="" type="date" value="">
+                    </div>
                   </div>
 
                   <div class="flex flex-col gap-1.5">
-                    <label class="font-label-sm text-label-sm text-on-surface font-medium" for="trainingVenueInput">Lokasi / Ruangan Pelatihan <span class="text-error">*</span></label>
+                    <div class="flex items-center justify-between">
+                      <label class="font-label-sm text-label-sm text-on-surface font-medium" for="endDateInput">Tanggal Selesai <span class="text-error">*</span></label>
+                      <span id="endDateHelper" class="text-[11px] text-primary font-medium hidden">(Bebas Date Pick)</span>
+                    </div>
+                    <div class="relative">
+                      <input class="w-full h-10 px-3 rounded-lg bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary shadow-sm cursor-pointer" id="endDateInput" onchange="calculateDuration()" oninput="calculateDuration()" onclick="if(!this.readOnly){try{this.showPicker()}catch(e){}}" required="" type="date" value="">
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col gap-1.5">
+                    <div class="flex items-center justify-between">
+                      <label class="font-label-sm text-label-sm text-on-surface font-medium" for="trainingVenueInput">Lokasi / Ruangan Pelatihan <span class="text-error">*</span></label>
+                      <span id="venueHelper" class="text-[11px] text-primary font-medium hidden">(Default: Gold Room • Ditentukan Admin)</span>
+                    </div>
                     <input class="w-full h-10 px-3 rounded-lg bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary shadow-sm" id="trainingVenueInput" required="" type="text" value="" placeholder="Pilih modul pelatihan untuk memuat ruangan...">
                   </div>
 
                   <div class="flex flex-col gap-1.5">
-                    <label class="font-label-sm text-label-sm text-on-surface font-medium" for="trainingHourInput">Waktu / Jam Mulai</label>
+                    <div class="flex items-center justify-between">
+                      <label class="font-label-sm text-label-sm text-on-surface font-medium" for="trainingHourInput">Waktu / Jam Mulai</label>
+                      <span id="hourHelper" class="text-[11px] text-primary font-medium hidden">(Default: 08:00 WIB • Ditentukan Admin)</span>
+                    </div>
                     <input class="w-full h-10 px-3 rounded-lg bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary shadow-sm" id="trainingHourInput" readonly="" type="text" value="" placeholder="Pilih modul untuk memuat jam...">
                   </div>
 
@@ -2166,6 +2253,10 @@
         <span class="text-on-surface-variant">Program:</span>
         <span class="font-semibold text-right" id="modalCourse">Pilih Program</span>
       </div>
+      <div class="flex justify-between">
+        <span class="text-on-surface-variant">Tanggal Pelaksanaan:</span>
+        <span class="font-semibold text-right text-xs text-on-surface" id="modalScheduleDates">-</span>
+      </div>
       <div class="flex justify-between items-center gap-2">
         <span class="text-on-surface-variant shrink-0">Lampiran PDF:</span>
         <span class="font-semibold text-right truncate text-xs text-primary" id="modalDocFile">Tidak dilampirkan</span>
@@ -2653,6 +2744,9 @@
 
   // Pilih modul dari kalender / modal detail dan langsung arahkan ke form pendaftaran
   function selectScheduleAndRegister(idJadwal, agendaTitle) {
+    if (typeof setCustomTrainingMode === 'function') {
+      setCustomTrainingMode(false);
+    }
     const target = (LIVE_SCHEDULES || []).find(s => s.id_jadwal === idJadwal || s.agenda === agendaTitle);
     const sisa = target ? Number(target.sisa_kuota) : NaN;
     const isFull = target ? ((!isNaN(sisa) && sisa <= 0) || /penuh/i.test(target.status)) : false;
@@ -3372,6 +3466,7 @@
         }
         if (typeof renderProgramComboboxList === 'function') renderProgramComboboxList();
         if (typeof updateProgramComboboxTrigger === 'function') updateProgramComboboxTrigger();
+        if (typeof populateTrainingSuggestions === 'function') populateTrainingSuggestions();
 
         // 4. Render Kalender & List View di Tab Jadwal
         if (!window.__periodInit) { window.__periodInit = true; pickDefaultPeriod(); }
@@ -3387,6 +3482,7 @@
         }
         if (typeof renderProgramComboboxList === 'function') renderProgramComboboxList();
         if (typeof updateProgramComboboxTrigger === 'function') updateProgramComboboxTrigger();
+        if (typeof populateTrainingSuggestions === 'function') populateTrainingSuggestions();
         renderDynamicListView(getFilteredSchedules());
         renderHome();
       }
@@ -3514,16 +3610,20 @@
 
     if (list.length === 0) {
       listContainer.innerHTML = `
-        <div class="p-6 text-center text-outline flex flex-col items-center gap-1.5 select-none">
+        <div class="p-6 text-center text-outline flex flex-col items-center gap-2 select-none">
           <span class="material-symbols-outlined text-[28px] opacity-40">search_off</span>
           <span class="font-medium text-body-sm text-on-surface-variant">Tidak ada pelatihan yang cocok</span>
-          <span class="text-[11px] text-outline">Coba cari dengan kata kunci lain atau periksa jadwal lain</span>
+          <span class="text-[11px] text-outline">Modul atau tanggal yang dicari tidak tersedia di jadwal resmi?</span>
+          <button type="button" onclick="setCustomTrainingMode(true, ${jsArg(query)}); toggleProgramCombobox(false);" class="mt-1 px-3.5 py-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary font-label-xs text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer">
+            <span class="material-symbols-outlined text-[16px]">edit_calendar</span>
+            Ajukan Request di Luar Jadwal
+          </button>
         </div>
       `;
       return;
     }
 
-    listContainer.innerHTML = list.map(item => {
+    const itemsHtml = list.map(item => {
       const sisa = Number(item.sisa_kuota);
       const isFull = (!isNaN(sisa) && sisa <= 0) || /penuh/i.test(item.status);
       const isSelected = item.agenda === currentSelectedVal;
@@ -3552,9 +3652,29 @@
         </button>
       `;
     }).join('');
+
+    const footerHtml = `
+      <div class="p-2 border-t border-outline-variant/30 bg-surface-container-low/60 shrink-0 sticky bottom-0">
+        <button type="button" onclick="setCustomTrainingMode(true, ${jsArg(query)}); toggleProgramCombobox(false);" class="w-full p-2.5 rounded-lg border border-primary/30 bg-primary/5 hover:bg-primary/10 text-primary transition-colors flex items-center justify-between text-left group cursor-pointer">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="material-symbols-outlined text-[18px] shrink-0 text-primary">add_circle</span>
+            <div class="flex flex-col min-w-0">
+              <span class="text-xs font-semibold truncate text-primary">Butuh pelatihan atau tanggal lain?</span>
+              <span class="text-[10px] text-on-surface-variant truncate">Ajukan Request di Luar Jadwal (Tulis Nama &amp; Tanggal Manual)</span>
+            </div>
+          </div>
+          <span class="material-symbols-outlined text-[16px] text-primary shrink-0 group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+        </button>
+      </div>
+    `;
+
+    listContainer.innerHTML = itemsHtml + footerHtml;
   }
 
   function selectComboboxProgram(idJadwal) {
+    if (typeof setCustomTrainingMode === 'function' && isCustomTrainingModeActive) {
+      setCustomTrainingMode(false);
+    }
     const list = (Array.isArray(LIVE_SCHEDULES) && LIVE_SCHEDULES.length > 0) ? LIVE_SCHEDULES : fetchedJadwalList;
     const item = (list || []).find(s => s.id_jadwal === idJadwal || s.agenda === idJadwal);
     if (!item) return;
@@ -3890,7 +4010,200 @@
     return regNo;
   }
 
+  // ===========================================================================
+  // SISTEM PERMINTAAN PELATIHAN DI LUAR JADWAL (CUSTOM REQUEST)
+  // ===========================================================================
+  let isCustomTrainingModeActive = false;
+
+  function setCustomTrainingMode(isCustom, initialName = '') {
+    isCustomTrainingModeActive = !!isCustom;
+
+    const tabResmi = document.getElementById('tabModeJadwalResmi');
+    const tabKhusus = document.getElementById('tabModeRequestKhusus');
+    const comboboxContainer = document.getElementById('training-program-combobox-container');
+    const customContainer = document.getElementById('custom-training-name-container');
+    const customNotice = document.getElementById('custom-schedule-notice');
+    const customNameInput = document.getElementById('customTrainingNameInput');
+    const select = document.getElementById('trainingProgramSelect');
+    const quotaBadge = document.getElementById('selected-program-quota-badge');
+
+    const startDateInput = document.getElementById('startDateInput');
+    const endDateInput = document.getElementById('endDateInput');
+    const venueInput = document.getElementById('trainingVenueInput');
+    const hourInput = document.getElementById('trainingHourInput');
+
+    const startHelper = document.getElementById('startDateHelper');
+    const endHelper = document.getElementById('endDateHelper');
+    const venueHelper = document.getElementById('venueHelper');
+    const hourHelper = document.getElementById('hourHelper');
+
+    if (isCustomTrainingModeActive) {
+      if (tabResmi) {
+        tabResmi.className = 'px-3 py-1.5 rounded-md font-medium text-on-surface-variant hover:text-on-surface transition-all flex items-center gap-1.5 cursor-pointer';
+      }
+      if (tabKhusus) {
+        tabKhusus.className = 'px-3 py-1.5 rounded-md font-semibold transition-all bg-surface-container-lowest text-amber-800 shadow-xs flex items-center gap-1.5 cursor-pointer';
+      }
+
+      if (comboboxContainer) comboboxContainer.classList.add('hidden');
+      if (customContainer) customContainer.classList.remove('hidden');
+      if (customNotice) customNotice.classList.remove('hidden');
+      if (quotaBadge) quotaBadge.classList.add('hidden');
+
+      if (select) select.required = false;
+      if (customNameInput) {
+        customNameInput.required = true;
+        if (initialName && typeof initialName === 'string') customNameInput.value = initialName;
+        setTimeout(() => customNameInput.focus(), 60);
+      }
+
+      [startDateInput, endDateInput, venueInput, hourInput].forEach(el => {
+        if (!el) return;
+        el.readOnly = false;
+        el.removeAttribute('readonly');
+        el.classList.remove('bg-surface-container-low', 'cursor-not-allowed');
+        el.classList.add('bg-surface-container-lowest', 'cursor-pointer');
+      });
+
+      if (venueInput) {
+        venueInput.classList.remove('cursor-pointer');
+        venueInput.placeholder = 'Default: Gold Room (akan ditentukan oleh Admin L&D)';
+        venueInput.value = 'Gold Room';
+      }
+
+      if (hourInput) {
+        hourInput.classList.remove('cursor-pointer');
+        hourInput.placeholder = 'Default: 08:00 WIB (akan ditentukan oleh Admin L&D)';
+        hourInput.value = '08:00 WIB';
+      }
+
+      if (startHelper) {
+        startHelper.textContent = '(Bebas Date Pick)';
+        startHelper.className = 'text-[11px] text-primary font-medium';
+        startHelper.classList.remove('hidden');
+      }
+      if (endHelper) {
+        endHelper.textContent = '(Bebas Date Pick)';
+        endHelper.className = 'text-[11px] text-primary font-medium';
+        endHelper.classList.remove('hidden');
+      }
+      if (venueHelper) {
+        venueHelper.textContent = '(Default: Gold Room • Ditentukan Admin)';
+        venueHelper.className = 'text-[11px] text-primary font-medium';
+        venueHelper.classList.remove('hidden');
+      }
+      if (hourHelper) {
+        hourHelper.textContent = '(Default: 08:00 WIB • Ditentukan Admin)';
+        hourHelper.className = 'text-[11px] text-primary font-medium';
+        hourHelper.classList.remove('hidden');
+      }
+
+      calculateDuration();
+      if (typeof populateTrainingSuggestions === 'function') {
+        populateTrainingSuggestions(initialName || '');
+      }
+    } else {
+      if (tabResmi) {
+        tabResmi.className = 'px-3 py-1.5 rounded-md font-semibold transition-all bg-surface-container-lowest text-primary shadow-xs flex items-center gap-1.5 cursor-pointer';
+      }
+      if (tabKhusus) {
+        tabKhusus.className = 'px-3 py-1.5 rounded-md font-medium text-on-surface-variant hover:text-on-surface transition-all flex items-center gap-1.5 cursor-pointer';
+      }
+
+      if (comboboxContainer) comboboxContainer.classList.remove('hidden');
+      if (customContainer) customContainer.classList.add('hidden');
+      if (customNotice) customNotice.classList.add('hidden');
+
+      if (select) select.required = true;
+      if (customNameInput) customNameInput.required = false;
+
+      [startDateInput, endDateInput, venueInput, hourInput].forEach(el => {
+        if (!el) return;
+        el.readOnly = true;
+        el.setAttribute('readonly', 'true');
+        el.classList.remove('bg-surface-container-lowest', 'cursor-pointer');
+        el.classList.add('bg-surface-container-low', 'cursor-not-allowed');
+      });
+
+      if (venueInput) venueInput.placeholder = 'Pilih modul pelatihan untuk memuat ruangan...';
+      if (hourInput) hourInput.placeholder = 'Pilih modul untuk memuat jam...';
+
+      if (startHelper) startHelper.classList.add('hidden');
+      if (endHelper) endHelper.classList.add('hidden');
+      if (venueHelper) venueHelper.classList.add('hidden');
+      if (hourHelper) hourHelper.classList.add('hidden');
+
+      updateTrainingInfo();
+    }
+  }
+  window.setCustomTrainingMode = setCustomTrainingMode;
+
+  // ===========================================================================
+  // SARAN NAMA PELATIHAN SESUAI JADWAL RESMI (AGAR PENULISAN KONSISTEN)
+  // ===========================================================================
+  function populateTrainingSuggestions(filter = '') {
+    const datalist = document.getElementById('suggestedTrainingsList');
+    const chipsContainer = document.getElementById('suggestedTrainingChips');
+    if (!datalist && !chipsContainer) return;
+
+    const list = (Array.isArray(LIVE_SCHEDULES) && LIVE_SCHEDULES.length > 0) ? LIVE_SCHEDULES : (Array.isArray(fetchedJadwalList) ? fetchedJadwalList : []);
+    const seen = new Set();
+    const items = [];
+
+    list.forEach(item => {
+      if (!item || !item.agenda) return;
+      let title = String(item.agenda).trim();
+      title = title.replace(/\s*\[Batch\s*\d+\]/gi, '').replace(/\s*-\s*Batch\s*\d+/gi, '').trim();
+      if (title && !seen.has(title.toLowerCase())) {
+        seen.add(title.toLowerCase());
+        items.push(title);
+      }
+    });
+
+    items.sort((a, b) => a.localeCompare(b));
+
+    // 1. Datalist untuk autocomplete input
+    if (datalist) {
+      datalist.innerHTML = items.map(name => `<option value="${escapeHtml(name)}"></option>`).join('');
+    }
+
+    // 2. Chip saran yang dapat langsung diklik
+    if (chipsContainer) {
+      const q = (filter || '').toLowerCase().trim();
+      const filtered = q ? items.filter(t => t.toLowerCase().includes(q)) : items;
+
+      if (filtered.length === 0) {
+        chipsContainer.innerHTML = `<span class="text-[11px] text-outline italic py-0.5">Tidak ada jadwal dengan kata kunci tersebut. Anda tetap dapat menulis nama modul baru secara manual.</span>`;
+        return;
+      }
+
+      chipsContainer.innerHTML = filtered.map(name => `
+        <button type="button" onclick="selectSuggestedTrainingName('${escapeHtml(name)}')" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-surface-container hover:bg-primary/10 hover:text-primary text-on-surface text-xs font-medium border border-outline-variant/40 transition-colors cursor-pointer group">
+          <span class="material-symbols-outlined text-[13px] text-primary group-hover:scale-125 transition-transform">add_circle</span>
+          <span>${escapeHtml(name)}</span>
+        </button>
+      `).join('');
+    }
+  }
+  window.populateTrainingSuggestions = populateTrainingSuggestions;
+
+  function filterSuggestedTrainingChips(val) {
+    populateTrainingSuggestions(val);
+  }
+  window.filterSuggestedTrainingChips = filterSuggestedTrainingChips;
+
+  function selectSuggestedTrainingName(name) {
+    const input = document.getElementById('customTrainingNameInput');
+    if (input) {
+      input.value = name;
+      input.focus();
+    }
+    showToast('info', 'Nama Pelatihan Terpilih', `Nama modul diselaraskan: "${name}".`);
+  }
+  window.selectSuggestedTrainingName = selectSuggestedTrainingName;
+
   function updateTrainingInfo() {
+    if (isCustomTrainingModeActive) return;
     const select = document.getElementById('trainingProgramSelect');
     const venueInput = document.getElementById('trainingVenueInput');
     const hourInput = document.getElementById('trainingHourInput');
@@ -3947,9 +4260,20 @@
   }
 
   function calculateDuration() {
-    const startVal = document.getElementById('startDateInput').value;
-    const endVal = document.getElementById('endDateInput').value;
+    const startEl = document.getElementById('startDateInput');
+    const endEl = document.getElementById('endDateInput');
     const badge = document.getElementById('durationSummaryBadge');
+
+    const startVal = startEl ? startEl.value : '';
+    let endVal = endEl ? endEl.value : '';
+
+    if (isCustomTrainingModeActive && startEl && startVal && endEl) {
+      endEl.min = startVal;
+      if (!endVal || endVal < startVal) {
+        endEl.value = startVal;
+        endVal = startVal;
+      }
+    }
 
     if (startVal && endVal) {
       const start = new Date(startVal);
@@ -3967,7 +4291,7 @@
         return;
       }
     }
-    if (badge) badge.textContent = '5 Hari (40 Jam Pelatihan)';
+    if (badge) badge.textContent = isCustomTrainingModeActive ? 'Tentukan Tanggal' : '5 Hari (40 Jam Pelatihan)';
   }
 
   let uploadedFileObj = null;
@@ -4063,6 +4387,10 @@
     const form = document.getElementById('trainingRegistrationForm');
     if (form) form.reset();
 
+    setCustomTrainingMode(false);
+    const customCourseInput = document.getElementById('customTrainingNameInput');
+    if (customCourseInput) customCourseInput.value = '';
+
     const compSelect = document.getElementById('companySelect');
     if (compSelect) compSelect.selectedIndex = 0;
     const customCompWrap = document.getElementById('customCompanyWrapper');
@@ -4111,12 +4439,21 @@
   // 7. SUBMIT PENDAFTARAN KE GOOGLE APPS SCRIPT WEB APP
   // ===========================================================================
   function submitForm() {
-        let reg = document.getElementById('regRefNo').value;
+    let reg = document.getElementById('regRefNo').value;
     if (!reg) {
       reg = 'REG-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
       document.getElementById('regRefNo').value = reg;
     }
-    const course = document.getElementById('trainingProgramSelect').value;
+
+    const isCustom = isCustomTrainingModeActive;
+    let course = '';
+    if (isCustom) {
+      const customCourseInput = document.getElementById('customTrainingNameInput');
+      course = customCourseInput ? customCourseInput.value.trim() : '';
+    } else {
+      course = document.getElementById('trainingProgramSelect').value;
+    }
+
     const startDate = document.getElementById('startDateInput').value;
     const endDate = document.getElementById('endDateInput').value;
     const picName = document.getElementById('picNameInput').value.trim();
@@ -4133,11 +4470,21 @@
     }
 
     if (!course) {
-      showToast('warning', 'Modul Belum Dipilih', 'Silakan pilih program pelatihan yang tersedia.');
+      if (isCustom) {
+        showToast('warning', 'Nama Pelatihan Belum Diisi', 'Silakan tuliskan nama program pelatihan yang diminta.');
+        const customInput = document.getElementById('customTrainingNameInput');
+        if (customInput) { customInput.focus(); customInput.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+      } else {
+        showToast('warning', 'Modul Belum Dipilih', 'Silakan pilih program pelatihan yang tersedia.');
+      }
       return;
     }
     if (!startDate || !endDate) {
       showToast('warning', 'Tanggal Belum Lengkap', 'Tentukan tanggal mulai dan selesai pelatihan.');
+      return;
+    }
+    if (new Date(endDate) < new Date(startDate)) {
+      showToast('warning', 'Rentang Tanggal Tidak Sesuai', 'Tanggal selesai pelatihan tidak boleh mendahului tanggal mulai.');
       return;
     }
     if (!picName) {
@@ -4170,7 +4517,7 @@
     const selEl = document.getElementById('trainingProgramSelect');
     const selOpt = selEl ? selEl.selectedOptions[0] : null;
     const selId = selOpt ? selOpt.getAttribute('data-id') : null;
-    const targetSchedule = (selId ? (fetchedJadwalList || []).find(j => j.id_jadwal === selId) : null) || (fetchedJadwalList || []).find(j => j.agenda === course);
+    const targetSchedule = isCustom ? null : ((selId ? (fetchedJadwalList || []).find(j => j.id_jadwal === selId) : null) || (fetchedJadwalList || []).find(j => j.agenda === course));
 
     const vErr = validatePeserta(peserta);
     if (vErr) { showToast('warning', 'Data Peserta Belum Valid', vErr); return; }
@@ -4179,7 +4526,13 @@
     const modalCompEl = document.getElementById('modalCompany');
     if (modalCompEl) modalCompEl.textContent = company;
     document.getElementById('modalEmpName').textContent = `${peserta.length} Peserta (${peserta[0].nama_karyawan}${peserta.length > 1 ? ' dkk.' : ''})`;
-    document.getElementById('modalCourse').textContent = course;
+    document.getElementById('modalCourse').textContent = course + (isCustom ? ' (Request di Luar Jadwal)' : '');
+
+    const modalDates = document.getElementById('modalScheduleDates');
+    if (modalDates) {
+      const sFmt = formatSmartDateRange(startDate, endDate);
+      modalDates.textContent = sFmt || `${startDate} s/d ${endDate}`;
+    }
 
     const modalDoc = document.getElementById('modalDocFile');
     if (modalDoc) {
@@ -4228,6 +4581,12 @@
       const val = id => document.getElementById(id)?.value || '';
       localStorage.setItem(DRAFT_KEY, JSON.stringify({
         company: val('companySelect'), customCompany: val('customCompanyInput'),
+        isCustomTraining: isCustomTrainingModeActive,
+        customTrainingName: val('customTrainingNameInput'),
+        startDate: val('startDateInput'),
+        endDate: val('endDateInput'),
+        venue: val('trainingVenueInput'),
+        hour: val('trainingHourInput'),
         pic: val('picNameInput'), picPhone: val('picPhoneInput'), notes: val('notesInput'),
         peserta: collectParticipants(), at: Date.now()
       }));
@@ -4247,6 +4606,14 @@
       set('companySelect', d.company); handleCompanyChange(d.company || '');
       set('customCompanyInput', d.customCompany); set('picNameInput', d.pic);
       set('picPhoneInput', d.picPhone); set('notesInput', d.notes);
+      if (d.isCustomTraining) {
+        setCustomTrainingMode(true, d.customTrainingName || '');
+        set('startDateInput', d.startDate);
+        set('endDateInput', d.endDate);
+        set('trainingVenueInput', d.venue);
+        set('trainingHourInput', d.hour);
+        calculateDuration();
+      }
       if (Array.isArray(d.peserta) && d.peserta.length) d.peserta.forEach(p => addParticipantRow(p));
       showToast('info', 'Draf Dipulihkan', 'Isian terakhir Anda dimuat kembali.');
     } catch (e) { /* abaikan draf rusak */ }
@@ -4279,10 +4646,18 @@
       reg = 'REG-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
       document.getElementById('regRefNo').value = reg;
     }
-    const course = document.getElementById('trainingProgramSelect').value;
+    const isCustom = isCustomTrainingModeActive;
+    let course = '';
+    if (isCustom) {
+      course = (document.getElementById('customTrainingNameInput')?.value || '').trim();
+    } else {
+      course = document.getElementById('trainingProgramSelect').value;
+    }
     const startDate = document.getElementById('startDateInput').value;
     const endDate = document.getElementById('endDateInput').value;
     const picName = document.getElementById('picNameInput').value.trim();
+    const venue = (document.getElementById('trainingVenueInput')?.value || '').trim() || (isCustom ? 'Tentatif (Request Khusus)' : '-');
+    const startHour = (document.getElementById('trainingHourInput')?.value || '').trim() || '08:00 WIB (Tentatif)';
 
     const rows = document.querySelectorAll('#participantTableBody tr:not([data-is-example])');
     const pesertaArray = [];
@@ -4307,11 +4682,16 @@
     });
 
     const selectedCompany = getSelectedCompany() || "PT Pani Bersama Tambang";
-    const courseSelect = document.getElementById('trainingProgramSelect');
-    const selectedOpt = courseSelect ? courseSelect.selectedOptions[0] : null;
-    const selectedJadwalId = selectedOpt ? selectedOpt.getAttribute('data-id') : null;
-    const matchJadwal = (selectedJadwalId ? fetchedJadwalList.find(j => j.id_jadwal === selectedJadwalId) : null) || fetchedJadwalList.find(j => j.agenda === course);
-    const finalIdJadwal = matchJadwal && matchJadwal.id_jadwal ? matchJadwal.id_jadwal : (selectedJadwalId || ("JADWAL-" + course.substring(0, 10).replace(/[^a-zA-Z0-9]/g, '').toUpperCase()));
+    let finalIdJadwal = '';
+    if (isCustom) {
+      finalIdJadwal = 'REQ-' + reg.replace(/^REG-/, '') + '-' + Math.floor(100 + Math.random() * 900);
+    } else {
+      const courseSelect = document.getElementById('trainingProgramSelect');
+      const selectedOpt = courseSelect ? courseSelect.selectedOptions[0] : null;
+      const selectedJadwalId = selectedOpt ? selectedOpt.getAttribute('data-id') : null;
+      const matchJadwal = (selectedJadwalId ? fetchedJadwalList.find(j => j.id_jadwal === selectedJadwalId) : null) || fetchedJadwalList.find(j => j.agenda === course);
+      finalIdJadwal = matchJadwal && matchJadwal.id_jadwal ? matchJadwal.id_jadwal : (selectedJadwalId || ("JADWAL-" + course.substring(0, 10).replace(/[^a-zA-Z0-9]/g, '').toUpperCase()));
+    }
 
     const payload = {
       id_booking: reg,
@@ -4319,6 +4699,9 @@
       nama_pelatihan: course,
       tanggal_mulai: startDate,
       tanggal_selesai: endDate,
+      ruangan: venue,
+      waktu_mulai: startHour,
+      is_custom: isCustom,
       pic_pendaftaran: picName,
       perusahaan: selectedCompany,
       catatan: document.getElementById('notesInput')?.value?.trim() || '',
@@ -4347,11 +4730,15 @@
         hideSoftLoader();
         closeModal();
         const fileMsg = result.file_url ? ' beserta dokumen memo di Google Drive' : '';
-        showToast('success', 'Pendaftaran Berhasil!', `Data ${result.total_peserta || pesertaArray.length} peserta${fileMsg} telah tersimpan (ID: ${result.id_booking}).`);
+        const successTitle = isCustom ? 'Permintaan Terkirim!' : 'Pendaftaran Berhasil!';
+        const successMsg = isCustom
+          ? `Permintaan pelatihan "${course}" di luar jadwal untuk ${result.total_peserta || pesertaArray.length} peserta${fileMsg} telah diajukan (ID: ${result.id_booking}). Tim L&D akan segera memvalidasi pengajuan Anda.`
+          : `Data ${result.total_peserta || pesertaArray.length} peserta${fileMsg} telah tersimpan (ID: ${result.id_booking}).`;
+        showToast('success', successTitle, successMsg);
         
         const statusBadge = document.getElementById('statusRegistrasiLabel');
         if (statusBadge) {
-          statusBadge.textContent = 'Terkirim (Menunggu Verifikasi)';
+          statusBadge.textContent = isCustom ? 'Request Diajukan (Menunggu Validasi L&D)' : 'Terkirim (Menunggu Verifikasi)';
           statusBadge.className = 'font-label-md text-label-md text-emerald-700 font-bold';
         }
 
@@ -4362,6 +4749,7 @@
         generateRegNumber();
         clearAllRows();
         removeUploadedFile();
+        setCustomTrainingMode(false);
 
       } else {
         hideSoftLoader();
@@ -5210,10 +5598,18 @@
       if (profModal && e.target === profModal) closeUserProfileModal();
     });
 
-    // Field turunan jadwal tidak boleh diedit manual
+    // Field turunan jadwal tidak boleh diedit manual secara default (bisa diedit di mode Request di Luar Jadwal)
     ['startDateInput', 'endDateInput', 'trainingVenueInput', 'trainingHourInput', 'courseCapacityInput'].forEach(id => {
       const el = document.getElementById(id);
-      if (el) { el.readOnly = true; el.classList.add('bg-surface-container-low', 'cursor-not-allowed'); }
+      if (el) {
+        el.readOnly = true;
+        el.classList.add('bg-surface-container-low', 'cursor-not-allowed');
+        el.addEventListener('click', () => {
+          if (el.readOnly && !isCustomTrainingModeActive) {
+            showToast('info', 'Jadwal Terkunci Otomatis', 'Bidang ini terisi otomatis dari modul yang dipilih. Untuk mengisi nama pelatihan & tanggal secara manual, klik tab "Request di Luar Jadwal".');
+          }
+        });
+      }
     });
     window.addEventListener('unhandledrejection', ev => { console.error(ev.reason); showToast('warning', 'Terjadi Kesalahan', 'Aksi gagal diproses. Muat ulang halaman jika berlanjut.'); });
     window.addEventListener('error', ev => console.error(ev.error || ev.message));
