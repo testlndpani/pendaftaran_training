@@ -118,6 +118,7 @@
   </style>
 
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script id="tailwind-config">
     tailwind.config = {
       darkMode: "class",
@@ -424,18 +425,12 @@
                       </div>
                     </div>
 
-                    <button class="h-9 px-3 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-sm text-label-sm flex items-center gap-1.5 border border-outline-variant/60 transition-colors" onclick="document.getElementById('excelQuickPasteArea').classList.toggle('hidden')" type="button">
-                      <span class="material-symbols-outlined text-[16px] text-primary">content_paste</span>
+                    <button class="h-9 px-3.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-sm text-label-sm flex items-center gap-2 border border-outline-variant/60 transition-colors cursor-pointer shadow-xs font-semibold" onclick="toggleExcelQuickPasteArea()" type="button" title="Salin dan tempel data peserta langsung dari file Excel">
+                      <span class="material-symbols-outlined text-[18px] text-primary">content_paste</span>
                       <span>Paste dari Excel</span>
                     </button>
 
-                    <label class="h-9 px-3 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface font-label-sm text-label-sm flex items-center gap-1.5 border border-outline-variant/60 cursor-pointer transition-colors">
-                      <span class="material-symbols-outlined text-[16px] text-emerald-600">upload_file</span>
-                      <span>Unggah Excel / CSV</span>
-                      <input accept=".xlsx,.xls,.csv" class="hidden" id="csvFileInput" onchange="handleCsvUpload(event)" type="file">
-                    </label>
-
-                    <button class="h-9 px-3.5 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-sm text-label-sm flex items-center gap-1.5 transition-all shadow-sm font-semibold" id="btnAddRowTop" onclick="addParticipantRow()" type="button">
+                    <button class="h-9 px-3.5 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-sm text-label-sm flex items-center gap-1.5 transition-all shadow-sm font-semibold cursor-pointer" id="btnAddRowTop" onclick="addParticipantRow()" type="button">
                       <span class="material-symbols-outlined text-[16px]">add</span>
                       <span>+ Baris Baru</span>
                     </button>
@@ -443,24 +438,57 @@
                 </div>
 
                 <!-- EXCEL QUICK PASTE AREA -->
-                <div class="hidden bg-surface-container-low p-3.5 rounded-lg border border-outline-variant flex flex-col gap-2.5 transition-all" id="excelQuickPasteArea">
+                <div class="hidden bg-surface-container-low p-4 rounded-xl border border-outline-variant flex flex-col gap-3 transition-all shadow-sm" id="excelQuickPasteArea">
                   <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                      <span class="material-symbols-outlined text-primary text-[18px]">info</span>
-                      <span class="font-label-sm text-label-sm text-on-surface font-semibold">Quick Paste dari Excel / File Tabel (Format Baris &amp; Kolom)</span>
+                      <span class="material-symbols-outlined text-primary text-[20px]">content_paste_go</span>
+                      <span class="font-label-sm text-label-sm text-on-surface font-bold">Paste dari Excel &bull; Tempel / Perbarui Tabel Peserta</span>
                     </div>
-                    <button class="text-outline hover:text-on-surface text-[18px]" onclick="document.getElementById('excelQuickPasteArea').classList.add('hidden')" type="button">
-                      <span class="material-symbols-outlined text-[18px]">close</span>
-                    </button>
+                    <div class="flex items-center gap-2">
+                      <button type="button" onclick="exportTableToPasteArea()" class="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1 cursor-pointer" title="Muat data baris tabel saat ini ke kotak teks untuk diedit / disalin kembali">
+                        <span class="material-symbols-outlined text-[15px]">edit_note</span>
+                        <span>Muat Data Tabel Saat Ini</span>
+                      </button>
+                      <button class="text-outline hover:text-on-surface text-[18px] p-1 cursor-pointer rounded hover:bg-surface-container-high transition-colors" onclick="toggleExcelQuickPasteArea(false)" type="button" title="Tutup">
+                        <span class="material-symbols-outlined text-[18px]">close</span>
+                      </button>
+                    </div>
                   </div>
-                  <p class="font-body-sm text-body-sm text-on-surface-variant">Blok sel di Excel Anda (NIP, Nama, HP, Jabatan, Departemen), salin (Ctrl+C), lalu tempel (Ctrl+V) di area bawah ini:</p>
-                  <textarea class="w-full h-20 p-2.5 rounded bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary font-mono text-[12px]" id="excelPasteTextarea" placeholder="EMP-1001	Ahmad Dhani	08123456789	Staff HC	Development&#10;EMP-1002	Bunga Citra	08198765432	Engineer	Technology"></textarea>
-                  <div class="flex justify-end gap-2">
-                    <button class="px-3 py-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm transition-colors" onclick="document.getElementById('excelQuickPasteArea').classList.add('hidden')" type="button">Tutup</button>
-                    <button class="px-3 py-1 rounded bg-primary text-on-primary hover:bg-primary-container font-label-sm text-label-sm font-semibold transition-colors flex items-center gap-1" onclick="applyExcelPaste()" type="button">
-                      <span class="material-symbols-outlined text-[16px]">system_update_alt</span>
-                      <span>Terapkan ke Tabel</span>
-                    </button>
+
+                  <p class="font-body-sm text-body-sm text-on-surface-variant text-[12px] leading-relaxed">
+                    Blok sel data di lembar Excel Anda (kolom: <strong>NIP, Nama Karyawan, No HP, Jabatan, Departemen</strong>), tekan <strong>Ctrl+C</strong> (Salin), lalu tekan <strong>Ctrl+V</strong> (Tempel) di kotak bawah ini:
+                  </p>
+
+                  <textarea class="w-full h-24 p-3 rounded-lg bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary font-mono text-[12px] leading-relaxed transition-all" id="excelPasteTextarea" placeholder="EMP-1001	Ahmad Pratama	08123456789	Mining Engineer	Mining Operations&#10;EMP-1002	Bunga Citra	08198765432	Process Specialist	Processing Plant"></textarea>
+
+                  <!-- PILIHAN CARA TERAPKAN / UPDATE TABEL -->
+                  <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pt-1 border-t border-outline-variant/30">
+                    <div class="flex flex-wrap items-center gap-3 text-[12px] text-on-surface-variant">
+                      <span class="font-semibold text-on-surface flex items-center gap-1 text-[12px]">
+                        <span class="material-symbols-outlined text-[16px] text-primary">sync_saved_locally</span>
+                        Tindakan Penerapan:
+                      </span>
+                      <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-on-surface select-none" title="Ganti seluruh baris yang ada di tabel dengan data baru yang ditempel">
+                        <input type="radio" name="pasteApplyMode" value="replace" checked class="text-primary focus:ring-primary w-4 h-4">
+                        <span class="font-medium text-on-surface">Ganti / Perbarui Seluruh Tabel</span>
+                      </label>
+                      <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-on-surface select-none" title="Jika NIP sudah ada, perbarui datanya. Jika NIP belum ada, buat baris baru">
+                        <input type="radio" name="pasteApplyMode" value="update" class="text-primary focus:ring-primary w-4 h-4">
+                        <span>Cocokkan NIP (Update) &amp; Tambah Baru</span>
+                      </label>
+                      <label class="inline-flex items-center gap-1.5 cursor-pointer hover:text-on-surface select-none" title="Tambahkan data baru di bawah baris yang sudah ada">
+                        <input type="radio" name="pasteApplyMode" value="append" class="text-primary focus:ring-primary w-4 h-4">
+                        <span>Tambahkan di Bawah</span>
+                      </label>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 shrink-0">
+                      <button class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm transition-colors cursor-pointer" onclick="toggleExcelQuickPasteArea(false)" type="button">Batal</button>
+                      <button class="px-4 py-1.5 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-sm text-label-sm font-semibold transition-all shadow-sm flex items-center gap-1.5 cursor-pointer" onclick="applyExcelPaste()" type="button">
+                        <span class="material-symbols-outlined text-[16px]">system_update_alt</span>
+                        <span>Terapkan ke Tabel</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -3946,68 +3974,282 @@
   }
 
   // ===========================================================================
-  // 5. PASTE EXCEL (TSV) & IMPORT CSV
+  // 5. PASTE EXCEL (TSV) & UPDATE TABEL PESERTA
   // ===========================================================================
+  async function toggleExcelQuickPasteArea(forceState) {
+    const wrap = document.getElementById('excelQuickPasteArea');
+    const area = document.getElementById('excelPasteTextarea');
+    if (!wrap) return;
+
+    const willOpen = (typeof forceState === 'boolean') ? forceState : wrap.classList.contains('hidden');
+    if (willOpen) {
+      wrap.classList.remove('hidden');
+      if (area) {
+        // Coba baca clipboard otomatis jika kotak masih kosong
+        if (!area.value.trim() && navigator.clipboard && navigator.clipboard.readText) {
+          try {
+            const clipText = await navigator.clipboard.readText();
+            if (clipText && (clipText.includes('\t') || clipText.includes('\n'))) {
+              area.value = clipText;
+              showToast('info', 'Data Terdeteksi dari Clipboard', 'Data dari Excel telah otomatis ditempelkan ke kotak teks. Silakan periksa opsi dan klik Terapkan ke Tabel.');
+            }
+          } catch (e) {
+            // Pengguna belum memberikan izin clipboard browser, abaikan
+          }
+        }
+        area.focus();
+      }
+    } else {
+      wrap.classList.add('hidden');
+    }
+  }
+
+  function exportTableToPasteArea() {
+    const realRows = document.querySelectorAll('#participantTableBody tr:not([data-is-example])');
+    if (realRows.length === 0) {
+      showToast('warning', 'Tabel Masih Kosong', 'Belum ada data peserta di tabel untuk dimuat.');
+      return;
+    }
+
+    const tsvLines = [];
+    realRows.forEach(r => {
+      const nip = r.querySelector('.p-nip')?.value.trim() || '';
+      const nama = r.querySelector('.p-nama')?.value.trim() || '';
+      const hp = r.querySelector('.p-hp')?.value.trim() || '';
+      const jabatan = r.querySelector('.p-jabatan')?.value.trim() || '';
+      const dept = r.querySelector('.p-dept')?.value.trim() || '';
+      if (nip || nama) {
+        tsvLines.push([nip, nama, hp, jabatan, dept].join('\t'));
+      }
+    });
+
+    const area = document.getElementById('excelPasteTextarea');
+    if (area) {
+      area.value = tsvLines.join('\n');
+      area.focus();
+      showToast('success', 'Data Tabel Dimuat', `${tsvLines.length} baris peserta berhasil dimuat ke kotak teks. Anda dapat mengedit lalu menerapkan kembali perubahan ke tabel.`);
+    }
+  }
+
   async function pasteFromClipboard() {
     try {
       const text = await navigator.clipboard.readText();
       if (!text || text.trim() === '') {
-        showToast('warning', 'Clipboard Kosong', 'Silakan salin (Copy) tabel dari Excel terlebih dahulu.');
+        showToast('warning', 'Clipboard Kosong', 'Silakan salin (Copy) tabel peserta dari Excel terlebih dahulu.');
+        toggleExcelQuickPasteArea(true);
         return;
       }
-      processTsvData(text);
+      processTsvData(text, 'replace');
     } catch (err) {
-      const manual = prompt('Tempelkan teks tabel dari Excel (Ctrl+V) di sini:');
-      if (manual) processTsvData(manual);
+      toggleExcelQuickPasteArea(true);
+      showToast('info', 'Tempelkan Data', 'Silakan tekan Ctrl+V pada kotak teks yang terbuka lalu klik Terapkan ke Tabel.');
     }
   }
 
-  function processTsvData(tsvText) {
-    removeExampleRow(); // Hapus data contoh
+  function applyExcelPaste(forcedMode) {
+    const area = document.getElementById('excelPasteTextarea');
+    const text = (area ? area.value : '').trim();
+    if (!text) {
+      showToast('warning', 'Area Paste Kosong', 'Tempelkan (Ctrl+V) data tabel dari Excel terlebih dahulu ke kotak teks.');
+      if (area) area.focus();
+      return;
+    }
+
+    // Deteksi mode yang dipilih: 'replace' (ganti/perbarui), 'update' (cocokkan NIP & tambah baru), atau 'append' (tambahkan di bawah)
+    let mode = forcedMode;
+    if (!mode) {
+      const radio = document.querySelector('input[name="pasteApplyMode"]:checked');
+      mode = radio ? radio.value : 'replace';
+    }
+
+    processTsvData(text, mode);
+    if (area) area.value = '';
+    const wrap = document.getElementById('excelQuickPasteArea');
+    if (wrap) wrap.classList.add('hidden');
+  }
+
+  function processTsvData(tsvText, mode = 'replace') {
+    if (!tsvText || !tsvText.trim()) return;
+    removeExampleRow(); // Hapus baris contoh jika ada
+
     const lines = tsvText.trim().split(/\r\n|\n|\r/);
-    let inserted = 0;
+    const parsedData = [];
 
     for (let i = 0; i < lines.length; i++) {
-      if (!lines[i].trim()) continue;
-      let parts = lines[i].split('\t');
-      if (parts.length < 2) parts = lines[i].split(',');
+      const line = lines[i].trim();
+      if (!line) continue;
 
-      // Skip header jika terdeteksi
-      if (i === 0 && (parts[0].toLowerCase().includes('nip') || parts[0].toLowerCase().includes('id'))) {
-        continue;
+      let parts = line.split('\t');
+      if (parts.length < 2) parts = line.split(';');
+      if (parts.length < 2) parts = line.split(',');
+
+      // Bersihkan tanda kutip ganda dan spasi berlebih
+      parts = parts.map(p => (p || '').trim().replace(/^["']|["']$/g, '').trim());
+
+      // Lewati baris header jika terdeteksi di baris pertama
+      if (i === 0) {
+        const lineLower = line.toLowerCase();
+        if (lineLower.includes('nip') || lineLower.includes('nik') || lineLower.includes('id_karyawan') || lineLower.includes('nama_karyawan') || lineLower.includes('nama') || lineLower.includes('jabatan') || lineLower.includes('departemen')) {
+          continue;
+        }
       }
 
-      if (parts.length >= 2) {
-        addParticipantRow({
-          nip: parts[0] ? parts[0].trim() : '',
-          nama: parts[1] ? parts[1].trim() : '',
-          hp: parts[2] ? parts[2].trim() : '',
-          jabatan: parts[3] ? parts[3].trim() : '',
-          dept: parts[4] ? parts[4].trim() : ''
+      // Jika kolom pertama adalah nomor urut (angka 1, 2, 3...) dan kolom berikutnya adalah NIP/Nama
+      if (parts.length >= 3 && /^\d{1,3}$/.test(parts[0]) && (parts[1].length > 2 || isNaN(parts[1]))) {
+        parts.shift(); // Buang kolom nomor urut
+      }
+
+      if (parts.length >= 2 || (parts[0] && parts[0].length >= 3)) {
+        parsedData.push({
+          nip: parts[0] || '',
+          nama: parts[1] || '',
+          hp: parts[2] || '',
+          jabatan: parts[3] || '',
+          dept: parts[4] || ''
         });
-        inserted++;
       }
     }
 
-    if (inserted > 0) {
-      showToast('success', 'Data Excel Ditempel', `${inserted} peserta berhasil ditambahkan dari clipboard.`);
-    } else {
-      showToast('warning', 'Format Tidak Sesuai', 'Pastikan data memuat minimal kolom NIP dan Nama.');
+    if (parsedData.length === 0) {
+      showToast('warning', 'Format Tidak Sesuai', 'Pastikan data memuat minimal kolom NIP dan Nama Karyawan.');
+      return;
     }
+
+    let inserted = 0;
+    let updated = 0;
+
+    if (mode === 'replace') {
+      // MODE 1: GANTI / PERBARUI SELURUH TABEL
+      const tbody = document.getElementById('participantTableBody');
+      if (tbody) tbody.innerHTML = ''; // Bersihkan seluruh baris yang ada sebelumnya
+      rowCount = 0;
+
+      parsedData.forEach(item => {
+        addParticipantRow(item);
+        inserted++;
+      });
+
+      showToast('success', 'Tabel Berhasil Diperbarui', `${inserted} data peserta dari Excel telah diterapkan ke tabel.`);
+
+    } else if (mode === 'update') {
+      // MODE 2: COCOKKAN NIP (UPDATE) & TAMBAH DATA BARU
+      const existingRows = Array.from(document.querySelectorAll('#participantTableBody tr:not([data-is-example])'));
+
+      parsedData.forEach(item => {
+        const cleanNip = (item.nip || '').trim().toLowerCase();
+        // Cari baris yang memiliki NIP cocok
+        const matchedRow = cleanNip
+          ? existingRows.find(r => (r.querySelector('.p-nip')?.value.trim().toLowerCase() === cleanNip))
+          : null;
+
+        if (matchedRow) {
+          // Update data baris yang ada
+          if (item.nama) {
+            const el = matchedRow.querySelector('.p-nama');
+            if (el) el.value = item.nama;
+          }
+          if (item.hp) {
+            const el = matchedRow.querySelector('.p-hp');
+            if (el) el.value = item.hp;
+          }
+          if (item.jabatan) {
+            const el = matchedRow.querySelector('.p-jabatan');
+            if (el) el.value = item.jabatan;
+          }
+          if (item.dept) {
+            const el = matchedRow.querySelector('.p-dept');
+            if (el) el.value = item.dept;
+          }
+
+          // Efek visual highlight pada baris yang diperbarui
+          matchedRow.classList.add('bg-emerald-500/10', 'transition-all');
+          setTimeout(() => {
+            matchedRow.classList.remove('bg-emerald-500/10');
+          }, 1200);
+
+          updated++;
+        } else {
+          // NIP belum ada, buat baris baru
+          addParticipantRow(item);
+          inserted++;
+        }
+      });
+
+      updateRowIndices();
+      updateQuotaMetrics();
+
+      if (updated > 0 && inserted > 0) {
+        showToast('success', 'Tabel Diperbarui', `${updated} peserta diperbarui & ${inserted} peserta baru ditambahkan.`);
+      } else if (updated > 0) {
+        showToast('success', 'Data Diperbarui', `${updated} data peserta yang ada di tabel berhasil diperbarui dari Excel.`);
+      } else {
+        showToast('success', 'Peserta Ditambahkan', `${inserted} peserta baru berhasil ditambahkan ke tabel.`);
+      }
+
+    } else {
+      // MODE 3: TAMBAHKAN DI BAWAH (APPEND)
+      parsedData.forEach(item => {
+        addParticipantRow(item);
+        inserted++;
+      });
+      showToast('success', 'Peserta Ditambahkan', `${inserted} peserta baru berhasil ditambahkan ke tabel.`);
+    }
+  }
+
+  // Listener untuk Paste (Ctrl+V) langsung pada tabel
+  function setupTablePasteListener() {
+    const tableContainer = document.getElementById('participantTable');
+    if (tableContainer && !tableContainer.__pasteListenerAttached) {
+      tableContainer.__pasteListenerAttached = true;
+      tableContainer.addEventListener('paste', (e) => {
+        const text = (e.clipboardData || window.clipboardData)?.getData('text');
+        if (!text) return;
+
+        // Jika data dari clipboard berupa baris/kolom tabel (memiliki tab atau newline)
+        if (text.includes('\t') || text.includes('\n')) {
+          e.preventDefault(); // Cegah masuknya seluruh teks tabel ke dalam satu input saja
+          
+          const realRows = document.querySelectorAll('#participantTableBody tr:not([data-is-example])');
+          // Jika tabel masih kosong, gunakan mode replace langsung
+          // Jika tabel sudah ada isinya, buka quick paste area dan isi teksnya agar pengguna bisa memilih opsi update/replace
+          if (realRows.length === 0) {
+            processTsvData(text, 'replace');
+            showToast('success', 'Data Excel Diterapkan', 'Data peserta dari clipboard berhasil dimasukkan langsung ke tabel.');
+          } else {
+            const area = document.getElementById('excelPasteTextarea');
+            if (area) area.value = text;
+            toggleExcelQuickPasteArea(true);
+            showToast('info', 'Pembaruan Tabel', 'Data tabel terdeteksi dari Excel. Tentukan opsi penerapan lalu klik "Terapkan ke Tabel".');
+          }
+        }
+      });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupTablePasteListener);
+  } else {
+    setupTablePasteListener();
+  }
+
+  // Stubs pembantu untuk kompatibilitas
+  function handleCsvUpload(event) {
+    showToast('info', 'Gunakan Paste dari Excel', 'Silakan gunakan tombol "Paste dari Excel" untuk menempelkan data tabel secara langsung.');
+    if (event && event.target) event.target.value = '';
   }
 
   function importCsvFile(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    removeExampleRow();
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      processTsvData(e.target.result);
-      event.target.value = '';
-    };
-    reader.readAsText(file);
+    handleCsvUpload(event);
   }
+
+  // Bind ke objek window secara eksplisit
+  window.toggleExcelQuickPasteArea = toggleExcelQuickPasteArea;
+  window.exportTableToPasteArea = exportTableToPasteArea;
+  window.applyExcelPaste = applyExcelPaste;
+  window.handleCsvUpload = handleCsvUpload;
+  window.importCsvFile = handleCsvUpload;
+  window.pasteFromClipboard = pasteFromClipboard;
+  window.processTsvData = processTsvData;
 
   function downloadTemplateExcel() {
     const csv = "ID_Karyawan,Nama_Karyawan,No_HP,Jabatan,Departemen\n" +
