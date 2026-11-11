@@ -997,9 +997,13 @@
 </div>
 <!-- Action Triggers -->
 <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 shrink-0 w-full sm:w-auto">
-<button type="button" onclick="exportSchedulesToCsv('internal')" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 h-10 px-4 rounded-xl bg-surface-container-lowest text-on-surface font-label-md text-label-md shadow-sm hover:bg-surface-container-low border border-outline-variant/50 transition-all cursor-pointer">
-<span class="material-symbols-outlined text-[19px] text-tertiary">download</span>
-<span class="">Ekspor Kalender (.CSV / Excel)</span>
+<button type="button" onclick="downloadTrainingCalendarIcs('internal')" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 h-10 px-4 rounded-xl bg-primary text-on-primary font-label-md text-label-md font-semibold shadow-sm hover:bg-primary-container transition-all cursor-pointer" title="Download Kalender Pelatihan (.ics) lengkap dengan jam dan ruangan untuk Google Calendar, Outlook, dan HP">
+<span class="material-symbols-outlined text-[19px]">event</span>
+<span>Download Kalender (.ics)</span>
+</button>
+<button type="button" onclick="exportSchedulesToCsv('internal')" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 h-10 px-4 rounded-xl bg-surface-container-lowest text-on-surface font-label-md text-label-md shadow-sm hover:bg-surface-container-low border border-outline-variant/50 transition-all cursor-pointer" title="Ekspor daftar jadwal lengkap (.csv / Excel)">
+<span class="material-symbols-outlined text-[19px] text-tertiary">table_view</span>
+<span>Ekspor Excel (.csv)</span>
 </button>
 <button type="button" data-admin-only="true" onclick="openAdminScheduleModal('batch', null, 'internal')" class="hidden flex-1 sm:flex-none items-center justify-center gap-2 h-10 px-4 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300/80 font-label-md text-label-md shadow-xs transition-all font-semibold cursor-pointer">
 <span class="material-symbols-outlined text-[19px] text-amber-700">library_add</span>
@@ -1007,7 +1011,7 @@
 </button>
 <button type="button" data-admin-only="true" onclick="openAdminScheduleModal('add', null, 'internal')" class="hidden flex-1 sm:flex-none items-center justify-center gap-2 h-10 px-5 rounded-xl bg-primary text-on-primary font-label-md text-label-md shadow-sm hover:bg-primary-container transition-all font-semibold cursor-pointer">
 <span class="material-symbols-outlined text-[20px]">add_circle</span>
-<span class="">+ Tambah Jadwal Pelatihan</span>
+<span>+ Tambah Jadwal Pelatihan</span>
 </button>
 </div>
 </div>
@@ -1131,7 +1135,11 @@
 </div>
 <!-- Status Kuota -->
 <div class="relative">
-<select id="schedule-status-filter" onchange="filterSchedules()" class="h-10 pl-3 pr-8 bg-surface-container-low text-on-surface font-label-md text-label-md rounded-xl border-0 appearance-none cursor-pointer focus:ring-2 focus:ring-primary"><option value="all">Status: Semua</option>
+<select id="schedule-status-filter" onchange="filterSchedules()" class="h-10 pl-3 pr-8 bg-surface-container-low text-on-surface font-label-md text-label-md rounded-xl border-0 appearance-none cursor-pointer focus:ring-2 focus:ring-primary"><option value="all">Status: Semua Jadwal & Request</option>
+<option value="official">Hanya Jadwal Resmi</option>
+<option value="request">Semua Training Request</option>
+<option value="request_unscheduled">Request: Belum Didaftarkan Admin LnD</option>
+<option value="request_synced">Request: Tersinkron Jadwal Resmi</option>
 <option value="open">Pendaftaran Buka</option>
 <option value="full">Kuota Penuh</option>
 <option value="running">Sedang Berlangsung</option>
@@ -1475,11 +1483,128 @@
     <div class="day-events-container mt-1 flex flex-col gap-1 w-full flex-1" data-day-container="oct-5"></div>
   </div>
 </div>
+<!-- CATATAN & KETENTUAN RESMI KALENDER INTERNAL TRAINING -->
+<div class="p-4 sm:p-5 bg-gradient-to-r from-amber-500/10 via-surface-container-lowest to-emerald-500/10 border-t border-surface-container flex flex-col gap-3.5">
+  <div class="flex flex-wrap items-center justify-between gap-2.5">
+    <div class="flex items-center gap-2">
+      <span class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-800 flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined text-[19px]">notifications_active</span>
+      </span>
+      <span class="text-xs sm:text-sm font-bold text-on-surface uppercase tracking-wider">Catatan &amp; Ketentuan Resmi Kalender Pelatihan</span>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold text-xs shadow-2xs">
+        <span class="material-symbols-outlined text-[15px] text-emerald-700">handshake</span>
+        Telah Disepakati Bersama
+      </span>
+      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-950 border border-amber-300 font-bold text-xs shadow-2xs">
+        <span class="material-symbols-outlined text-[15px] text-amber-700">schedule</span>
+        Cut-Off Tgl 25
+      </span>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+    <!-- Poin 1: Pengiriman Email -->
+    <div class="p-3.5 rounded-xl bg-surface-container-lowest/90 border border-amber-200/80 shadow-2xs flex items-start gap-3">
+      <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 mt-0.5">
+        <span class="material-symbols-outlined text-[18px]">mark_email_read</span>
+      </div>
+      <div class="flex flex-col gap-0.5 min-w-0">
+        <span class="text-xs font-bold text-amber-950">Pengiriman Email Seluruh Pekerja</span>
+        <p class="text-xs text-on-surface leading-relaxed">
+          Pengiriman ke email semua pekerja maksimal <strong class="text-amber-900 font-bold">tanggal 25</strong> setiap bulannya.
+        </p>
+      </div>
+    </div>
+
+    <!-- Poin 2: Kesepakatan Bersama -->
+    <div class="p-3.5 rounded-xl bg-surface-container-lowest/90 border border-emerald-200/80 shadow-2xs flex items-start gap-3">
+      <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5">
+        <span class="material-symbols-outlined text-[18px]">verified</span>
+      </div>
+      <div class="flex flex-col gap-0.5 min-w-0">
+        <span class="text-xs font-bold text-emerald-950">Persetujuan &amp; Kesepakatan Bersama</span>
+        <p class="text-xs text-on-surface leading-relaxed">
+          Kalender ini telah <strong class="text-emerald-900 font-bold">disepakati bersama</strong> antara <strong class="text-emerald-900 font-semibold">Trainer</strong> dan <strong class="text-emerald-900 font-semibold">HOD</strong> serta <strong class="text-emerald-900 font-semibold">Team LnD</strong>.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-[11px] text-on-surface-variant font-medium border-t border-surface-container/60">
+    <span class="flex items-center gap-1.5">
+      <span class="material-symbols-outlined text-[14px] text-primary">groups</span>
+      <span>Stakeholder: Trainer Internal &bull; Seluruh HOD Terkait &bull; Learning &amp; Development Pani Gold Project</span>
+    </span>
+    <span class="flex items-center gap-1 text-outline">
+      <span class="material-symbols-outlined text-[14px]">policy</span>
+      <span>SOP Pelaksanaan Pelatihan &amp; Manajemen Kuota</span>
+    </span>
+  </div>
+</div>
 </div>
 <!-- ============================================== -->
 <!-- VIEW 2: WEEK VIEW (TIMELINE / SLOTS)          -->
 <!-- ============================================== -->
-<div id="view-week" class="view-panel bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/40 overflow-hidden flex flex-col hidden"><div class="px-6 py-4 border-b border-surface-container flex flex-wrap items-center justify-between gap-3 bg-surface-container-low/30"><div><div class="flex items-center gap-2 flex-wrap"><h3 id="week-view-title" class="font-title-md text-title-md font-bold text-on-surface">Jadwal Mingguan</h3><span id="week-count-badge" class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-label-sm font-semibold">0 Pelatihan Terjadwal</span></div><p class="text-body-sm text-on-surface-variant">Situs Tambang Pani Gold Project &bull; WIB</p></div><div id="week-capacity-summary" class="text-body-sm text-on-surface-variant"></div></div><div id="week-view-body" class="p-4 sm:p-6 flex flex-col gap-6 overflow-x-auto"></div></div>
+<div id="view-week" class="view-panel bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/40 overflow-hidden flex flex-col hidden">
+  <div class="px-6 py-4 border-b border-surface-container flex flex-wrap items-center justify-between gap-3 bg-surface-container-low/30">
+    <div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <h3 id="week-view-title" class="font-title-md text-title-md font-bold text-on-surface">Jadwal Mingguan</h3>
+        <span id="week-count-badge" class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-label-sm font-semibold">0 Pelatihan Terjadwal</span>
+      </div>
+      <p class="text-body-sm text-on-surface-variant">Situs Tambang Pani Gold Project &bull; WIB</p>
+    </div>
+    <div id="week-capacity-summary" class="text-body-sm text-on-surface-variant"></div>
+  </div>
+  <div id="week-view-body" class="p-4 sm:p-6 flex flex-col gap-6 overflow-x-auto"></div>
+  <!-- CATATAN & KETENTUAN RESMI KALENDER INTERNAL TRAINING -->
+  <div class="p-4 sm:p-5 bg-gradient-to-r from-amber-500/10 via-surface-container-lowest to-emerald-500/10 border-t border-surface-container flex flex-col gap-3.5">
+    <div class="flex flex-wrap items-center justify-between gap-2.5">
+      <div class="flex items-center gap-2">
+        <span class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-800 flex items-center justify-center shrink-0">
+          <span class="material-symbols-outlined text-[19px]">notifications_active</span>
+        </span>
+        <span class="text-xs sm:text-sm font-bold text-on-surface uppercase tracking-wider">Catatan &amp; Ketentuan Resmi Kalender Pelatihan</span>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold text-xs shadow-2xs">
+          <span class="material-symbols-outlined text-[15px] text-emerald-700">handshake</span>
+          Telah Disepakati Bersama
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-950 border border-amber-300 font-bold text-xs shadow-2xs">
+          <span class="material-symbols-outlined text-[15px] text-amber-700">schedule</span>
+          Cut-Off Tgl 25
+        </span>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+      <div class="p-3.5 rounded-xl bg-surface-container-lowest/90 border border-amber-200/80 shadow-2xs flex items-start gap-3">
+        <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 mt-0.5">
+          <span class="material-symbols-outlined text-[18px]">mark_email_read</span>
+        </div>
+        <div class="flex flex-col gap-0.5 min-w-0">
+          <span class="text-xs font-bold text-amber-950">Pengiriman Email Seluruh Pekerja</span>
+          <p class="text-xs text-on-surface leading-relaxed">
+            Pengiriman ke email semua pekerja maksimal <strong class="text-amber-900 font-bold">tanggal 25</strong> setiap bulannya.
+          </p>
+        </div>
+      </div>
+      <div class="p-3.5 rounded-xl bg-surface-container-lowest/90 border border-emerald-200/80 shadow-2xs flex items-start gap-3">
+        <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5">
+          <span class="material-symbols-outlined text-[18px]">verified</span>
+        </div>
+        <div class="flex flex-col gap-0.5 min-w-0">
+          <span class="text-xs font-bold text-emerald-950">Persetujuan &amp; Kesepakatan Bersama</span>
+          <p class="text-xs text-on-surface leading-relaxed">
+            Kalender ini telah <strong class="text-emerald-900 font-bold">disepakati bersama</strong> antara <strong class="text-emerald-900 font-semibold">Trainer</strong> dan <strong class="text-emerald-900 font-semibold">HOD</strong> serta <strong class="text-emerald-900 font-semibold">Team LnD</strong>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- ============================================== -->
 <!-- VIEW 3: YEAR VIEW (12-MONTH MATRIX & HEATMAP) -->
 <!-- ============================================== -->
@@ -1647,6 +1772,14 @@
             </div>
             <!-- Action Triggers -->
             <div class="flex flex-wrap items-center gap-2 sm:gap-2.5 shrink-0 w-full sm:w-auto">
+              <button type="button" onclick="downloadTrainingCalendarIcs('external')" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 h-10 px-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-label-md text-label-md font-semibold shadow-sm transition-all cursor-pointer" title="Download Kalender External & Event (.ics) lengkap dengan jam dan ruangan">
+                <span class="material-symbols-outlined text-[18px]">event</span>
+                <span>Download Kalender (.ics)</span>
+              </button>
+              <button type="button" onclick="exportSchedulesToCsv('external')" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 h-10 px-3.5 rounded-xl bg-surface-container-lowest text-emerald-900 border border-emerald-600/40 hover:bg-emerald-50 font-label-md text-label-md font-semibold shadow-xs transition-all cursor-pointer" title="Ekspor daftar jadwal External lengkap (.csv / Excel)">
+                <span class="material-symbols-outlined text-[18px] text-emerald-700">table_view</span>
+                <span>Ekspor Excel (.csv)</span>
+              </button>
               <button type="button" onclick="refreshDataWithLoader()" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 h-10 px-3.5 rounded-xl bg-surface-container-lowest text-on-surface font-label-md text-label-md shadow-sm hover:bg-surface-container-low border border-outline-variant/50 transition-all cursor-pointer">
                 <span class="material-symbols-outlined text-[18px] text-emerald-700">sync</span>
                 <span>Segarkan</span>
@@ -2583,7 +2716,7 @@
           <div class="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
             <div class="relative w-full sm:w-56">
               <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-outline text-[16px] pointer-events-none">search</span>
-              <input type="text" id="modal-participant-search" oninput="filterModalParticipants(this.value)" placeholder="Cari nama, NIP, dept..." class="w-full h-8 pl-8 pr-7 rounded-lg bg-surface-container-lowest border border-outline-variant/60 font-body-sm text-[12px] text-on-surface focus:outline-none focus:ring-1 focus:ring-primary shadow-xs" autocomplete="off">
+              <input type="text" id="modal-participant-search" oninput="filterModalParticipants(this.value)" placeholder="Cari nama, NIP, dept, PIC..." class="w-full h-8 pl-8 pr-7 rounded-lg bg-surface-container-lowest border border-outline-variant/60 font-body-sm text-[12px] text-on-surface focus:outline-none focus:ring-1 focus:ring-primary shadow-xs" autocomplete="off">
               <button type="button" id="modal-participant-search-clear" onclick="clearModalParticipantSearch()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface text-xs">
                 <span class="material-symbols-outlined text-[14px]">close</span>
               </button>
@@ -2594,7 +2727,7 @@
         <div class="overflow-x-auto">
           <table class="w-full text-left text-body-sm">
             <thead class="text-[12px] text-on-surface-variant bg-surface-container-low/60 border-y border-outline-variant/50">
-              <tr><th class="py-2 px-4 sm:px-6 font-medium w-12">No</th><th class="py-2 px-3 font-medium">Nama</th><th class="py-2 px-3 font-medium hidden sm:table-cell">Perusahaan</th><th class="py-2 px-3 font-medium hidden sm:table-cell">Departemen</th><th class="py-2 px-4 sm:px-6 font-medium text-right">Status</th></tr>
+              <tr><th class="py-2 px-4 sm:px-6 font-medium w-12">No</th><th class="py-2 px-3 font-medium">Nama</th><th class="py-2 px-3 font-medium hidden sm:table-cell">Perusahaan &amp; PIC</th><th class="py-2 px-3 font-medium hidden sm:table-cell">Departemen</th><th class="py-2 px-4 sm:px-6 font-medium text-right">Status</th></tr>
             </thead>
             <tbody id="participant-table-body" class="divide-y divide-surface-container"></tbody>
           </table>
@@ -2626,9 +2759,15 @@
 
       <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-3">
         <button type="button" onclick="closeTrainingDetailModal()" class="w-full sm:w-auto h-10 px-4 rounded-xl text-on-surface-variant hover:bg-surface-container font-label-md text-label-md font-semibold transition-all">Tutup</button>
-        <button type="button" id="modal-btn-register" class="w-full sm:w-auto h-10 px-5 rounded-xl bg-primary text-on-primary hover:bg-primary-container font-label-md text-label-md font-semibold inline-flex items-center justify-center gap-1.5 shadow-sm transition-all">
-          <span class="material-symbols-outlined text-[18px]">person_add</span>Daftarkan Peserta
-        </button>
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-2.5 w-full sm:w-auto">
+          <button type="button" id="modal-btn-download-ics" onclick="downloadSingleScheduleIcs(currentModalJadwalId)" class="w-full sm:w-auto h-10 px-4 rounded-xl bg-surface-container-lowest hover:bg-surface-container text-on-surface border border-outline-variant/60 font-label-md text-label-md font-semibold inline-flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer" title="Download agenda pelatihan ini ke Google Calendar / Outlook (.ics)">
+            <span class="material-symbols-outlined text-[18px] text-primary">event</span>
+            <span>Download Kalender (.ics)</span>
+          </button>
+          <button type="button" id="modal-btn-register" class="w-full sm:w-auto h-10 px-5 rounded-xl bg-primary text-on-primary hover:bg-primary-container font-label-md text-label-md font-semibold inline-flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">person_add</span>Daftarkan Peserta
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -3396,6 +3535,7 @@
     if (tabName === 'beranda') renderHome();
     if (tabName === 'external' && typeof renderExtAllViews === 'function') renderExtAllViews();
   }
+  window.switchPageTab = switchPageTab;
 
   function initAmbassador() {
     const imgs = Array.from(document.querySelectorAll('.amb-img')), dots = Array.from(document.querySelectorAll('.amb-dot'));
@@ -3444,6 +3584,24 @@
         return minA - minB;
       }).slice(0, 4);
     box.innerHTML = up.length ? up.map(({ s, r }) => {
+      if (s.is_request) {
+        const isSynced = !!s.is_synced;
+        return `<button type="button" onclick="openTrainingDetailModal(${jsArg(s.id_jadwal)})" class="w-full flex items-center gap-4 py-3.5 text-left hover:bg-amber-50/60 transition-colors">
+          <div class="w-14 shrink-0 border-2 border-amber-400 rounded text-center py-1.5 bg-amber-50">
+            <div class="font-title-md text-title-md font-extrabold text-amber-900 leading-none">${r[0].getDate()}</div>
+            <div class="text-[11px] text-amber-800 font-bold mt-0.5">${MONTH_NAMES[r[0].getMonth()].slice(0, 3)}</div>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="font-title-sm text-title-sm font-bold text-on-surface truncate flex items-center gap-1.5">
+              <span class="px-1.5 py-0.2 rounded bg-amber-500 text-slate-950 text-[10px] font-extrabold">REQ</span>
+              <span class="truncate">${escapeHtml(s.agenda)}</span>
+            </div>
+            <div class="text-body-sm text-amber-900 font-medium truncate">${isSynced ? 'Tersinkron: ' + escapeHtml(s.synced_schedule_id) : 'Belum didaftarkan Admin LnD'} &bull; ${(s.peserta || []).length} Peserta</div>
+          </div>
+          <div class="text-right shrink-0 text-label-md font-bold ${isSynced ? 'text-emerald-700' : 'text-amber-800'}">${isSynced ? 'Tersinkron' : 'Menunggu'}</div>
+          <span class="material-symbols-outlined text-[18px] text-amber-600 hidden sm:block">chevron_right</span>
+        </button>`;
+      }
       const sisa = Number(s.sisa_kuota), full = !isNaN(sisa) && sisa <= 0;
       return `<button type="button" onclick="openTrainingDetailModal(${jsArg(s.id_jadwal)})" class="w-full flex items-center gap-4 py-3.5 text-left hover:bg-surface-container-low/60 transition-colors">
         <div class="w-14 shrink-0 border border-outline-variant/70 rounded text-center py-1.5 bg-surface-container-lowest">
@@ -3769,14 +3927,28 @@
           <div class="flex flex-col gap-1.5 mt-1 max-h-[190px] overflow-y-auto pr-1">
             ${monthItems.map(it => {
               const itPast = isSchedulePast(it);
-              const regCount = getScheduleRegisteredCount(it);
+              const isReq = !!it.is_request;
+              const isSynced = !!it.is_synced;
+              const regCount = (it.peserta ? it.peserta.length : 0) || getScheduleRegisteredCount(it);
+              const dotColor = isReq
+                ? (isSynced ? 'bg-amber-500' : 'bg-orange-500')
+                : (itPast ? 'bg-outline' : 'bg-primary');
+              const itemTitle = isReq
+                ? `[Training Request] ${it.agenda} (${isSynced ? 'Tersinkron: ' + it.synced_schedule_id : 'Belum didaftarkan Admin LnD'})`
+                : `${it.agenda} (${regCount} Peserta Terdaftar)`;
+              const badgeText = isReq
+                ? (isSynced ? 'REQ SYNC' : 'REQ: Menunggu')
+                : `${regCount} Peserta`;
+              const badgeClass = isReq
+                ? (isSynced ? 'bg-emerald-100 text-emerald-800 font-bold' : 'bg-amber-100 text-amber-900 font-bold')
+                : (regCount > 0 ? 'text-primary' : 'text-outline');
               return `
-              <div onclick="event.stopPropagation(); openTrainingDetailModal(${jsArg(it.id_jadwal)})" class="px-2.5 py-1.5 rounded-lg bg-surface-container-lowest border border-outline-variant/40 text-[11px] font-medium ${itPast ? 'opacity-60 text-on-surface-variant' : 'text-on-surface'} flex items-center justify-between gap-2 hover:border-primary hover:bg-primary-fixed/40 transition-all cursor-pointer" title="${escapeHtml(it.agenda)} (${regCount} Peserta Terdaftar)">
+              <div onclick="event.stopPropagation(); openTrainingDetailModal(${jsArg(it.id_jadwal)})" class="px-2.5 py-1.5 rounded-lg ${isReq ? 'bg-amber-50/80 border-amber-300' : 'bg-surface-container-lowest border-outline-variant/40'} border text-[11px] font-medium ${itPast ? 'opacity-60 text-on-surface-variant' : 'text-on-surface'} flex items-center justify-between gap-2 hover:border-amber-500 hover:bg-amber-100/50 transition-all cursor-pointer" title="${escapeHtml(itemTitle)}">
                 <div class="flex items-center gap-1.5 min-w-0 flex-1">
-                  <span class="w-1.5 h-1.5 rounded-full ${itPast ? 'bg-outline' : 'bg-primary'} shrink-0"></span>
-                  <span class="truncate font-semibold">${escapeHtml(it.agenda)}</span>
+                  <span class="w-1.5 h-1.5 rounded-full ${dotColor} shrink-0"></span>
+                  <span class="truncate font-semibold">${isReq ? '<span class="text-amber-800 font-bold">[REQ] </span>' : ''}${escapeHtml(it.agenda)}</span>
                 </div>
-                <span class="px-1.5 py-0.5 rounded bg-surface-container text-[10px] font-bold ${regCount > 0 ? 'text-primary' : 'text-outline'} shrink-0">${regCount} Peserta</span>
+                <span class="px-1.5 py-0.5 rounded bg-surface-container text-[10px] font-bold ${badgeClass} shrink-0">${badgeText}</span>
               </div>
               `;
             }).join('')}
@@ -3962,7 +4134,15 @@
       }
 
       // 2. Status matching
-      if (status === 'open') {
+      if (status === 'official') {
+        if (item.is_request) return false;
+      } else if (status === 'request') {
+        if (!item.is_request) return false;
+      } else if (status === 'request_unscheduled') {
+        if (!item.is_request || item.is_synced) return false;
+      } else if (status === 'request_synced') {
+        if (!item.is_request || !item.is_synced) return false;
+      } else if (status === 'open') {
         const sisa = parseInt(item.sisa_kuota, 10);
         if (!isNaN(sisa) && sisa <= 0) return false;
         if (isSchedulePast(item)) return false;
@@ -4010,6 +4190,170 @@
   // ===========================================================================
   // 3. FETCH JADWAL DARI GOOGLE APPS SCRIPT (REAL DATABASE SPREADSHEET)
   // ===========================================================================
+  function extractAndSyncTrainingRequests(officialSchedules, pendaftaranRows) {
+    if (!Array.isArray(pendaftaranRows) || pendaftaranRows.length === 0) return [];
+    
+    const reqMap = {};
+    pendaftaranRows.forEach(rw => {
+      let rc = rw.c || rw;
+      const getVal = (i) => {
+        if (!rc || rc[i] === undefined || rc[i] === null) return '';
+        if (typeof rc[i] === 'object' && rc[i] !== null) {
+          return rc[i].v !== undefined ? rc[i].v : (rc[i].f !== undefined ? rc[i].f : '');
+        }
+        return rc[i];
+      };
+      const getFmt = (i) => {
+        if (!rc || rc[i] === undefined || rc[i] === null) return '';
+        if (typeof rc[i] === 'object' && rc[i] !== null) {
+          return rc[i].f !== undefined ? rc[i].f : (rc[i].v !== undefined ? rc[i].v : '');
+        }
+        return rc[i];
+      };
+
+      const ts = String(getFmt(0) || getVal(0) || '');
+      const idBooking = String(getVal(1) || '').trim();
+      const nik = String(getVal(2) || '').trim();
+      const nama = String(getVal(3) || '').trim();
+      const hp = String(getVal(4) || '').trim();
+      const jab = String(getVal(5) || '').trim();
+      const dept = String(getVal(6) || '').trim();
+      const comp = String(getVal(7) || '').trim();
+      const idJad = String(getVal(8) || '').trim();
+      const namaPel = String(getVal(9) || '').trim();
+      const tglM = String(getFmt(10) || getVal(10) || '');
+      const tglS = String(getFmt(11) || getVal(11) || '');
+      const pic = String(getVal(12) || '').trim();
+      const val = String(getVal(13) || 'OK').trim();
+      const docLink = String(getVal(14) || '').trim();
+
+      const isReq = (/^REQ-/i.test(idJad)) || (/^CUSTOM/i.test(idJad)) || (/custom request/i.test(namaPel));
+      if (!isReq) return;
+      if (!idBooking && !idJad && !namaPel) return;
+
+      const groupKey = idJad || idBooking || namaPel;
+      if (!reqMap[groupKey]) {
+        reqMap[groupKey] = {
+          id_jadwal: idJad || ('REQ-' + (idBooking ? idBooking.replace(/^REG-/, '') : Date.now())),
+          id_booking: idBooking,
+          agenda: namaPel || 'Training Request',
+          startRaw: tglM,
+          endRaw: tglS || tglM,
+          pic: pic || 'PIC Pemohon',
+          link_dokumen: docLink,
+          timestamp: ts,
+          peserta: []
+        };
+      }
+
+      reqMap[groupKey].peserta.push({
+        timestamp: ts,
+        id_booking: idBooking,
+        id_karyawan: nik,
+        nama_karyawan: nama,
+        jabatan: jab,
+        departement: dept,
+        perusahaan: comp,
+        id_jadwal: idJad,
+        nama_pelatihan: namaPel,
+        pic_pendaftaran: pic,
+        pic: pic,
+        validasi: val
+      });
+    });
+
+    const cleanStr = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const reqList = [];
+
+    Object.keys(reqMap).forEach(key => {
+      const req = reqMap[key];
+      const cleanReqTitle = cleanStr(req.agenda);
+
+      // Sinkronisasi dengan jadwal resmi yang ada
+      let matched = null;
+      for (let i = 0; i < officialSchedules.length; i++) {
+        const off = officialSchedules[i];
+        if (off.is_request) continue;
+        if (off.id_jadwal && req.id_jadwal && off.id_jadwal.toLowerCase() === req.id_jadwal.toLowerCase()) {
+          matched = off;
+          break;
+        }
+        const cleanOffTitle = cleanStr(off.agenda);
+        if (cleanReqTitle && cleanOffTitle && (cleanOffTitle === cleanReqTitle || cleanOffTitle.includes(cleanReqTitle) || cleanReqTitle.includes(cleanOffTitle))) {
+          matched = off;
+          break;
+        }
+      }
+
+      const isSynced = !!matched;
+      const syncedId = matched ? matched.id_jadwal : '';
+      const statusLnD = isSynced
+        ? `Tersinkron dengan Jadwal Resmi (${syncedId})`
+        : 'Belum didaftarkan Admin LnD jadwalnya';
+
+      if (matched) {
+        matched.has_linked_request = true;
+        matched.linked_request_id = req.id_jadwal;
+        matched.linked_request_count = (matched.linked_request_count || 0) + req.peserta.length;
+      }
+
+      let parsedDates = null;
+      if (req.startRaw) {
+        const sP = typeof parseDateString === 'function' ? parseDateString(req.startRaw) : null;
+        if (sP) {
+          const eP = req.endRaw && typeof parseDateString === 'function' ? parseDateString(req.endRaw) : sP;
+          parsedDates = {
+            start: `${sP.year}-${String(sP.month).padStart(2, '0')}-${String(sP.day).padStart(2, '0')}`,
+            end: eP ? `${eP.year}-${String(eP.month).padStart(2, '0')}-${String(eP.day).padStart(2, '0')}` : `${sP.year}-${String(sP.month).padStart(2, '0')}-${String(sP.day).padStart(2, '0')}`
+          };
+        }
+      }
+
+      const isTentative = !parsedDates;
+      let startStr = parsedDates ? parsedDates.start : '';
+      let endStr = parsedDates ? parsedDates.end : '';
+      if (!startStr) {
+        const tsP = typeof parseDateString === 'function' ? parseDateString(req.timestamp) : null;
+        if (tsP) {
+          startStr = `${tsP.year}-${String(tsP.month).padStart(2, '0')}-${String(tsP.day).padStart(2, '0')}`;
+          endStr = startStr;
+        } else {
+          startStr = new Date().toISOString().split('T')[0];
+          endStr = startStr;
+        }
+      }
+
+      reqList.push({
+        id_jadwal: req.id_jadwal,
+        id_booking: req.id_booking,
+        start: startStr,
+        end: endStr,
+        duration: isTentative ? 'Tentatif (Menunggu Admin LnD)' : '2 Hari (16 Jam)',
+        start_hour: '08:00',
+        start_minutes: 480,
+        agenda: req.agenda,
+        pic: req.pic,
+        room: 'Tentatif (Gold Room / Diklat)',
+        batch: 'Training Request',
+        kuota: req.peserta.length,
+        sisa_kuota: 0,
+        total_terdaftar: req.peserta.length,
+        status: statusLnD,
+        status_lnd: statusLnD,
+        is_request: true,
+        is_synced: isSynced,
+        synced_schedule_id: syncedId,
+        is_tentative: isTentative,
+        link_dokumen: req.link_dokumen,
+        deskripsi: `Permintaan Pelatihan di luar jadwal yang diajukan oleh PIC ${req.pic} (${req.peserta.length} peserta). Status: ${statusLnD}.`,
+        peserta: req.peserta
+      });
+    });
+
+    return reqList;
+  }
+  window.extractAndSyncTrainingRequests = extractAndSyncTrainingRequests;
+
   async function fetchJadwal() {
     return await fetchAllDatabaseData();
   }
@@ -4077,6 +4421,8 @@
                   perusahaan: String(getC(7)),
                   id_jadwal: idJad,
                   nama_pelatihan: namaPel,
+                  pic_pendaftaran: String(getC(12)).trim(),
+                  pic: String(getC(12)).trim(),
                   validasi: String(getC(13) || 'OK')
                 };
                 if (idJad) { (regsByKey[idJad] = regsByKey[idJad] || []).push(pObj); }
@@ -4163,10 +4509,15 @@
                 deskripsi: String(cellVal(c, idxDesc) || ''),
                 peserta: pesertaList
               };
-            }).filter(item => item.id_jadwal && item.agenda && !/tutup|selesai|closed|batal/i.test(item.status));
+            });
+            const filteredParsed = parsedSchedules.filter(item => item.id_jadwal && item.agenda && !/tutup|selesai|closed|batal/i.test(item.status));
+            if (rData && rData.table && Array.isArray(rData.table.rows)) {
+              const reqs = extractAndSyncTrainingRequests(filteredParsed, rData.table.rows);
+              reqs.forEach(rq => filteredParsed.push(rq));
+            }
 
-            if (parsedSchedules.length > 0) {
-              res = { status: "success", data: parsedSchedules };
+            if (filteredParsed.length > 0) {
+              res = { status: "success", data: filteredParsed };
             }
           }
         } catch (gvizErr) {
@@ -4181,6 +4532,20 @@
         let mergedInternal = typeof window.applyAdminOverridesToInternalList === 'function'
           ? window.applyAdminOverridesToInternalList(res.data)
           : res.data;
+
+        // Jika data dari API belum memuat request (misal sebelum GAS di-deploy ulang), ambil dari Data Pendaftaran via GViz
+        if (!mergedInternal.some(it => it.is_request)) {
+          try {
+            const pData = await fetchGvizSheetJson("1Y5IQUSN84p2Os1e9wxraDIfZF6UfOql4Y5EdXbv850A", "Data Pendaftaran");
+            if (pData && pData.table && Array.isArray(pData.table.rows)) {
+              const reqs = extractAndSyncTrainingRequests(mergedInternal, pData.table.rows);
+              reqs.forEach(rq => mergedInternal.push(rq));
+            }
+          } catch (eReqGviz) {
+            console.warn("Gviz training requests sync fallback error:", eReqGviz);
+          }
+        }
+
         mergedInternal.forEach(item => {
           const parsedH = parseStartHour(item.start_hour || item.startHour || item.waktu);
           item.start_hour = parsedH.formatted;
@@ -4199,10 +4564,10 @@
           syncLabel.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Database Sistem: Terhubung (${timeStr} WIB • ${LIVE_SCHEDULES.length} Pelatihan Aktif)`;
         }
 
-        // 3. Populate Dropdown Pendaftaran (Hanya jadwal aktif yang belum terlewat)
+        // 3. Populate Dropdown Pendaftaran (Hanya jadwal resmi aktif yang belum terlewat)
         if (select) {
           select.innerHTML = '';
-          const activeSchedules = fetchedJadwalList.filter(item => !isSchedulePast(item));
+          const activeSchedules = fetchedJadwalList.filter(item => !item.is_request && !isSchedulePast(item));
           activeSchedules.forEach((item, idx) => {
             const opt = document.createElement('option');
             opt.value = item.agenda;
@@ -5815,6 +6180,123 @@
     let pastDividerInserted = false;
 
     const cardsHtml = sortedList.map(item => {
+      if (item.is_request) {
+        const isSynced = !!item.is_synced;
+        const statusText = isSynced
+          ? `Tersinkron dengan Jadwal Resmi (${escapeHtml(item.synced_schedule_id)})`
+          : 'Belum didaftarkan Admin LnD jadwalnya';
+        const statusBg = isSynced
+          ? 'bg-emerald-100 text-emerald-950 border border-emerald-400'
+          : 'bg-amber-100 text-amber-950 border border-amber-400';
+        const statusIcon = isSynced ? 'sync' : 'pending_actions';
+        const barColorClass = 'bg-gradient-to-b from-amber-500 to-orange-500';
+        const cardContainerClass = 'p-4 sm:p-6 bg-gradient-to-br from-amber-50/40 via-surface-container-lowest to-surface-container-lowest rounded-2xl shadow-sm border-2 border-amber-400/80 hover:shadow-md transition-shadow flex flex-col gap-4 relative overflow-hidden group';
+
+        const pCount = (item.peserta || []).length;
+        const isAdminOn = typeof window.isAdminAuthenticated === 'function' && window.isAdminAuthenticated();
+
+        return `
+        <div class="${cardContainerClass}">
+          <div class="absolute left-0 top-0 bottom-0 w-2 ${barColorClass}"></div>
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
+              <span class="px-2.5 py-1 rounded-md bg-amber-500 text-slate-950 font-label-sm text-label-sm font-extrabold flex items-center gap-1 shadow-2xs">
+                <span class="material-symbols-outlined text-[14px]">history_edu</span>
+                TRAINING REQUEST
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full ${statusBg} font-label-sm text-label-sm font-bold shadow-2xs">
+                <span class="material-symbols-outlined text-[15px] ${!isSynced ? 'text-amber-700 animate-pulse' : 'text-emerald-700'}">${statusIcon}</span>
+                ${statusText}
+              </span>
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100/70 text-amber-900 border border-amber-200 font-label-sm text-label-sm font-semibold">
+                <span class="material-symbols-outlined text-[14px]">group</span>
+                ${pCount} Peserta Diajukan
+              </span>
+            </div>
+            <div class="flex items-center gap-1.5 text-on-surface-variant font-label-md text-label-md">
+              <span class="material-symbols-outlined text-[18px] text-amber-600">pin_drop</span>
+              <span>${escapeHtml(item.room || 'Tentatif (Gold Room / Diklat)')}</span>
+            </div>
+          </div>
+
+          <div class="flex flex-col md:flex-row gap-4 items-start justify-between">
+            <div class="flex gap-3 sm:gap-4 w-full">
+              <div class="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-slate-950 flex items-center justify-center shrink-0 shadow-xs">
+                <span class="material-symbols-outlined text-[26px] sm:text-[32px] md:text-[36px]">hourglass_top</span>
+              </div>
+              <div class="flex flex-col gap-1 min-w-0 flex-1">
+                <span class="font-label-sm text-label-sm uppercase tracking-wider text-amber-800 font-extrabold flex items-center gap-1">
+                  <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                  Permintaan Pelatihan di Luar Jadwal (Custom Request)
+                </span>
+                <h3 onclick="openTrainingDetailModal(${jsArg(item.id_jadwal)})" class="font-headline-sm text-headline-sm text-on-surface font-bold group-hover:text-amber-800 transition-colors cursor-pointer break-words">
+                  ${escapeHtml(item.agenda)}
+                </h3>
+                <p class="text-body-sm text-on-surface-variant line-clamp-2">${escapeHtml(item.deskripsi || 'Permintaan jadwal pelatihan khusus dari departemen / pemohon.')}</p>
+                <div class="flex flex-wrap items-center gap-y-1 gap-x-4 text-on-surface-variant font-body-sm text-body-sm mt-0.5">
+                  <span class="flex items-center gap-1 text-on-surface font-semibold">
+                    <span class="material-symbols-outlined text-[16px] text-amber-600">date_range</span> ${item.is_tentative ? 'Tanggal Tentatif / Belum Ditetapkan' : escapeHtml(formatSmartDateRange(item.start, item.end))}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[16px] text-outline">alarm</span> ${escapeHtml(item.duration)}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[16px] text-outline">badge</span> Kode: <strong>${escapeHtml(item.id_jadwal)}</strong>
+                  </span>
+                  ${item.id_booking ? `
+                  <span class="flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[16px] text-outline">confirmation_number</span> ID Booking: <strong>${escapeHtml(item.id_booking)}</strong>
+                  </span>` : ''}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-amber-50/60 border border-amber-200/70 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3 w-full md:w-auto">
+              <div class="w-9 h-9 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center font-title-sm text-title-sm font-extrabold shadow-2xs">
+                ${escapeHtml(getInitials(item.pic || 'PIC'))}
+              </div>
+              <div class="flex flex-col">
+                <span class="font-label-md text-label-md text-on-surface font-bold">${escapeHtml(item.pic || 'PIC Pemohon')}</span>
+                <span class="font-body-sm text-body-sm text-amber-900 font-medium">Pemohon Training Request</span>
+              </div>
+            </div>
+            <div class="flex flex-col gap-1 w-full md:w-64">
+              <div class="flex items-center justify-between font-label-sm text-label-sm">
+                <span class="text-amber-950 font-semibold">Peserta Diajukan</span>
+                <span class="font-extrabold text-amber-900">${pCount} Orang</span>
+              </div>
+              <div class="w-full h-2 bg-amber-200 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-amber-500 to-orange-500 rounded-full" style="width: 100%"></div>
+              </div>
+              <span class="text-right font-label-sm text-label-sm ${isSynced ? 'text-emerald-700' : 'text-amber-900'} font-bold">
+                ${isSynced ? 'Jadwal Resmi Diterbitkan' : 'Menunggu Penjadwalan Admin L&D'}
+              </span>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
+            <span class="flex items-center gap-1.5 font-label-md text-label-md ${isSynced ? 'text-emerald-800 font-semibold' : 'text-amber-950 font-medium'}">
+              <span class="material-symbols-outlined text-[17px] ${isSynced ? 'text-emerald-600' : 'text-amber-600'}">${isSynced ? 'verified' : 'info'}</span>
+              ${isSynced ? `Telah tersinkronisasi ke jadwal resmi ${escapeHtml(item.synced_schedule_id)}` : 'Pengajuan belum dimasukkan ke jadwal resmi oleh Admin L&D'}
+            </span>
+            <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 w-full sm:w-auto">
+              ${(isAdminOn && !isSynced) ? `
+              <button type="button" onclick="openAdminAddFromRequest(${jsArg(item.id_jadwal)})" class="flex-1 sm:flex-none h-10 sm:h-9 px-4 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-label-md text-label-md font-bold shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer" title="Daftarkan Request ini menjadi Jadwal Resmi Admin LnD">
+                <span class="material-symbols-outlined text-[17px]">add_circle</span>
+                <span>+ Daftarkan Jadwal Resmi</span>
+              </button>
+              ` : ''}
+              <button type="button" onclick="openTrainingDetailModal(${jsArg(item.id_jadwal)})" class="flex-1 sm:flex-none h-10 sm:h-9 px-4 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-label-md text-label-md font-semibold transition-colors justify-center flex items-center gap-1.5 cursor-pointer">
+                <span class="material-symbols-outlined text-[17px]">visibility</span>
+                <span>Lihat Detail &amp; Peserta (${pCount})</span>
+              </button>
+            </div>
+          </div>
+        </div>`;
+      }
+
       const kuota = Number(item.kuota) || 20;
       const sisa = Number(item.sisa_kuota) || 0;
       const terisi = Math.max(0, kuota - sisa);
@@ -5863,6 +6345,11 @@
               <span class="material-symbols-outlined text-[14px]">${statusIcon}</span>
               ${statusText}
             </span>
+            ${item.has_linked_request ? `
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-950 border border-amber-300 font-label-sm text-label-sm font-bold shadow-2xs" title="Tersinkron dengan Training Request (${escapeHtml(item.linked_request_id)})">
+              <span class="material-symbols-outlined text-[14px] text-amber-700">link</span>
+              ${item.linked_request_count || 1} Peserta dari Training Request
+            </span>` : ''}
             <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm font-medium">
               <span class="material-symbols-outlined text-[14px]">apartment</span>
               Tatap Muka (Offline)
@@ -6171,7 +6658,13 @@
   }
   window.sortSchedulesChronologically = sortSchedulesChronologically;
 
-  function colorFor(agenda) {
+  function colorFor(agenda, item) {
+    if (item && item.is_request) {
+      if (item.is_synced) {
+        return 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold border-2 border-amber-600 shadow-sm';
+      }
+      return 'bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black border-2 border-amber-600 shadow-sm';
+    }
     const c = (agenda || '').toLowerCase();
     if (/k3|hse|safety|tambang/.test(c)) return 'bg-[#9D7828] text-white';
     if (/cyber|\bit\b|sap|cloud/.test(c)) return 'bg-secondary text-on-secondary';
@@ -6246,12 +6739,21 @@
         const sisa = Number(x.it.sisa_kuota);
         const timeStr = x.it.start_hour ? `${escapeHtml(x.it.start_hour)} \u2022 ` : '';
         const isPast = isSchedulePast(x.it) || (x.r && x.r[1] && x.r[1].getTime() < todayMidnight);
-        const barStyle = isPast
-          ? `${colorFor(x.it.agenda)} opacity-40 hover:opacity-95 filter grayscale-[55%] hover:grayscale-0 shadow-none border border-black/10`
-          : `${colorFor(x.it.agenda)} shadow-xs hover:opacity-90`;
-        const subLabel = isPast
-          ? `${timeStr}Selesai \u2022 ${escapeHtml(x.it.room || '')}`
-          : `${timeStr}${escapeHtml(x.it.room || '')} &bull; ${!isNaN(sisa) && sisa <= 0 ? 'Penuh' : 'Sisa ' + (isNaN(sisa) ? '-' : sisa) + ' kursi'}`;
+        const isReq = !!x.it.is_request;
+        const isSynced = !!x.it.is_synced;
+        const reqStyle = isSynced
+          ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold border border-amber-600 shadow-xs'
+          : 'bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black border-2 border-amber-600 shadow-sm';
+        const barStyle = isReq
+          ? reqStyle
+          : (isPast
+              ? `${colorFor(x.it.agenda, x.it)} opacity-40 hover:opacity-95 filter grayscale-[55%] hover:grayscale-0 shadow-none border border-black/10`
+              : `${colorFor(x.it.agenda, x.it)} shadow-xs hover:opacity-90`);
+        const subLabel = isReq
+          ? `[Request] ${isSynced ? 'Tersinkron: ' + escapeHtml(x.it.synced_schedule_id) : 'Belum didaftarkan Admin LnD'} \u2022 ${(x.it.peserta || []).length} Peserta`
+          : (isPast
+              ? `${timeStr}Selesai \u2022 ${escapeHtml(x.it.room || '')}`
+              : `${timeStr}${escapeHtml(x.it.room || '')} &bull; ${!isNaN(sisa) && sisa <= 0 ? 'Penuh' : 'Sisa ' + (isNaN(sisa) ? '-' : sisa) + ' kursi'}`);
         const isAdminOn = typeof window.isAdminAuthenticated === 'function' && window.isAdminAuthenticated();
         const adminBarActions = isAdminOn
           ? `<span class="inline-flex items-center gap-0.5 ml-1 shrink-0"><span onclick="event.stopPropagation(); openAdminScheduleModal('edit', ${jsArg(x.it.id_jadwal)}, 'internal')" class="w-5 h-5 rounded bg-black/25 hover:bg-black/45 text-white inline-flex items-center justify-center cursor-pointer" title="Edit Jadwal"><span class="material-symbols-outlined text-[12px]">edit</span></span><span onclick="event.stopPropagation(); openAdminDeleteModal(${jsArg(x.it.id_jadwal)}, 'internal')" class="w-5 h-5 rounded bg-red-600/80 hover:bg-red-700 text-white inline-flex items-center justify-center cursor-pointer" title="Hapus Jadwal"><span class="material-symbols-outlined text-[12px]">delete</span></span></span>`
@@ -6308,32 +6810,55 @@
         const badge = document.createElement('div');
         badge.setAttribute('data-schedule-id', item.id_jadwal);
 
-        if (isPast) {
-          badge.className = `mt-0.5 sm:mt-1 p-1 sm:p-1.5 rounded-md sm:rounded-lg ${colorFor(item.agenda)} opacity-40 hover:opacity-95 filter grayscale-[55%] hover:grayscale-0 text-[10px] sm:text-[11px] leading-tight cursor-pointer transition-all border border-black/10`;
-          badge.title = `${item.agenda} (Selesai) - Klik untuk melihat detail & dokumentasi`;
-        } else {
-          badge.className = `mt-0.5 sm:mt-1 p-1 sm:p-1.5 rounded-md sm:rounded-lg ${colorFor(item.agenda)} text-[10px] sm:text-[11px] leading-tight shadow-xs cursor-pointer hover:opacity-90 hover:scale-[1.01] transition-all`;
-          badge.title = `${item.agenda} - Klik untuk mendaftar atau melihat detail`;
-        }
-        badge.onclick = () => openTrainingDetailModal(item.id_jadwal);
-
-        const timePill = item.start_hour
-          ? `<span class="inline-block px-1 py-0.2 rounded ${isPast ? 'bg-black/30 text-white/80' : 'bg-black/20'} text-[8.5px] sm:text-[9px] font-mono font-bold mr-1 shrink-0">${escapeHtml(item.start_hour)}</span>`
-          : '';
-
         const isAdminOn = typeof window.isAdminAuthenticated === 'function' && window.isAdminAuthenticated();
         const adminMiniBtns = isAdminOn
           ? `<span class="inline-flex items-center gap-0.5 ml-auto pl-1 shrink-0"><button type="button" onclick="event.stopPropagation(); openAdminScheduleModal('edit', ${jsArg(item.id_jadwal)}, 'internal')" class="w-4 h-4 rounded bg-black/25 hover:bg-black/50 text-white inline-flex items-center justify-center" title="Edit Jadwal"><span class="material-symbols-outlined text-[11px]">edit</span></button><button type="button" onclick="event.stopPropagation(); openAdminDeleteModal(${jsArg(item.id_jadwal)}, 'internal')" class="w-4 h-4 rounded bg-red-600/85 hover:bg-red-700 text-white inline-flex items-center justify-center" title="Hapus Jadwal"><span class="material-symbols-outlined text-[11px]">close</span></button></span>`
           : '';
 
-        if (isPast) {
+        if (item.is_request) {
+          const isSynced = !!item.is_synced;
+          const statusLabel = isSynced ? `Tersinkron (${item.synced_schedule_id})` : 'Belum didaftarkan Admin LnD';
+          const reqColor = isSynced
+            ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-bold border border-amber-600 shadow-sm'
+            : 'bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black border-2 border-amber-600 shadow-sm';
+
+          badge.className = `mt-0.5 sm:mt-1 p-1 sm:p-1.5 rounded-md sm:rounded-lg ${reqColor} text-[10px] sm:text-[11px] leading-tight cursor-pointer hover:opacity-95 hover:scale-[1.01] transition-all`;
+          badge.title = `[Training Request] ${item.agenda} - ${statusLabel} (${(item.peserta || []).length} Peserta)`;
+
+          const reqPill = `<span class="inline-block px-1 py-0.2 rounded ${isSynced ? 'bg-amber-950/20 text-slate-950' : 'bg-slate-950/20 text-slate-950'} text-[8.5px] font-mono font-black mr-1 shrink-0">REQ</span>`;
+          const adminReqBtn = (isAdminOn && !isSynced)
+            ? `<button type="button" onclick="event.stopPropagation(); openAdminAddFromRequest(${jsArg(item.id_jadwal)})" class="w-4 h-4 rounded bg-amber-800 hover:bg-amber-900 text-white inline-flex items-center justify-center ml-auto shrink-0 shadow-2xs" title="Daftarkan Jadwal Resmi"><span class="material-symbols-outlined text-[11px]">add</span></button>`
+            : '';
+
           badge.innerHTML = isStart
-            ? `<div class="font-bold truncate flex items-center">${timePill}<span class="truncate">${escapeHtml(item.agenda)}</span>${adminMiniBtns}</div><div class="text-[9px] sm:text-[9.5px] opacity-85 truncate flex items-center gap-1 mt-0.5"><span class="inline-block w-1.5 h-1.5 rounded-full bg-white/70"></span> Selesai &bull; ${escapeHtml(item.batch || 'Batch')}</div>`
-            : `<div class="font-semibold truncate opacity-85 flex items-center">${timePill}<span class="truncate">&#8627; ${escapeHtml(item.agenda)} <span class="text-[9px] font-normal opacity-75">(Selesai)</span></span>${adminMiniBtns}</div>`;
+            ? `<div class="font-extrabold truncate flex items-center">${reqPill}<span class="truncate">${escapeHtml(item.agenda)}</span>${adminReqBtn}</div><div class="text-[9px] sm:text-[9.5px] text-slate-950/90 font-bold truncate flex items-center gap-1 mt-0.5"><span class="inline-block w-1.5 h-1.5 rounded-full ${isSynced ? 'bg-emerald-800' : 'bg-amber-800 animate-pulse'}"></span> ${escapeHtml(statusLabel)} &bull; ${(item.peserta || []).length} Peserta</div>`
+            : `<div class="font-bold truncate flex items-center">${reqPill}<span class="truncate">&#8627; ${escapeHtml(item.agenda)} <span class="text-[9px] font-normal">(${escapeHtml(statusLabel)})</span></span>${adminReqBtn}</div>`;
+        } else if (isPast) {
+          badge.className = `mt-0.5 sm:mt-1 p-1 sm:p-1.5 rounded-md sm:rounded-lg ${colorFor(item.agenda, item)} opacity-40 hover:opacity-95 filter grayscale-[55%] hover:grayscale-0 text-[10px] sm:text-[11px] leading-tight cursor-pointer transition-all border border-black/10`;
+          badge.title = `${item.agenda} (Selesai) - Klik untuk melihat detail & dokumentasi`;
         } else {
-          badge.innerHTML = isStart
-            ? `<div class="font-bold truncate flex items-center">${timePill}<span class="truncate">${escapeHtml(item.agenda)}</span>${adminMiniBtns}</div><div class="text-[9.5px] sm:text-[10px] opacity-90 truncate">${escapeHtml(item.batch || 'Batch')} &bull; Sisa ${item.sisa_kuota || 0} Kursi</div>`
-            : `<div class="font-semibold truncate opacity-90 flex items-center">${timePill}<span class="truncate">&#8627; ${escapeHtml(item.agenda)}</span>${adminMiniBtns}</div>`;
+          badge.className = `mt-0.5 sm:mt-1 p-1 sm:p-1.5 rounded-md sm:rounded-lg ${colorFor(item.agenda, item)} text-[10px] sm:text-[11px] leading-tight shadow-xs cursor-pointer hover:opacity-90 hover:scale-[1.01] transition-all`;
+          badge.title = `${item.agenda} - Klik untuk mendaftar atau melihat detail`;
+        }
+        badge.onclick = () => openTrainingDetailModal(item.id_jadwal);
+
+        if (!item.is_request) {
+          const timePill = item.start_hour
+            ? `<span class="inline-block px-1 py-0.2 rounded ${isPast ? 'bg-black/30 text-white/80' : 'bg-black/20'} text-[8.5px] sm:text-[9px] font-mono font-bold mr-1 shrink-0">${escapeHtml(item.start_hour)}</span>`
+            : '';
+          const reqLinkDot = item.has_linked_request
+            ? `<span class="inline-block w-2 h-2 rounded-full bg-amber-400 border border-white shrink-0 ml-1" title="Tersinkron dengan Training Request (${item.linked_request_count || 1} peserta)"></span>`
+            : '';
+
+          if (isPast) {
+            badge.innerHTML = isStart
+              ? `<div class="font-bold truncate flex items-center">${timePill}<span class="truncate">${escapeHtml(item.agenda)}</span>${reqLinkDot}${adminMiniBtns}</div><div class="text-[9px] sm:text-[9.5px] opacity-85 truncate flex items-center gap-1 mt-0.5"><span class="inline-block w-1.5 h-1.5 rounded-full bg-white/70"></span> Selesai &bull; ${escapeHtml(item.batch || 'Batch')}</div>`
+              : `<div class="font-semibold truncate opacity-85 flex items-center">${timePill}<span class="truncate">&#8627; ${escapeHtml(item.agenda)} <span class="text-[9px] font-normal opacity-75">(Selesai)</span></span>${adminMiniBtns}</div>`;
+          } else {
+            badge.innerHTML = isStart
+              ? `<div class="font-bold truncate flex items-center">${timePill}<span class="truncate">${escapeHtml(item.agenda)}</span>${reqLinkDot}${adminMiniBtns}</div><div class="text-[9.5px] sm:text-[10px] opacity-90 truncate">${escapeHtml(item.batch || 'Batch')} &bull; Sisa ${item.sisa_kuota || 0} Kursi</div>`
+              : `<div class="font-semibold truncate opacity-90 flex items-center">${timePill}<span class="truncate">&#8627; ${escapeHtml(item.agenda)}</span>${adminMiniBtns}</div>`;
+          }
         }
         c.appendChild(badge);
       });
@@ -6353,23 +6878,33 @@
     let s = String(str).trim();
     if (!s || s === '-') return '-';
 
+    // Jika string sudah memiliki tag HTML privacy-masked-blur atau span, jangan diproses lagi
+    if (s.includes('privacy-masked-blur') || s.includes('<span')) {
+      return s;
+    }
+
     const blurSpan = (bullets) => `<span class="privacy-masked-blur">${bullets}</span>`;
 
-    // Jika data dari backend sudah memiliki bullet/mask di bagian akhir
-    if (s.includes('â€¢') || s.includes('*')) {
-      s = s.replace(/[\u2022*]/g, 'â€¢');
-      return escapeHtml(s).replace(/(â€¢+)/g, m => blurSpan(m));
+    // Jika data dari backend sudah memiliki bullet/mask di bagian akhir (contoh: dari maskFromEnd code.gs)
+    if (/[\u2022\u00E2\u20AC\u00A2*•]/.test(s)) {
+      // Standarisasi mojibake atau karakter bullet ke '•'
+      s = s.replace(/â€¢/g, '•').replace(/[\u2022*]/g, '•');
+      const match = s.match(/^(.*?)(•+)$/);
+      if (match) {
+        return escapeHtml(match[1]) + blurSpan(match[2]);
+      }
+      return s.split(/(•+)/).map(pt => pt.startsWith('•') ? blurSpan(pt) : escapeHtml(pt)).join('');
     }
 
     const len = s.length;
     if (len <= 2) {
-      return escapeHtml(s[0]) + blurSpan('â€¢');
+      return escapeHtml(s[0]) + blurSpan('•');
     }
     if (len === 3) {
-      return escapeHtml(s.slice(0, 2)) + blurSpan('â€¢');
+      return escapeHtml(s.slice(0, 2)) + blurSpan('•');
     }
     if (len <= 5) {
-      return escapeHtml(s.slice(0, len - 2)) + blurSpan('â€¢â€¢');
+      return escapeHtml(s.slice(0, len - 2)) + blurSpan('••');
     }
 
     // Tangani akhiran singkatan bertanda kurung, contoh: "PT Jakarta Anugerah Mandiri (JAM)"
@@ -6377,23 +6912,23 @@
       const lastParen = s.lastIndexOf('(');
       if (lastParen !== -1 && lastParen < len - 2) {
         const inside = s.slice(lastParen + 1, -1);
-        const maskedInside = inside.length <= 2 ? inside[0] + 'â€¢' : inside[0] + 'â€¢'.repeat(inside.length - 1);
+        const maskedInside = inside.length <= 2 ? inside[0] + '•' : inside[0] + '•'.repeat(inside.length - 1);
         return escapeHtml(s.slice(0, lastParen + 1)) + blurSpan(maskedInside) + ')';
       }
     }
 
     // Untuk ID Karyawan: samarkan 3 atau 4 digit/karakter paling belakang
-    if (mode === 'id') {
+    if (mode === 'id' || mode === 'nik') {
       const maskCount = len >= 8 ? 4 : 3;
-      const keep = len - maskCount;
-      return escapeHtml(s.slice(0, keep)) + blurSpan('â€¢'.repeat(maskCount));
+      const keep = Math.max(1, len - maskCount);
+      return escapeHtml(s.slice(0, keep)) + blurSpan('•'.repeat(maskCount));
     }
 
     // Untuk Nama, Perusahaan, dan Departemen:
     // Hanya samarkan 2 hingga 3 karakter paling belakang saja
     const maskCount = len >= 9 ? 3 : 2;
-    const keep = len - maskCount;
-    return escapeHtml(s.slice(0, keep)) + blurSpan('â€¢'.repeat(maskCount));
+    const keep = Math.max(1, len - maskCount);
+    return escapeHtml(s.slice(0, keep)) + blurSpan('•'.repeat(maskCount));
   }
 
   let currentModalParticipantsList = [];
@@ -6411,13 +6946,31 @@
         const maskedCompany = maskStringWithBlur(p.perusahaan || '-', 'company');
         const maskedDept = maskStringWithBlur(p.departement || p.jabatan || '-', 'dept');
 
+        // Deteksi PIC Perusahaan / PIC Pendaftaran
+        const rawPic = String(p.pic_pendaftaran || p.pic || p.pic_perusahaan || '').trim();
+        const hasPic = rawPic && rawPic !== '-' && rawPic !== '- (-)' && rawPic !== '()';
+        const picText = hasPic ? escapeHtml(rawPic) : '';
+
         return `<tr class="hover:bg-surface-container-low/40 transition-colors">
           <td class="py-2.5 px-4 sm:px-6 text-outline text-[12px] font-mono">${idx + 1}</td>
           <td class="py-2.5 px-3">
             <div class="font-medium text-on-surface">${maskedName}</div>
             <div class="text-[11px] text-outline font-mono mt-0.5">${maskedId}</div>
+            <div class="sm:hidden text-[11px] text-on-surface-variant mt-1 space-y-0.5">
+              <div class="font-medium">${maskedCompany}</div>
+              ${hasPic ? `<div class="text-[10.5px] text-outline flex items-center gap-1"><span class="text-primary font-semibold text-[9.5px]">PIC:</span><span class="text-on-surface-variant truncate">${picText}</span></div>` : ''}
+            </div>
           </td>
-          <td class="py-2.5 px-3 text-on-surface-variant hidden sm:table-cell text-body-sm">${maskedCompany}</td>
+          <td class="py-2.5 px-3 text-on-surface-variant hidden sm:table-cell text-body-sm">
+            <div class="font-medium text-on-surface">${maskedCompany}</div>
+            ${hasPic ? `<div class="text-[11px] text-outline mt-0.5 flex items-center gap-1" title="PIC Perusahaan: ${picText}">
+              <span class="inline-flex items-center gap-0.5 font-semibold text-primary">
+                <span class="material-symbols-outlined text-[13px] leading-none">person</span>
+                <span class="text-[9.5px] uppercase font-bold tracking-wider">PIC:</span>
+              </span>
+              <span class="font-normal text-on-surface-variant truncate max-w-[190px]">${picText}</span>
+            </div>` : ''}
+          </td>
           <td class="py-2.5 px-3 text-on-surface-variant hidden sm:table-cell text-body-sm">${maskedDept}</td>
           <td class="py-2.5 px-4 sm:px-6 text-right"><span class="inline-flex items-center gap-1.5 text-[12px] font-medium ${wait ? 'text-amber-700' : 'text-emerald-700'}"><span class="w-1.5 h-1.5 rounded-full ${wait ? 'bg-amber-500' : 'bg-emerald-600'}"></span>${escapeHtml(p.validasi || 'OK')}</span></td>
         </tr>`;
@@ -6442,8 +6995,9 @@
       const idK = String(p.id_karyawan || '').toLowerCase();
       const comp = String(p.perusahaan || '').toLowerCase();
       const dept = String(p.departement || p.jabatan || '').toLowerCase();
+      const pic = String(p.pic_pendaftaran || p.pic || p.pic_perusahaan || '').toLowerCase();
       const val = String(p.validasi || '').toLowerCase();
-      return nama.includes(term) || idK.includes(term) || comp.includes(term) || dept.includes(term) || val.includes(term);
+      return nama.includes(term) || idK.includes(term) || comp.includes(term) || dept.includes(term) || pic.includes(term) || val.includes(term);
     });
     renderModalParticipantRows(filtered);
   }
@@ -6479,11 +7033,27 @@
     if (titleEl) titleEl.textContent = item.agenda || "Detail Pelatihan";
 
     const batchEl = document.getElementById('modal-batch-badge');
-    if (batchEl) batchEl.textContent = item.batch || item.id_jadwal || '-';
+    if (batchEl) {
+      if (item.is_request) {
+        batchEl.className = 'px-2.5 py-0.5 rounded-full bg-amber-500 text-slate-950 font-extrabold text-label-sm shadow-2xs';
+        batchEl.textContent = 'TRAINING REQUEST';
+      } else {
+        batchEl.className = 'px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm font-semibold';
+        batchEl.textContent = item.batch || item.id_jadwal || '-';
+      }
+    }
 
     const statusEl = document.getElementById('modal-status-badge');
     if (statusEl) {
-      if (isPast) {
+      if (item.is_request) {
+        const isSynced = !!item.is_synced;
+        statusEl.className = isSynced
+          ? 'inline-flex items-center gap-1.5 font-bold text-emerald-950 bg-emerald-100 border border-emerald-300 px-3 py-1 rounded-full'
+          : 'inline-flex items-center gap-1.5 font-bold text-amber-950 bg-amber-100 border border-amber-300 px-3 py-1 rounded-full';
+        statusEl.innerHTML = isSynced
+          ? `<span class="material-symbols-outlined text-[15px] text-emerald-700">sync</span>Tersinkron dengan Jadwal Resmi (${escapeHtml(item.synced_schedule_id)})`
+          : `<span class="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>Belum didaftarkan Admin LnD jadwalnya`;
+      } else if (isPast) {
         statusEl.className = 'inline-flex items-center gap-1.5 font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-full';
         statusEl.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>Selesai Pelaksanaan';
       } else {
@@ -6545,7 +7115,7 @@
       if (isPast) {
         barText.textContent = `${terdaftarCount} Peserta Terdaftar (Pelatihan Telah Selesai Dilaksanakan)`;
       } else {
-        barText.textContent = `${terdaftarCount} Peserta Terdaftar (Kapasitas ${kuota} Kursi â€¢ ${isFull ? 'Kuota Penuh (Verifikasi Tim L&D)' : 'Sisa ' + sisa + ' Tersedia'})`;
+        barText.textContent = `${terdaftarCount} Peserta Terdaftar (Kapasitas ${kuota} Kursi • ${isFull ? 'Kuota Penuh (Verifikasi Tim L&D)' : 'Sisa ' + sisa + ' Tersedia'})`;
       }
     }
 
@@ -6554,6 +7124,24 @@
     if (mSearch) mSearch.value = '';
     const mClear = document.getElementById('modal-participant-search-clear');
     if (mClear) mClear.classList.add('hidden');
+
+    // Pastikan PIC Perusahaan terpetakan pada setiap baris peserta jika ada baris yang kosong
+    const compPicMap = {};
+    const bookPicMap = {};
+    list.forEach(p => {
+      const pic = String(p.pic_pendaftaran || p.pic || '').trim();
+      if (pic && pic !== '-' && pic !== '- (-)') {
+        if (p.id_booking) bookPicMap[p.id_booking] = pic;
+        if (p.perusahaan && p.perusahaan !== '-') compPicMap[p.perusahaan] = pic;
+      }
+    });
+    list.forEach(p => {
+      if (!p.pic_pendaftaran && !p.pic) {
+        p.pic_pendaftaran = (p.id_booking && bookPicMap[p.id_booking]) ||
+                            (p.perusahaan && compPicMap[p.perusahaan]) ||
+                            (item.is_request ? item.pic : '') || '';
+      }
+    });
 
     currentModalParticipantsList = list;
     renderModalParticipantRows(list);
@@ -6593,7 +7181,20 @@
     const regBtn = document.getElementById('modal-btn-register');
     if (regBtn) {
       regBtn.disabled = false;
-      if (isPast) {
+      if (item.is_request) {
+        if (isAdminOnModal && !item.is_synced) {
+          regBtn.className = 'w-full sm:w-auto h-10 px-5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-label-md text-label-md font-bold inline-flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer';
+          regBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">add_circle</span><span>+ Daftarkan ke Jadwal Resmi Admin LnD</span>';
+          regBtn.onclick = () => {
+            closeTrainingDetailModal();
+            openAdminAddFromRequest(item.id_jadwal);
+          };
+        } else {
+          regBtn.className = 'w-full sm:w-auto h-10 px-5 rounded-xl bg-amber-100 text-amber-950 border border-amber-300 font-label-md text-label-md font-bold inline-flex items-center justify-center gap-1.5 shadow-2xs cursor-default';
+          regBtn.innerHTML = `<span class="material-symbols-outlined text-[18px] ${item.is_synced ? 'text-emerald-700' : 'text-amber-700'}">${item.is_synced ? 'verified' : 'pending_actions'}</span><span>${item.is_synced ? 'Tersinkron Jadwal Resmi' : 'Menunggu Penjadwalan Admin L&D'}</span>`;
+          regBtn.onclick = null;
+        }
+      } else if (isPast) {
         regBtn.className = 'w-full sm:w-auto h-10 px-5 rounded-xl bg-surface-container-highest text-on-surface hover:bg-primary hover:text-on-primary font-label-md text-label-md font-semibold inline-flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer';
         regBtn.innerHTML = '<span class="material-symbols-outlined text-[18px]">add_circle</span><span>Ajukan Request Jadwal Baru</span>';
         regBtn.onclick = () => {
@@ -6616,6 +7217,29 @@
 
     modal.classList.remove('hidden');
   }
+
+  function openAdminAddFromRequest(reqId) {
+    const req = (LIVE_SCHEDULES || []).find(s => s.id_jadwal === reqId);
+    if (!req) return;
+    if (typeof openAdminScheduleModal === 'function') {
+      openAdminScheduleModal('add', null, 'internal', req.start && !req.is_tentative ? req.start : '');
+      setTimeout(() => {
+        const agendaInput = document.getElementById('admin-input-agenda');
+        if (agendaInput) agendaInput.value = req.agenda || '';
+        const descInput = document.getElementById('admin-input-description');
+        if (descInput) descInput.value = `Diakomodasi dari Training Request (${req.id_jadwal}) yang diajukan oleh ${req.pic} (${req.peserta ? req.peserta.length : 0} peserta).`;
+        const roomInput = document.getElementById('admin-input-room');
+        if (roomInput && req.room && !/tentatif/i.test(req.room)) roomInput.value = req.room;
+        const kuotaInput = document.getElementById('admin-input-kuota');
+        if (kuotaInput) kuotaInput.value = Math.max(20, (req.peserta ? req.peserta.length : 0) + 10);
+        const startInput = document.getElementById('admin-input-start-date');
+        if (startInput && req.start && !req.is_tentative) startInput.value = req.start;
+        const endInput = document.getElementById('admin-input-end-date');
+        if (endInput && req.end && !req.is_tentative) endInput.value = req.end;
+      }, 120);
+    }
+  }
+  window.openAdminAddFromRequest = openAdminAddFromRequest;
 
   function closeTrainingDetailModal() {
     const modal = document.getElementById('training-detail-modal');
@@ -6911,6 +7535,7 @@
               perusahaan: comp,
               id_jadwal: idJ,
               nama_pelatihan: namaP,
+              pic_pendaftaran: String(gvizCellVal(c, idxPic) || '').trim(),
               pic: String(gvizCellVal(c, idxPic) || '').trim(),
               validasi: statusVal
             };
@@ -7336,15 +7961,10 @@
             ? `${escapeHtml(item.batch || 'Batch')} &bull; ${(item.peserta || []).length}/${item.kuota || 15} Peserta`
             : `${escapeHtml(item.room || 'Agenda Luar Training')}`;
 
-          const isAdminOn = typeof window.isAdminAuthenticated === 'function' && window.isAdminAuthenticated();
-          const itemScope = item.source_type || 'external_training';
-          const extAdminMiniBtns = isAdminOn
-            ? `<span class="inline-flex items-center gap-0.5 ml-auto pl-1 shrink-0"><button type="button" onclick="event.stopPropagation(); openAdminScheduleModal('edit', '${safeUid}', '${itemScope}')" class="w-4 h-4 rounded bg-black/25 hover:bg-black/50 text-white inline-flex items-center justify-center" title="Edit Jadwal"><span class="material-symbols-outlined text-[11px]">edit</span></button><button type="button" onclick="event.stopPropagation(); openAdminDeleteModal('${safeUid}', '${itemScope}')" class="w-4 h-4 rounded bg-red-600/85 hover:bg-red-700 text-white inline-flex items-center justify-center" title="Hapus Jadwal"><span class="material-symbols-outlined text-[11px]">close</span></button></span>`
-            : '';
 
           badge.innerHTML = isStart
-            ? `<div class="font-bold truncate flex items-center"><span class="truncate">${escapeHtml(item.agenda)}</span>${extAdminMiniBtns}</div><div class="text-[9.5px] sm:text-[10px] opacity-90 truncate">${subInfo}</div>`
-            : `<div class="font-semibold truncate opacity-90 flex items-center"><span class="truncate">&#8627; ${escapeHtml(item.agenda)}</span>${extAdminMiniBtns}</div>`;
+            ? `<div class="font-bold truncate">${escapeHtml(item.agenda)}</div><div class="text-[9.5px] sm:text-[10px] opacity-90 truncate">${subInfo}</div>`
+            : `<div class="font-semibold truncate opacity-90">&#8627; ${escapeHtml(item.agenda)}</div>`;
           cellEvents.appendChild(badge);
         }
       }
@@ -7370,18 +7990,13 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
               ${unscheduled.map(u => {
                 const safeUid = escapeHtml(u.uid).replace(/'/g, "\\'");
-                const uScope = u.source_type || 'external_training';
-                const isAdminOn = typeof window.isAdminAuthenticated === 'function' && window.isAdminAuthenticated();
-                const uAdminBtns = isAdminOn
-                  ? `<div class="flex items-center gap-1 shrink-0"><button type="button" onclick="event.stopPropagation(); openAdminScheduleModal('edit', '${safeUid}', '${uScope}')" class="w-6 h-6 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 inline-flex items-center justify-center" title="Edit Jadwal TBA"><span class="material-symbols-outlined text-[14px]">edit</span></button><button type="button" onclick="event.stopPropagation(); openAdminDeleteModal('${safeUid}', '${uScope}')" class="w-6 h-6 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 inline-flex items-center justify-center" title="Hapus Jadwal TBA"><span class="material-symbols-outlined text-[14px]">delete</span></button></div>`
-                  : `<span class="material-symbols-outlined text-emerald-700 text-[18px] shrink-0">chevron_right</span>`;
                 return `
                   <div onclick="openTrainingDetailModal('${safeUid}')" class="p-3 rounded-xl bg-surface-container-lowest hover:bg-emerald-50/50 border border-outline-variant/50 flex items-center justify-between gap-2 cursor-pointer transition-all">
                     <div class="min-w-0">
                       <div class="font-semibold text-on-surface text-body-sm truncate">${escapeHtml(u.agenda)}</div>
-                      <div class="text-[11px] text-on-surface-variant">Tanggal Menyusul (TBA) &bull; ${escapeHtml(u.id_jadwal)}</div>
+                      <div class="text-[11px] text-on-surface-variant">Tanggal Menyusul (TBA)</div>
                     </div>
-                    ${uAdminBtns}
+                    <span class="material-symbols-outlined text-emerald-700 text-[18px] shrink-0">chevron_right</span>
                   </div>
                 `;
               }).join('')}
@@ -7441,12 +8056,7 @@
         const subLabel = isTr
           ? `${escapeHtml(x.it.room || '')} &bull; ${(x.it.peserta || []).length}/${x.it.kuota || 15} Peserta`
           : `${escapeHtml(x.it.room || 'Agenda Luar Training')}`;
-        const isAdminOn = typeof window.isAdminAuthenticated === 'function' && window.isAdminAuthenticated();
-        const extScope = x.it.source_type || 'external_training';
-        const extWeekAdminBtns = isAdminOn
-          ? `<span class="inline-flex items-center gap-0.5 ml-1 shrink-0"><span onclick="event.stopPropagation(); openAdminScheduleModal('edit', '${safeUid}', '${extScope}')" class="w-5 h-5 rounded bg-black/25 hover:bg-black/45 text-white inline-flex items-center justify-center cursor-pointer" title="Edit Jadwal"><span class="material-symbols-outlined text-[12px]">edit</span></span><span onclick="event.stopPropagation(); openAdminDeleteModal('${safeUid}', '${extScope}')" class="w-5 h-5 rounded bg-red-600/80 hover:bg-red-700 text-white inline-flex items-center justify-center cursor-pointer" title="Hapus Jadwal"><span class="material-symbols-outlined text-[12px]">delete</span></span></span>`
-          : '';
-        return `<div onclick="openTrainingDetailModal('${safeUid}')" style="grid-column:${a + 1} / ${b + 2}" class="${barColor} shadow-xs hover:opacity-90 rounded-lg px-2.5 py-1.5 text-left text-[12px] leading-tight transition-all min-w-0 cursor-pointer flex items-center justify-between gap-1"><div class="min-w-0 flex-1"><span class="block font-bold truncate">${escapeHtml(x.it.agenda)}</span><span class="block text-[10px] opacity-90 truncate">${subLabel}</span></div>${extWeekAdminBtns}</div>`;
+        return `<button type="button" onclick="openTrainingDetailModal('${safeUid}')" style="grid-column:${a + 1} / ${b + 2}" class="${barColor} shadow-xs hover:opacity-90 rounded-lg px-2.5 py-1.5 text-left text-[12px] leading-tight transition-all min-w-0 cursor-pointer"><span class="block font-bold truncate">${escapeHtml(x.it.agenda)}</span><span class="block text-[10px] opacity-90 truncate">${subLabel}</span></button>`;
       }).join('');
       html += `<div class="min-w-[640px]"><div class="text-label-md font-semibold text-on-surface mb-2">${short(ws)} - ${short(we)}</div><div class="grid grid-cols-7 gap-1 pb-1 border-b border-surface-container">${heads}</div><div class="grid grid-cols-7 gap-1 pt-2">${bars || '<div class="col-span-7 text-center text-[12px] text-outline py-2">Tidak ada sesi</div>'}</div></div>`;
     }
@@ -7461,41 +8071,25 @@
 
     let html = '';
     for (let m = 0; m < 12; m++) {
-      const mItems = sortSchedulesChronologically(items.filter(it => {
+      const mItems = items.filter(it => {
         const s = parseDateString(it.start);
         return s && s.year === year && (s.month - 1) === m;
-      }));
-      let monthExtRegistered = 0;
-      mItems.forEach(it => { monthExtRegistered += getScheduleRegisteredCount(it); });
+      });
       const isSelected = m === activeMonth;
       html += `
         <div onclick="updateExtCalendarPeriod(${year}, ${m}); switchExtCalendarView('ext-view-month');" class="p-4 rounded-xl border ${isSelected ? 'border-emerald-600 ring-2 ring-emerald-500/20 bg-emerald-50/30' : 'border-outline-variant/40 bg-surface-container-lowest hover:border-emerald-500/60'} flex flex-col justify-between gap-3 cursor-pointer transition-all shadow-xs">
-          <div class="flex flex-col gap-2.5">
-            <div class="flex items-center justify-between">
-              <span class="font-title-sm text-title-sm font-bold text-on-surface">${MONTH_NAMES[m]}</span>
-              <span class="px-2 py-0.5 rounded-full text-xs font-bold ${mItems.length > 0 ? 'bg-emerald-700 text-white' : 'bg-surface-container text-on-surface-variant'}">${mItems.length} Agenda</span>
-            </div>
-            <div class="flex flex-col gap-1.5 min-h-[85px] max-h-[185px] overflow-y-auto pr-1">
-              ${mItems.length === 0
-                ? `<div class="flex items-center justify-center min-h-[80px] rounded-lg border border-dashed border-outline-variant/40 text-xs text-outline italic">Belum ada jadwal</div>`
-                : mItems.map(it => {
-                    const regCount = getScheduleRegisteredCount(it);
-                    const safeUid = escapeHtml(it.uid).replace(/'/g, "\\'");
-                    return `
-                    <div onclick="event.stopPropagation(); openTrainingDetailModal('${safeUid}')" class="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold flex items-center justify-between gap-2 ${it.source_type === 'external_training' ? 'bg-emerald-50/80 text-emerald-950 border border-emerald-200 hover:bg-emerald-100' : 'bg-teal-50/80 text-teal-950 border border-teal-200 hover:bg-teal-100'} transition-colors">
-                      <span class="truncate">${escapeHtml(it.agenda)}</span>
-                      <span class="px-1.5 py-0.5 rounded bg-white/90 text-[10px] font-bold text-emerald-800 shrink-0">${regCount} Peserta</span>
-                    </div>
-                  `;
-                  }).join('')}
-            </div>
+          <div class="flex items-center justify-between">
+            <span class="font-title-sm text-title-sm font-bold text-on-surface">${MONTH_NAMES[m]}</span>
+            <span class="px-2 py-0.5 rounded-full text-xs font-bold ${mItems.length > 0 ? 'bg-emerald-700 text-white' : 'bg-surface-container text-on-surface-variant'}">${mItems.length} Agenda</span>
           </div>
-          <div class="pt-2 border-t border-outline-variant/40 flex items-center justify-between text-xs">
-            <span class="font-semibold ${monthExtRegistered > 0 ? 'text-on-surface' : 'text-outline'} flex items-center gap-1">
-              <span class="material-symbols-outlined text-[15px] ${monthExtRegistered > 0 ? 'text-emerald-700' : 'text-outline'}">groups</span>
-              Total Terdaftar: <strong>${monthExtRegistered.toLocaleString('id-ID')} Peserta</strong>
-            </span>
-            <span class="material-symbols-outlined text-[16px] text-emerald-700">arrow_forward</span>
+          <div class="flex flex-col gap-1.5 min-h-[60px]">
+            ${mItems.length === 0
+              ? `<span class="text-xs text-outline italic my-auto">Tidak ada jadwal</span>`
+              : mItems.map(it => `
+                  <div class="px-2 py-1 rounded text-[11px] font-semibold truncate ${it.source_type === 'external_training' ? 'bg-emerald-50 text-emerald-900 border-l-2 border-emerald-700' : 'bg-teal-50 text-teal-900 border-l-2 border-teal-600'}">
+                    ${escapeHtml(it.agenda)}
+                  </div>
+                `).join('')}
           </div>
         </div>
       `;
@@ -7516,16 +8110,9 @@
       return;
     }
 
-    // Urutkan: Aktif / Akan Datang di atas, TBA di tengah, dan yang Sudah Berjalan / Selesai di paling bawah
-    const sortedExtList = sortSchedulesChronologically(items);
-    const activeExtCount = sortedExtList.filter(it => !isSchedulePast(it)).length;
-    const pastExtCount = sortedExtList.length - activeExtCount;
-    let extPastDividerInserted = false;
-
-    const cardsHtml = sortedExtList.map(item => {
+    container.innerHTML = items.map(item => {
       const isTr = item.source_type === 'external_training';
       const hasDate = Boolean(parseDateString(item.start));
-      const isPast = hasDate && isSchedulePast(item);
       const safeUid = escapeHtml(item.uid).replace(/'/g, "\\'");
       const mpList = Array.isArray(item.peserta) ? item.peserta : [];
       const kuota = Number(item.kuota) || 15;
@@ -7533,45 +8120,18 @@
       const sisa = Math.max(0, kuota - terisi);
       const pct = isTr && kuota > 0 ? Math.min(100, Math.round((terisi / kuota) * 100)) : 0;
 
-      let dividerHtml = '';
-      if (isPast && !extPastDividerInserted) {
-        extPastDividerInserted = true;
-        dividerHtml = `
-          <div class="pt-4 pb-1 flex items-center gap-3">
-            <div class="h-px bg-outline-variant/60 flex-1"></div>
-            <span class="px-3 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm font-bold flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-[15px]">history</span>
-              Agenda &amp; Pelatihan yang Sudah Berjalan / Selesai (${pastExtCount})
-            </span>
-            <div class="h-px bg-outline-variant/60 flex-1"></div>
-          </div>
-        `;
-      }
-
-      const barColor = isPast ? 'bg-slate-400' : (isTr ? 'bg-emerald-700' : 'bg-teal-600');
+      const barColor = isTr ? 'bg-emerald-700' : 'bg-teal-600';
       const iconName = isTr ? 'workspace_premium' : 'event_note';
-      const cardClass = isPast
-        ? 'p-4 sm:p-6 bg-surface-container-low/30 rounded-2xl shadow-none border border-outline-variant/30 opacity-75 hover:opacity-100 transition-all flex flex-col gap-4 relative overflow-hidden group'
-        : 'p-4 sm:p-6 bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/40 hover:shadow-md transition-shadow flex flex-col gap-4 relative overflow-hidden group';
-
-      const statusBadgeClass = isPast
-        ? 'bg-slate-100 text-slate-700'
-        : (hasDate ? 'bg-emerald-50 text-emerald-800' : 'bg-amber-50 text-amber-800');
-      const statusIconName = isPast ? 'task_alt' : (hasDate ? 'check_circle' : 'schedule');
-      const statusLabelText = isPast
-        ? 'Selesai Pelaksanaan'
-        : (hasDate ? (item.status || 'Terjadwal') : 'Menunggu Jadwal (TBA)');
 
       return `
-      ${dividerHtml}
-      <div class="${cardClass}">
+      <div class="p-4 sm:p-6 bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/40 hover:shadow-md transition-shadow flex flex-col gap-4 relative overflow-hidden group">
         <div class="absolute left-0 top-0 bottom-0 w-1.5 ${barColor}"></div>
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
-            <span class="px-2.5 py-1 rounded-md ${isPast ? 'bg-surface-container-high text-on-surface-variant' : 'bg-emerald-100 text-emerald-900'} font-label-sm text-label-sm font-bold">${escapeHtml(item.batch || item.id_jadwal)}</span>
-            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full ${statusBadgeClass} font-label-sm text-label-sm font-semibold">
-              <span class="material-symbols-outlined text-[14px]">${statusIconName}</span>
-              ${escapeHtml(statusLabelText)}
+            <span class="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-900 font-label-sm text-label-sm font-bold">${escapeHtml(item.batch || item.id_jadwal)}</span>
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full ${hasDate ? 'bg-emerald-50 text-emerald-800' : 'bg-amber-50 text-amber-800'} font-label-sm text-label-sm font-semibold">
+              <span class="material-symbols-outlined text-[14px]">${hasDate ? 'check_circle' : 'schedule'}</span>
+              ${escapeHtml(hasDate ? (item.status || 'Terjadwal') : 'Menunggu Jadwal (TBA)')}
             </span>
             <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm font-medium">
               <span class="material-symbols-outlined text-[14px]">${iconName}</span>
@@ -7579,7 +8139,7 @@
             </span>
           </div>
           <div class="flex items-center gap-1.5 text-on-surface-variant font-label-md text-label-md">
-            <span class="material-symbols-outlined text-[18px] ${isPast ? 'text-outline' : 'text-emerald-700'}">pin_drop</span>
+            <span class="material-symbols-outlined text-[18px] text-emerald-700">pin_drop</span>
             <span>${escapeHtml(item.room || 'Lokasi Menyusul')}</span>
           </div>
         </div>
@@ -7639,36 +8199,295 @@
             <span class="material-symbols-outlined text-[16px] text-emerald-700">verified</span>
             External &amp; Event Pani Gold Project
           </span>
-          <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-            ${(typeof window.isAdminAuthenticated === 'function' && window.isAdminAuthenticated()) ? `
-            <button type="button" onclick="openAdminScheduleModal('edit', '${safeUid}', '${item.source_type || 'external_training'}')" class="h-10 sm:h-9 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300/80 font-label-sm text-label-sm font-semibold transition-colors inline-flex items-center justify-center gap-1 cursor-pointer" title="Edit Jadwal External (Admin)">
-              <span class="material-symbols-outlined text-[16px] text-amber-700">edit_calendar</span>
-              <span>Edit</span>
-            </button>
-            <button type="button" onclick="openAdminDeleteModal('${safeUid}', '${item.source_type || 'external_training'}')" class="h-10 sm:h-9 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-label-sm text-label-sm font-semibold transition-colors inline-flex items-center justify-center gap-1 cursor-pointer" title="Hapus Jadwal External (Wajib Password Admin)">
-              <span class="material-symbols-outlined text-[16px]">delete</span>
-              <span>Hapus</span>
-            </button>
-            ` : ''}
-            <button type="button" onclick="openTrainingDetailModal('${safeUid}')" class="flex-1 sm:flex-none h-10 sm:h-9 px-4 rounded-xl ${isPast ? 'bg-surface-container-highest hover:bg-surface-container text-on-surface-variant' : 'bg-emerald-700 hover:bg-emerald-800 text-white'} font-label-md text-label-md font-semibold transition-colors justify-center flex items-center gap-1.5 cursor-pointer">
-              <span>${isPast ? 'Selesai Pelaksanaan (Lihat Detail)' : (terisi > 0 ? `Lihat Detail & ${terisi} Manpower` : 'Lihat Detail Agenda')}</span>
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <button type="button" onclick="openTrainingDetailModal('${safeUid}')" class="flex-1 sm:flex-none h-10 sm:h-9 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-label-md text-label-md font-semibold transition-colors justify-center flex items-center gap-1.5 cursor-pointer">
+              <span>${terisi > 0 ? `Lihat Detail & ${terisi} Manpower` : 'Lihat Detail Agenda'}</span>
             </button>
           </div>
         </div>
       </div>`;
     }).join('');
-
-    container.innerHTML = `
-      <div class="flex flex-wrap items-center justify-between gap-2 pb-2">
-        <h3 class="font-title-md text-title-md font-bold text-on-surface flex items-center gap-2">
-          <span class="material-symbols-outlined text-emerald-700 text-[22px]">event_available</span>
-          Agenda &amp; Pelatihan Aktif / Akan Datang (${activeExtCount})${pastExtCount > 0 ? ` <span class="text-body-sm font-normal text-on-surface-variant">&bull; ${pastExtCount} Sudah Berjalan</span>` : ''}
-        </h3>
-        <span class="text-label-sm text-emerald-700 font-semibold">Urutan: Aktif / Akan Datang Terdekat</span>
-      </div>
-      ${cardsHtml}
-    `;
   }
+
+  // ===========================================================================
+  // 10B. DOWNLOAD CALENDAR (.ICS / iCalendar) & EKSPOR EXCEL (.CSV)
+  // ===========================================================================
+
+  // Helper untuk format tanggal & waktu ke iCalendar format (YYYYMMDDTHHMMSS)
+  function formatIcsDateTime(dateStr, timeStr) {
+    if (!dateStr) return '';
+    const dMatch = String(dateStr).match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (!dMatch) return '';
+    const yr = dMatch[1], mo = dMatch[2], da = dMatch[3];
+    let hr = '08', mi = '00', se = '00';
+    if (timeStr) {
+      const tMatch = String(timeStr).match(/(\d{1,2}):(\d{2})/);
+      if (tMatch) {
+        hr = tMatch[1].padStart(2, '0');
+        mi = tMatch[2];
+      }
+    }
+    return `${yr}${mo}${da}T${hr}${mi}${se}`;
+  }
+
+  // Hitung perkiraan jam selesai berdasarkan durasi pelatihan
+  function computeIcsEndTime(dateStr, startHourStr, durationStr) {
+    if (!dateStr) return '';
+    const dMatch = String(dateStr).match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (!dMatch) return '';
+    const yr = parseInt(dMatch[1], 10), mo = parseInt(dMatch[2], 10) - 1, da = parseInt(dMatch[3], 10);
+    let hr = 8, mi = 0;
+    if (startHourStr) {
+      const tMatch = String(startHourStr).match(/(\d{1,2}):(\d{2})/);
+      if (tMatch) {
+        hr = parseInt(tMatch[1], 10);
+        mi = parseInt(tMatch[2], 10);
+      }
+    }
+    let durationHours = 4;
+    if (durationStr) {
+      const hMatch = String(durationStr).match(/(\d+)\s*jam/i);
+      if (hMatch) {
+        durationHours = parseInt(hMatch[1], 10);
+      } else if (/hari/i.test(durationStr)) {
+        durationHours = 8;
+      }
+    }
+    const endDate = new Date(yr, mo, da, hr, mi, 0);
+    endDate.setHours(endDate.getHours() + Math.min(12, Math.max(1, durationHours)));
+
+    const ey = endDate.getFullYear();
+    const em = String(endDate.getMonth() + 1).padStart(2, '0');
+    const ed = String(endDate.getDate()).padStart(2, '0');
+    const eh = String(endDate.getHours()).padStart(2, '0');
+    const en = String(endDate.getMinutes()).padStart(2, '0');
+    return `${ey}${em}${ed}T${eh}${en}00`;
+  }
+
+  function escapeIcsText(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/\\/g, '\\\\')
+      .replace(/;/g, '\\;')
+      .replace(/,/g, '\\,')
+      .replace(/\r\n|\n|\r/g, '\\n');
+  }
+
+  function buildIcsEvent(item) {
+    if (!item) return '';
+    const uid = `${(item.id_jadwal || item.uid || 'EVT').replace(/[^a-zA-Z0-9-]/g, '')}-${Date.now()}@panigoldproject.com`;
+    const dtStamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+
+    const startDate = item.start || (item.startRaw ? isoDate(item.startRaw, 'Asia/Makassar') : '');
+    if (!startDate) return '';
+    const endDate = item.end || startDate;
+    const startHour = item.start_hour || '08:00';
+    const room = item.room || 'Gold Room (Diklat PGP)';
+    const dtStart = formatIcsDateTime(startDate, startHour);
+    const dtEnd = computeIcsEndTime(endDate, startHour, item.duration);
+
+    const agenda = item.agenda || 'Pelatihan Pani Gold Project';
+    const summary = `[Training PGP] ${agenda} (${room})`;
+
+    const pCount = (item.peserta || []).length || Number(item.total_terdaftar) || 0;
+    const kuota = Number(item.kuota) || 0;
+    const descParts = [
+      `Detail Pelatihan: ${agenda}`,
+      `Kode Jadwal: ${item.id_jadwal || '-'}`,
+      `Ruangan: ${room}`,
+      `Waktu / Jam Mulai: ${startHour} WITA`,
+      `Durasi: ${item.duration || '1 Hari'}`,
+      `Instruktur / PIC: ${item.pic || 'Tim L&D Pani Gold Project'}`,
+      kuota > 0 ? `Kapasitas Kuota: ${kuota} Kursi (Terdaftar: ${pCount} Peserta)` : '',
+      item.deskripsi ? `Deskripsi Materi: ${item.deskripsi}` : '',
+      `Sistem: Pani Gold Project - Internal Training & Manpower Competency System`
+    ].filter(Boolean).join('\n');
+
+    return [
+      'BEGIN:VEVENT',
+      `UID:${uid}`,
+      `DTSTAMP:${dtStamp}`,
+      `DTSTART;TZID=Asia/Makassar:${dtStart}`,
+      `DTEND;TZID=Asia/Makassar:${dtEnd}`,
+      `SUMMARY:${escapeIcsText(summary)}`,
+      `LOCATION:${escapeIcsText(room)}`,
+      `DESCRIPTION:${escapeIcsText(descParts)}`,
+      'STATUS:CONFIRMED',
+      'TRANSP:OPAQUE',
+      'END:VEVENT'
+    ].join('\r\n');
+  }
+
+  function downloadIcsBlob(icsContent, filename) {
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename || 'Kalender_Pelatihan_PGP.ics';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 200);
+  }
+
+  // Download 1 jadwal pelatihan tertentu dari popup modal
+  function downloadSingleScheduleIcs(idJadwal) {
+    const extList = Array.isArray(window.EXTERNAL_ITEMS) ? window.EXTERNAL_ITEMS : [];
+    const item = (LIVE_SCHEDULES || []).find(s => s.id_jadwal === idJadwal || s.agenda === idJadwal)
+      || extList.find(s => s.uid === idJadwal || s.id_jadwal === idJadwal || s.agenda === idJadwal);
+
+    if (!item) {
+      showToast('warning', 'Jadwal Tidak Ditemukan', 'Tidak dapat menemukan rincian jadwal untuk diunduh.');
+      return;
+    }
+
+    if (!item.start) {
+      showToast('info', 'Tanggal Belum Ditetapkan', 'Jadwal ini berstatus tentatif. Tanggal pasti belum ditentukan admin LnD.');
+      return;
+    }
+
+    const eventBlock = buildIcsEvent(item);
+    if (!eventBlock) {
+      showToast('warning', 'Gagal Memproses Kalender', 'Format tanggal jadwal belum valid.');
+      return;
+    }
+
+    const calName = item.agenda || 'Pani Gold Project Training';
+    const icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Pani Gold Project//Training Calendar//ID',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      `X-WR-CALNAME:${escapeIcsText(calName)}`,
+      'X-WR-TIMEZONE:Asia/Makassar',
+      eventBlock,
+      'END:VCALENDAR'
+    ].join('\r\n');
+
+    const cleanTitle = (item.agenda || 'Pelatihan').replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 30);
+    const filename = `Jadwal_${cleanTitle}_${item.start || 'PGP'}.ics`;
+    downloadIcsBlob(icsContent, filename);
+
+    showToast('success', 'Kalender Diunduh', `Jadwal "${item.agenda}" (${item.room || 'Ruangan PGP'}) berhasil diunduh dalam format kalender (.ics).`);
+  }
+  window.downloadSingleScheduleIcs = downloadSingleScheduleIcs;
+
+  // Download semua jadwal dalam scope ('internal' atau 'external') ke file kalender .ics
+  function downloadTrainingCalendarIcs(scope = 'internal') {
+    const rawList = scope === 'internal' ? (LIVE_SCHEDULES || []) : (window.EXTERNAL_ITEMS || []);
+    const list = rawList.filter(s => s && s.start && !/tutup|batal/i.test(s.status || ''));
+
+    if (!list.length) {
+      showToast('info', 'Data Kosong', 'Belum ada jadwal bertanggal aktif untuk diunduh.');
+      return;
+    }
+
+    const events = list.map(item => buildIcsEvent(item)).filter(Boolean);
+    if (!events.length) {
+      showToast('info', 'Tidak Ada Agenda', 'Semua agenda saat ini masih menunggu penetapan tanggal.');
+      return;
+    }
+
+    const calName = scope === 'internal' ? 'Internal Training Pani Gold Project' : 'External & Event Calendar PGP';
+    const icsContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Pani Gold Project//Training Calendar//ID',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
+      `X-WR-CALNAME:${calName}`,
+      'X-WR-TIMEZONE:Asia/Makassar',
+      events.join('\r\n'),
+      'END:VCALENDAR'
+    ].join('\r\n');
+
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10);
+    const filename = `Kalender_${scope === 'internal' ? 'Internal_Training' : 'External_Event'}_PGP_${dateStr}.ics`;
+    downloadIcsBlob(icsContent, filename);
+
+    showToast('success', 'Kalender Berhasil Diunduh', `${events.length} sesi pelatihan berhasil diekspor ke file kalender (.ics) lengkap dengan jam dan ruangan.`);
+  }
+  window.downloadTrainingCalendarIcs = downloadTrainingCalendarIcs;
+
+  // Ekspor lengkap seluruh jadwal ke format CSV (Excel)
+  function exportSchedulesToCsv(scope = 'internal') {
+    const list = scope === 'internal' ? (LIVE_SCHEDULES || []) : (window.EXTERNAL_ITEMS || []);
+    if (!list.length) {
+      showToast('info', 'Data Kosong', 'Belum ada jadwal untuk diekspor.');
+      return;
+    }
+
+    const headers = [
+      'No',
+      'Kode_Jadwal',
+      'Nama_Pelatihan',
+      'Batch_Kategori',
+      'Tanggal_Mulai',
+      'Tanggal_Selesai',
+      'Jam_Mulai',
+      'Durasi',
+      'Ruangan',
+      'Instruktur_PIC',
+      'Kuota_Kursi',
+      'Total_Terdaftar',
+      'Sisa_Kuota',
+      'Status_Jadwal',
+      'Deskripsi_Pelatihan'
+    ];
+
+    const escapeCsv = (v) => {
+      const s = String(v == null ? '' : v).replace(/"/g, '""');
+      return `"${s}"`;
+    };
+
+    const rows = list.map((it, idx) => {
+      const pCount = (it.peserta || []).length || Number(it.total_terdaftar) || 0;
+      const kuota = Number(it.kuota) || 0;
+      const sisa = kuota > 0 ? Math.max(0, kuota - pCount) : 0;
+      const startHour = it.start_hour ? `${it.start_hour} WITA` : (it.start ? '08:00 WITA' : 'Tentatif');
+      const room = it.room || 'Gold Room / Diklat PGP';
+
+      return [
+        idx + 1,
+        it.id_jadwal || it.uid || '-',
+        it.agenda || 'Pelatihan',
+        it.batch || it.category_label || (it.is_request ? 'Training Request' : 'Reguler'),
+        it.start || 'TBA',
+        it.end || it.start || 'TBA',
+        startHour,
+        it.duration || '-',
+        room,
+        it.pic || 'Tim L&D PGP',
+        kuota,
+        pCount,
+        sisa,
+        it.status || 'Buka',
+        it.deskripsi || '-'
+      ].map(escapeCsv).join(',');
+    });
+
+    const csvContent = '\uFEFF' + [headers.map(escapeCsv).join(','), ...rows].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10);
+    a.download = `Jadwal_${scope === 'internal' ? 'Internal_Training' : 'External_Event'}_PGP_${dateStr}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 200);
+
+    showToast('success', 'File Excel (.CSV) Diunduh', `${list.length} jadwal pelatihan berhasil diekspor lengkap dengan rincian jam dan ruangan.`);
+  }
+  window.exportSchedulesToCsv = exportSchedulesToCsv;
 
   // ===========================================================================
   // 11. INITIALIZATION ON DOM READY
@@ -7680,6 +8499,7 @@
     // Inisialisasi awal sistem kalender dan view tab
     updateCalendarPeriod(currentCalendarYear, currentCalendarMonth);
     updateExtCalendarPeriod(extCalendarYear, extCalendarMonth);
+    fetchExternalCalendarData();
 
     // Calendar view switcher tabs (Bulan, Minggu, Tahun, Daftar)
     const viewTabs = document.querySelectorAll('.view-tab-btn');
@@ -7852,8 +8672,9 @@
 
   /* ------------------------------ Master kompetensi ------------------------------ */
   async function loadMasterViaGviz() {
-    const json = await window.fetchGvizSheetJson(SPREADSHEET_ID, 'Master_Competency', 'tq=' + encodeURIComponent('select C, D'));
-    if (!json || !json.table) return [];
+    const url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&headers=1&sheet=Master_Competency&tq=' + encodeURIComponent('select C, D');
+    const txt = await (await fetch(url)).text();
+    const json = JSON.parse(txt.substring(txt.indexOf('{'), txt.lastIndexOf('}') + 1));
     return (json.table.rows || []).map((r) => ({
       nama: r.c && r.c[0] && r.c[0].v != null ? String(r.c[0].v) : '',
       jenis: r.c && r.c[1] && r.c[1].v != null ? String(r.c[1].v) : ''
@@ -9193,1594 +10014,6 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
-})();
-
-// =============================================================================
-// 13. SISTEM ADMIN MANAJEMEN JADWAL PELATIHAN (INTERNAL, EXTERNAL & EVENT)
-//     - Autentikasi Real-time terhadap Sheet "akses_admin"
-//     - Single Add, Edit, Duplicate, Batch / Multiple Add
-//     - Delete dengan Wajib Verifikasi Ulang Password Admin
-//     - Auto-Generate ID_Jadwal Unik
-// =============================================================================
-(function () {
-  const ADMIN_SHEET_ID = "1Y5IQUSN84p2Os1e9wxraDIfZF6UfOql4Y5EdXbv850A";
-  const ADMIN_SHEET_NAME = "akses_admin";
-  const ADMIN_SESSION_KEY = "lnd_admin_session_v1";
-  const ADMIN_OVERRIDES_KEY = "lnd_admin_schedule_overrides_v1";
-
-  let adminSession = null; // { username, loginAt }
-  let pendingAdminAction = null; // Callback yang dijalankan otomatis setelah login berhasil
-  let pendingDeleteTarget = null; // { id_jadwal, lookupKey, scope, agenda }
-  let adminBatchRows = [];
-
-  // ---------------------------------------------------------------------------
-  // A. PENYIMPANAN OVERRIDE LOKAL & SINKRONISASI MEMORI LIVE
-  // ---------------------------------------------------------------------------
-  function getAdminOverrides() {
-    try {
-      const raw = localStorage.getItem(ADMIN_OVERRIDES_KEY);
-      if (!raw) return { upserts: {}, deleted: {} };
-      const parsed = JSON.parse(raw);
-      return {
-        upserts: (parsed && typeof parsed.upserts === 'object' && parsed.upserts) || {},
-        deleted: (parsed && typeof parsed.deleted === 'object' && parsed.deleted) || {}
-      };
-    } catch (e) {
-      return { upserts: {}, deleted: {} };
-    }
-  }
-
-  function saveAdminOverrides(ov) {
-    try {
-      localStorage.setItem(ADMIN_OVERRIDES_KEY, JSON.stringify(ov || { upserts: {}, deleted: {} }));
-    } catch (e) {}
-  }
-
-  function applyAdminOverridesToInternalList(list) {
-    const base = Array.isArray(list) ? [...list] : [];
-    const ov = getAdminOverrides();
-    const filtered = base.filter(it => {
-      const id = String(it.id_jadwal || '').trim();
-      return !ov.deleted['internal:' + id] && !ov.deleted['any:' + id];
-    });
-
-    const mapById = new Map();
-    filtered.forEach(it => {
-      mapById.set(String(it.id_jadwal || '').trim(), it);
-    });
-
-    Object.keys(ov.upserts).forEach(key => {
-      const rec = ov.upserts[key];
-      if (!rec || (rec.scope && rec.scope !== 'internal')) return;
-      const id = String(rec.id_jadwal || '').trim();
-      if (!id || ov.deleted['internal:' + id]) return;
-      const existing = mapById.get(id) || {};
-      mapById.set(id, Object.assign({}, existing, rec.item));
-    });
-
-    return Array.from(mapById.values());
-  }
-  window.applyAdminOverridesToInternalList = applyAdminOverridesToInternalList;
-
-  function applyAdminOverridesToExternalList(list) {
-    const base = Array.isArray(list) ? [...list] : [];
-    const ov = getAdminOverrides();
-    const filtered = base.filter(it => {
-      const id = String(it.id_jadwal || '').trim();
-      const uid = String(it.uid || '').trim();
-      const sc = it.source_type || 'external_training';
-      return !ov.deleted[sc + ':' + id] && !ov.deleted[sc + ':' + uid] && !ov.deleted['any:' + id] && !ov.deleted['any:' + uid];
-    });
-
-    const mapByKey = new Map();
-    filtered.forEach(it => {
-      const k = (it.source_type || 'external_training') + ':' + String(it.id_jadwal || it.uid || '').trim();
-      mapByKey.set(k, it);
-    });
-
-    Object.keys(ov.upserts).forEach(key => {
-      const rec = ov.upserts[key];
-      if (!rec || (rec.scope !== 'external_training' && rec.scope !== 'agenda_event')) return;
-      const id = String(rec.id_jadwal || '').trim();
-      if (!id || ov.deleted[rec.scope + ':' + id]) return;
-      const k = rec.scope + ':' + id;
-      const existing = mapByKey.get(k) || {};
-      mapByKey.set(k, Object.assign({}, existing, rec.item));
-    });
-
-    return Array.from(mapByKey.values());
-  }
-  window.applyAdminOverridesToExternalList = applyAdminOverridesToExternalList;
-
-  // ---------------------------------------------------------------------------
-  // B. AUTENTIKASI ADMIN TERHADAP SHEET "akses_admin"
-  // ---------------------------------------------------------------------------
-  function loadSavedAdminSession() {
-    try {
-      const raw = sessionStorage.getItem(ADMIN_SESSION_KEY);
-      if (!raw) return null;
-      const data = JSON.parse(raw);
-      if (data && data.username) {
-        adminSession = data;
-        return adminSession;
-      }
-    } catch (e) {}
-    return null;
-  }
-
-  function isAdminAuthenticated() {
-    return Boolean(adminSession && adminSession.username);
-  }
-  window.isAdminAuthenticated = isAdminAuthenticated;
-
-  async function verifyAdminCredentials(usernameInput, passwordInput) {
-    const cleanUser = String(usernameInput || '').trim();
-    const cleanPass = String(passwordInput || '').trim();
-    if (!cleanPass) {
-      return { valid: false, message: 'Password admin wajib diisi.' };
-    }
-
-    // 1. Cek langsung ke Sheet "akses_admin" via GViz JSONP (Real-time & tanpa kendala CORS)
-    try {
-      if (typeof fetchGvizSheetJson === 'function') {
-        const gviz = await fetchGvizSheetJson(ADMIN_SHEET_ID, ADMIN_SHEET_NAME);
-        if (gviz && gviz.table) {
-          const cols = gviz.table.cols || [];
-          const rows = gviz.table.rows || [];
-          const accounts = [];
-
-          // Cari indeks kolom username & password dari label kolom
-          let userIdx = -1;
-          let passIdx = -1;
-          cols.forEach((col, i) => {
-            const lbl = String(col.label || col.id || '').trim().toLowerCase();
-            if (userIdx === -1 && /user|username|nama|admin|email|id/.test(lbl)) userIdx = i;
-            if (passIdx === -1 && /pass|password|sandi|kode|pin|key/.test(lbl)) passIdx = i;
-          });
-          if (userIdx === -1) userIdx = 0;
-          if (passIdx === -1) passIdx = cols.length > 1 ? 1 : 0;
-
-          // Jika baris pertama terdeteksi sebagai label kolom oleh GViz dan tidak masuk rows
-          if (rows.length === 0 && cols.length >= 2) {
-            const c0 = String(cols[0].label || '').trim();
-            const c1 = String(cols[1].label || '').trim();
-            if (c0 && c1 && !/^(username|user)$/i.test(c0)) {
-              accounts.push({ u: c0, p: c1 });
-            }
-          }
-
-          rows.forEach(r => {
-            const c = r.c || [];
-            const getCell = (idx) => {
-              if (idx < 0 || idx >= c.length || !c[idx]) return '';
-              return String(c[idx].v !== undefined && c[idx].v !== null ? c[idx].v : (c[idx].f || '')).trim();
-            };
-            const uVal = getCell(userIdx);
-            const pVal = getCell(passIdx);
-            if ((uVal || pVal) && !(/^username$/i.test(uVal) && /^password$/i.test(pVal))) {
-              accounts.push({ u: uVal, p: pVal });
-            }
-          });
-
-          if (accounts.length > 0) {
-            const matched = accounts.find(acc => {
-              const passMatch = acc.p === cleanPass;
-              if (!passMatch) return false;
-              if (!cleanUser) return true;
-              return acc.u.toLowerCase() === cleanUser.toLowerCase();
-            });
-            if (matched) {
-              return { valid: true, username: matched.u || cleanUser || 'Admin L&D' };
-            }
-            return { valid: false, message: 'Username atau password tidak sesuai dengan data di sheet akses_admin.' };
-          }
-        }
-      }
-    } catch (gvizErr) {
-      console.warn('GViz akses_admin check warning, mencoba GAS API:', gvizErr);
-    }
-
-    // 2. Fallback ke Endpoint GAS API (doPost action = admin_login / admin_verify_password)
-    try {
-      const resp = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: cleanUser ? 'admin_login' : 'admin_verify_password',
-          data: { username: cleanUser, password: cleanPass }
-        })
-      });
-      if (resp.ok) {
-        const resJson = await resp.json();
-        if (resJson && resJson.status === 'success') {
-          return { valid: true, username: resJson.username || cleanUser || 'Admin L&D' };
-        }
-        if (resJson && resJson.message) {
-          return { valid: false, message: resJson.message };
-        }
-      }
-    } catch (apiErr) {
-      console.warn('GAS API admin auth error:', apiErr);
-    }
-
-    return { valid: false, message: 'Gagal memverifikasi kredensial ke sheet akses_admin. Pastikan sheet "akses_admin" memiliki kolom username & password.' };
-  }
-
-  function updateAdminHeaderUI() {
-    const isAuth = isAdminAuthenticated();
-    const btn = document.getElementById('header-admin-btn');
-    const badge = document.getElementById('header-admin-badge');
-    const label = document.getElementById('header-admin-label');
-    const userDisp = document.getElementById('header-admin-user-display');
-    const ribbon = document.getElementById('admin-active-ribbon');
-    const ribbonUser = document.getElementById('ribbon-admin-username');
-
-    if (btn) {
-      btn.className = isAuth
-        ? 'h-8.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-emerald-600/80 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 text-xs font-bold inline-flex items-center gap-1.5 shadow-xs transition-all cursor-pointer'
-        : 'h-8.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-outline-variant/70 bg-surface-container-lowest hover:bg-surface-container-low text-on-surface text-xs font-semibold inline-flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer';
-    }
-    if (badge) badge.classList.toggle('hidden', !isAuth);
-    if (label) label.textContent = isAuth ? (adminSession.username || 'Admin') : 'Admin';
-    if (userDisp) userDisp.textContent = isAuth ? (adminSession.username || 'Admin L&D') : 'Admin L&D';
-    if (ribbon) ribbon.classList.toggle('hidden', !isAuth);
-    if (ribbonUser) ribbonUser.textContent = isAuth ? (adminSession.username || 'Admin') : 'admin';
-
-    // Tampilkan/sembunyikan seluruh tombol aksi khusus Admin (+ Tambah Jadwal, + Batch Add, dan bar di Modal Detail)
-    document.querySelectorAll('[data-admin-only="true"]').forEach(el => {
-      el.classList.toggle('hidden', !isAuth);
-      el.classList.toggle('inline-flex', isAuth);
-    });
-    const modalAdminBar = document.getElementById('modal-admin-actions-bar');
-    if (modalAdminBar) {
-      modalAdminBar.classList.toggle('hidden', !isAuth);
-      modalAdminBar.classList.toggle('flex', isAuth);
-    }
-
-    // Re-render kalender & daftar agenda agar tombol + di tiap sel tanggal dan tombol Edit/Delete langsung tampil/sembunyi
-    if (typeof renderMonthGrid === 'function' && typeof currentCalendarYear === 'number') {
-      renderMonthGrid(currentCalendarYear, currentCalendarMonth);
-    }
-    if (typeof renderDynamicListView === 'function' && typeof getFilteredSchedules === 'function') {
-      renderDynamicListView(getFilteredSchedules());
-    }
-    if (typeof currentActiveView === 'string' && currentActiveView === 'view-week' && typeof renderDynamicWeekView === 'function') {
-      renderDynamicWeekView(getFilteredSchedules());
-    }
-    if (typeof renderExtAllViews === 'function' && Array.isArray(window.EXTERNAL_ITEMS)) {
-      renderExtAllViews();
-    }
-  }
-
-  function handleHeaderAdminClick(e) {
-    if (e) e.stopPropagation();
-    if (!isAdminAuthenticated()) {
-      openAdminLoginModal();
-      return;
-    }
-    const dd = document.getElementById('header-admin-dropdown');
-    if (dd) dd.classList.toggle('hidden');
-  }
-  window.handleHeaderAdminClick = handleHeaderAdminClick;
-
-  function closeAdminDropdown() {
-    const dd = document.getElementById('header-admin-dropdown');
-    if (dd) dd.classList.add('hidden');
-  }
-  window.closeAdminDropdown = closeAdminDropdown;
-
-  function openAdminLoginModal(onSuccessCallback) {
-    pendingAdminAction = typeof onSuccessCallback === 'function' ? onSuccessCallback : null;
-    const modal = document.getElementById('admin-login-modal');
-    const errBox = document.getElementById('admin-login-error');
-    const passInp = document.getElementById('admin-login-password');
-    if (errBox) errBox.classList.add('hidden');
-    if (passInp) passInp.value = '';
-    if (modal) {
-      modal.classList.remove('hidden');
-      setTimeout(() => {
-        const userInp = document.getElementById('admin-login-username');
-        if (userInp) userInp.focus();
-      }, 60);
-    }
-  }
-  window.openAdminLoginModal = openAdminLoginModal;
-
-  function closeAdminLoginModal() {
-    const modal = document.getElementById('admin-login-modal');
-    if (modal) modal.classList.add('hidden');
-  }
-  window.closeAdminLoginModal = closeAdminLoginModal;
-
-  async function submitAdminLogin(e) {
-    if (e) e.preventDefault();
-    const userInp = document.getElementById('admin-login-username');
-    const passInp = document.getElementById('admin-login-password');
-    const btn = document.getElementById('admin-login-submit-btn');
-    const txt = document.getElementById('admin-login-submit-text');
-    const errBox = document.getElementById('admin-login-error');
-    const errTxt = document.getElementById('admin-login-error-text');
-
-    const username = (userInp?.value || '').trim();
-    const password = (passInp?.value || '').trim();
-    if (!username || !password) return;
-
-    if (errBox) errBox.classList.add('hidden');
-    if (btn) btn.disabled = true;
-    if (txt) txt.textContent = 'Memverifikasi...';
-
-    try {
-      const res = await verifyAdminCredentials(username, password);
-      if (res.valid) {
-        adminSession = { username: res.username || username, loginAt: Date.now() };
-        try { sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(adminSession)); } catch (err) {}
-        closeAdminLoginModal();
-        updateAdminHeaderUI();
-        showToast('success', 'Mode Admin Aktif', `Selamat datang, ${adminSession.username}. Anda kini dapat mengelola jadwal pelatihan.`);
-        if (pendingAdminAction) {
-          const fn = pendingAdminAction;
-          pendingAdminAction = null;
-          setTimeout(() => fn(), 80);
-        }
-      } else {
-        if (errTxt) errTxt.textContent = res.message || 'Username atau password admin tidak valid.';
-        if (errBox) errBox.classList.remove('hidden');
-      }
-    } finally {
-      if (btn) btn.disabled = false;
-      if (txt) txt.textContent = 'Masuk Mode Admin';
-    }
-  }
-  window.submitAdminLogin = submitAdminLogin;
-
-  function handleAdminLogout() {
-    adminSession = null;
-    try { sessionStorage.removeItem(ADMIN_SESSION_KEY); } catch (e) {}
-    closeAdminDropdown();
-    updateAdminHeaderUI();
-    showToast('info', 'Mode Admin Dinonaktifkan', 'Anda telah keluar dari sesi Admin Jadwal L&D.');
-  }
-  window.handleAdminLogout = handleAdminLogout;
-
-  function togglePasswordVisibility(inputId, iconId) {
-    const inp = document.getElementById(inputId);
-    const ic = document.getElementById(iconId);
-    if (!inp) return;
-    if (inp.type === 'password') {
-      inp.type = 'text';
-      if (ic) ic.textContent = 'visibility_off';
-    } else {
-      inp.type = 'password';
-      if (ic) ic.textContent = 'visibility';
-    }
-  }
-  window.togglePasswordVisibility = togglePasswordVisibility;
-
-  // ---------------------------------------------------------------------------
-  // C. AUTO-GENERATOR ID_JADWAL & HELPER TANGGAL/DURASI
-  // ---------------------------------------------------------------------------
-  function generateAutoScheduleId(scope, dateStr, seqOffset = 0) {
-    const sc = String(scope || 'internal').toLowerCase();
-    const prefix = sc === 'external_training' ? 'EXT' : (sc === 'agenda_event' ? 'EVT' : 'INT');
-
-    let dateCompact = '';
-    const parsed = typeof parseDateString === 'function' ? parseDateString(dateStr) : null;
-    if (parsed) {
-      dateCompact = `${parsed.year}${String(parsed.month).padStart(2, '0')}${String(parsed.day).padStart(2, '0')}`;
-    } else {
-      const now = new Date();
-      dateCompact = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
-    }
-
-    const usedIds = new Set();
-    (LIVE_SCHEDULES || []).forEach(s => { if (s.id_jadwal) usedIds.add(String(s.id_jadwal).toUpperCase()); });
-    (window.EXTERNAL_ITEMS || []).forEach(s => { if (s.id_jadwal) usedIds.add(String(s.id_jadwal).toUpperCase()); });
-    (adminBatchRows || []).forEach(r => { if (r.id_jadwal) usedIds.add(String(r.id_jadwal).toUpperCase()); });
-
-    let seq = Math.max(1, (LIVE_SCHEDULES?.length || 0) + (window.EXTERNAL_ITEMS?.length || 0) + 1 + seqOffset);
-    for (let attempt = 0; attempt < 500; attempt++) {
-      const randSuffix = String((seq + attempt) % 1000).padStart(3, '0');
-      const candidate = `${prefix}-${dateCompact}-${randSuffix}`;
-      if (!usedIds.has(candidate.toUpperCase())) {
-        return candidate;
-      }
-    }
-    return `${prefix}-${dateCompact}-${Math.floor(100 + Math.random() * 900)}`;
-  }
-  window.generateAutoScheduleId = generateAutoScheduleId;
-
-  function toIsoDateInputValue(rawDateStr) {
-    if (!rawDateStr) return '';
-    const p = typeof parseDateString === 'function' ? parseDateString(rawDateStr) : null;
-    if (!p) return '';
-    return `${p.year}-${String(p.month).padStart(2, '0')}-${String(p.day).padStart(2, '0')}`;
-  }
-
-  function parseDurationNumbers(durationStr, startStr, endStr) {
-    let days = 1;
-    let hours = 8;
-    const dStr = String(durationStr || '');
-    const dayMatch = dStr.match(/(\d+)\s*hari/i);
-    const hrMatch = dStr.match(/(\d+)\s*(?:jam|hour)/i);
-
-    const ps = typeof parseDateString === 'function' ? parseDateString(startStr) : null;
-    const pe = typeof parseDateString === 'function' ? parseDateString(endStr) : null;
-    if (ps && pe) {
-      const d1 = new Date(ps.year, ps.month - 1, ps.day);
-      const d2 = new Date(pe.year, pe.month - 1, pe.day);
-      const diff = Math.round((d2 - d1) / 864e5) + 1;
-      if (diff > 0) {
-        days = diff;
-        hours = diff * 8;
-      }
-    }
-    if (dayMatch) days = Math.max(1, parseInt(dayMatch[1], 10));
-    if (hrMatch) hours = Math.max(1, parseInt(hrMatch[1], 10));
-    else hours = days * 8;
-
-    return { days, hours };
-  }
-
-  function findScheduleItemAnywhere(lookupKey, scopeHint) {
-    if (!lookupKey) return null;
-    const keyStr = String(lookupKey).trim();
-    const extList = Array.isArray(window.EXTERNAL_ITEMS) ? window.EXTERNAL_ITEMS : [];
-    const intList = Array.isArray(LIVE_SCHEDULES) ? LIVE_SCHEDULES : [];
-
-    if (scopeHint === 'external_training' || scopeHint === 'agenda_event') {
-      const foundExt = extList.find(s => s.uid === keyStr || s.id_jadwal === keyStr || s.agenda === keyStr);
-      if (foundExt) return { item: foundExt, scope: foundExt.source_type || scopeHint };
-    }
-    if (scopeHint === 'internal') {
-      const foundInt = intList.find(s => s.id_jadwal === keyStr || s.agenda === keyStr);
-      if (foundInt) return { item: foundInt, scope: 'internal' };
-    }
-
-    const anyExt = extList.find(s => s.uid === keyStr || s.id_jadwal === keyStr);
-    if (anyExt) return { item: anyExt, scope: anyExt.source_type || 'external_training' };
-
-    const anyInt = intList.find(s => s.id_jadwal === keyStr || s.agenda === keyStr);
-    if (anyInt) return { item: anyInt, scope: 'internal' };
-
-    return null;
-  }
-
-  // ---------------------------------------------------------------------------
-  // D. MODAL KELOLA JADWAL (SINGLE ADD / EDIT / DUPLICATE & BATCH ADD)
-  // ---------------------------------------------------------------------------
-  function openAdminScheduleModal(mode = 'add', scheduleKey = null, defaultScope = 'internal', prefillDate = '') {
-    if (!isAdminAuthenticated()) {
-      openAdminLoginModal(() => openAdminScheduleModal(mode, scheduleKey, defaultScope, prefillDate));
-      return;
-    }
-
-    const modal = document.getElementById('admin-schedule-modal');
-    if (!modal) return;
-
-    if (mode === 'batch') {
-      const batchScopeSel = document.getElementById('admin-batch-default-scope');
-      if (batchScopeSel && defaultScope) batchScopeSel.value = defaultScope;
-      if (adminBatchRows.length === 0) {
-        resetAdminBatchRows(defaultScope || 'internal');
-      } else if (defaultScope) {
-        applyBatchDefaultScope(defaultScope);
-      }
-      switchAdminScheduleModalTab('batch');
-      modal.classList.remove('hidden');
-      return;
-    }
-
-    switchAdminScheduleModalTab('single');
-
-    const modeInput = document.getElementById('admin-form-mode');
-    const origIdInput = document.getElementById('admin-form-original-id');
-    const origScopeInput = document.getElementById('admin-form-original-scope');
-    const modalTitle = document.getElementById('admin-schedule-modal-title');
-    const modalSub = document.getElementById('admin-schedule-modal-subtitle');
-    const tabSingleLbl = document.getElementById('admin-tab-single-label');
-    const regenBtn = document.getElementById('admin-btn-regen-id');
-    const delBtn = document.getElementById('admin-single-delete-btn');
-    const submitTxt = document.getElementById('admin-single-submit-text');
-
-    const found = scheduleKey ? findScheduleItemAnywhere(scheduleKey, defaultScope) : null;
-    const isEdit = (mode === 'edit' && found && found.item);
-    const isDuplicate = (mode === 'duplicate' && found && found.item);
-    const activeScope = found ? found.scope : (defaultScope || 'internal');
-
-    if (modeInput) modeInput.value = isEdit ? 'edit' : 'add';
-    if (origIdInput) origIdInput.value = isEdit ? (found.item.id_jadwal || '') : '';
-    if (origScopeInput) origScopeInput.value = isEdit ? activeScope : '';
-
-    // Set radio scope
-    const radios = document.querySelectorAll('input[name="admin_schedule_scope"]');
-    radios.forEach(r => { r.checked = (r.value === activeScope); });
-
-    if (isEdit) {
-      const it = found.item;
-      if (modalTitle) modalTitle.textContent = `Edit Jadwal: ${it.agenda || it.id_jadwal}`;
-      if (modalSub) modalSub.textContent = `Perbarui rincian tanggal, jam, ruangan, kapasitas kuota, atau deskripsi jadwal`;
-      if (tabSingleLbl) tabSingleLbl.textContent = 'Edit Jadwal';
-      if (regenBtn) regenBtn.classList.add('hidden');
-      if (delBtn) delBtn.classList.remove('hidden');
-      if (submitTxt) submitTxt.textContent = 'Simpan Perubahan Jadwal';
-
-      const isoStart = toIsoDateInputValue(it.start);
-      const isoEnd = toIsoDateInputValue(it.end) || isoStart;
-      const isTba = !isoStart && activeScope !== 'internal';
-      const durInfo = parseDurationNumbers(it.duration, it.start, it.end);
-      const parsedH = typeof parseStartHour === 'function' ? parseStartHour(it.start_hour) : { formatted: '08:00' };
-
-      setVal('admin-input-id-jadwal', it.id_jadwal || generateAutoScheduleId(activeScope, isoStart));
-      setVal('admin-input-agenda', it.agenda || '');
-      setVal('admin-input-batch', it.batch || '');
-      setVal('admin-input-status', it.status || 'Buka');
-      setVal('admin-input-start-date', isoStart);
-      setVal('admin-input-end-date', isoEnd);
-      const tbaChk = document.getElementById('admin-input-tba-check');
-      if (tbaChk) tbaChk.checked = isTba;
-      toggleAdminTbaDates(isTba);
-
-      setVal('admin-input-start-hour', parsedH.formatted && /^\d{2}:\d{2}$/.test(parsedH.formatted) ? parsedH.formatted : '08:00');
-      setVal('admin-input-duration-day', durInfo.days);
-      setVal('admin-input-duration-hour', durInfo.hours);
-      setVal('admin-input-kuota', it.kuota != null ? it.kuota : (activeScope === 'agenda_event' ? 0 : 25));
-      setVal('admin-input-sisa-kuota', it.sisa_kuota != null ? it.sisa_kuota : (it.kuota != null ? it.kuota : 25));
-      setVal('admin-input-room', it.room || '');
-      setVal('admin-input-pic', it.pic || '');
-      setVal('admin-input-deskripsi', it.deskripsi || '');
-    } else if (isDuplicate) {
-      const it = found.item;
-      const isoStart = toIsoDateInputValue(it.start);
-      const isoEnd = toIsoDateInputValue(it.end) || isoStart;
-      const durInfo = parseDurationNumbers(it.duration, it.start, it.end);
-      const parsedH = typeof parseStartHour === 'function' ? parseStartHour(it.start_hour) : { formatted: '08:00' };
-
-      if (modalTitle) modalTitle.textContent = `Duplikat Jadwal Pelatihan`;
-      if (modalSub) modalSub.textContent = `Buat jadwal baru berdasarkan "${it.agenda}" dengan ID_Jadwal otomatis baru`;
-      if (tabSingleLbl) tabSingleLbl.textContent = 'Duplikat Jadwal';
-      if (regenBtn) regenBtn.classList.remove('hidden');
-      if (delBtn) delBtn.classList.add('hidden');
-      if (submitTxt) submitTxt.textContent = 'Simpan Jadwal Baru';
-
-      setVal('admin-input-id-jadwal', generateAutoScheduleId(activeScope, isoStart));
-      setVal('admin-input-agenda', it.agenda || '');
-      setVal('admin-input-batch', (it.batch || 'Batch 1') + ' (Copy)');
-      setVal('admin-input-status', 'Buka');
-      setVal('admin-input-start-date', isoStart);
-      setVal('admin-input-end-date', isoEnd);
-      const tbaChk = document.getElementById('admin-input-tba-check');
-      if (tbaChk) tbaChk.checked = false;
-      toggleAdminTbaDates(false);
-
-      setVal('admin-input-start-hour', parsedH.formatted && /^\d{2}:\d{2}$/.test(parsedH.formatted) ? parsedH.formatted : '08:00');
-      setVal('admin-input-duration-day', durInfo.days);
-      setVal('admin-input-duration-hour', durInfo.hours);
-      setVal('admin-input-kuota', it.kuota != null ? it.kuota : 25);
-      setVal('admin-input-sisa-kuota', it.kuota != null ? it.kuota : 25);
-      setVal('admin-input-room', it.room || 'Gold Room');
-      setVal('admin-input-pic', it.pic || 'Tim Trainer L&D');
-      setVal('admin-input-deskripsi', it.deskripsi || '');
-    } else {
-      // Mode Add Baru
-      if (modalTitle) modalTitle.textContent = `Tambah Jadwal Pelatihan Baru`;
-      if (modalSub) modalSub.textContent = `Isi informasi lengkap jadwal pelatihan Internal, External, atau Agenda di Luar Training`;
-      if (tabSingleLbl) tabSingleLbl.textContent = 'Tambah Jadwal';
-      if (regenBtn) regenBtn.classList.remove('hidden');
-      if (delBtn) delBtn.classList.add('hidden');
-      if (submitTxt) submitTxt.textContent = 'Simpan Jadwal Baru';
-
-      const todayIso = prefillDate || new Date().toISOString().slice(0, 10);
-      setVal('admin-input-id-jadwal', generateAutoScheduleId(activeScope, todayIso));
-      setVal('admin-input-agenda', '');
-      setVal('admin-input-batch', activeScope === 'agenda_event' ? 'Agenda Event' : 'Batch 1');
-      setVal('admin-input-status', activeScope === 'agenda_event' ? 'Terjadwal' : 'Buka');
-      setVal('admin-input-start-date', todayIso);
-      setVal('admin-input-end-date', todayIso);
-      const tbaChk = document.getElementById('admin-input-tba-check');
-      if (tbaChk) tbaChk.checked = false;
-      toggleAdminTbaDates(false);
-
-      setVal('admin-input-start-hour', '08:00');
-      setVal('admin-input-duration-day', 1);
-      setVal('admin-input-duration-hour', 8);
-      const defKuota = activeScope === 'agenda_event' ? 0 : (activeScope === 'external_training' ? 15 : 25);
-      setVal('admin-input-kuota', defKuota);
-      setVal('admin-input-sisa-kuota', defKuota);
-      setVal('admin-input-room', activeScope === 'internal' ? 'Gold Room' : 'Lokasi Eksternal / Site');
-      setVal('admin-input-pic', activeScope === 'internal' ? 'Tim Trainer L&D' : 'Tim L&D / Vendor Sertifikasi');
-      setVal('admin-input-deskripsi', '');
-    }
-
-    modal.classList.remove('hidden');
-  }
-  window.openAdminScheduleModal = openAdminScheduleModal;
-
-  function closeAdminScheduleModal() {
-    const modal = document.getElementById('admin-schedule-modal');
-    if (modal) modal.classList.add('hidden');
-  }
-  window.closeAdminScheduleModal = closeAdminScheduleModal;
-
-  function switchAdminScheduleModalTab(tab) {
-    const singleForm = document.getElementById('admin-single-schedule-form');
-    const batchPanel = document.getElementById('admin-batch-schedule-panel');
-    const btnSingle = document.getElementById('admin-tab-btn-single');
-    const btnBatch = document.getElementById('admin-tab-btn-batch');
-
-    const isBatch = (tab === 'batch');
-    if (singleForm) {
-      singleForm.classList.toggle('hidden', isBatch);
-      singleForm.classList.toggle('flex', !isBatch);
-    }
-    if (batchPanel) {
-      batchPanel.classList.toggle('hidden', !isBatch);
-      batchPanel.classList.toggle('flex', isBatch);
-    }
-    if (btnSingle) {
-      btnSingle.className = !isBatch
-        ? 'px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-white shadow-xs transition-all inline-flex items-center gap-1.5 cursor-pointer'
-        : 'px-3 py-1.5 rounded-lg text-xs font-semibold text-white/80 hover:text-white transition-all inline-flex items-center gap-1.5 cursor-pointer';
-    }
-    if (btnBatch) {
-      btnBatch.className = isBatch
-        ? 'px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-white shadow-xs transition-all inline-flex items-center gap-1.5 cursor-pointer'
-        : 'px-3 py-1.5 rounded-lg text-xs font-semibold text-white/80 hover:text-white transition-all inline-flex items-center gap-1.5 cursor-pointer';
-    }
-    if (isBatch && adminBatchRows.length === 0) {
-      resetAdminBatchRows('internal');
-    }
-  }
-  window.switchAdminScheduleModalTab = switchAdminScheduleModalTab;
-
-  function getSelectedAdminScope() {
-    const checked = document.querySelector('input[name="admin_schedule_scope"]:checked');
-    return checked ? checked.value : 'internal';
-  }
-
-  function handleAdminScopeChange(newScope) {
-    const mode = document.getElementById('admin-form-mode')?.value || 'add';
-    const startVal = document.getElementById('admin-input-start-date')?.value || '';
-    if (mode === 'add') {
-      setVal('admin-input-id-jadwal', generateAutoScheduleId(newScope, startVal));
-      if (newScope === 'agenda_event') {
-        setVal('admin-input-batch', 'Agenda Event');
-        setVal('admin-input-status', 'Terjadwal');
-      } else if (newScope === 'external_training') {
-        setVal('admin-input-kuota', 15);
-        setVal('admin-input-sisa-kuota', 15);
-      } else {
-        setVal('admin-input-kuota', 25);
-        setVal('admin-input-sisa-kuota', 25);
-      }
-    }
-  }
-  window.handleAdminScopeChange = handleAdminScopeChange;
-
-  function regenerateSingleScheduleId() {
-    const scope = getSelectedAdminScope();
-    const startVal = document.getElementById('admin-input-start-date')?.value || '';
-    setVal('admin-input-id-jadwal', generateAutoScheduleId(scope, startVal, Math.floor(Math.random() * 90)));
-  }
-  window.regenerateSingleScheduleId = regenerateSingleScheduleId;
-
-  function toggleAdminTbaDates(isTba) {
-    const sInp = document.getElementById('admin-input-start-date');
-    const eInp = document.getElementById('admin-input-end-date');
-    const sStar = document.getElementById('admin-start-req-star');
-    const eStar = document.getElementById('admin-end-req-star');
-    if (sInp) {
-      sInp.disabled = !!isTba;
-      sInp.required = !isTba;
-      if (isTba) sInp.value = '';
-    }
-    if (eInp) {
-      eInp.disabled = !!isTba;
-      eInp.required = !isTba;
-      if (isTba) eInp.value = '';
-    }
-    if (sStar) sStar.classList.toggle('hidden', !!isTba);
-    if (eStar) eStar.classList.toggle('hidden', !!isTba);
-    if (isTba) {
-      setVal('admin-input-status', 'Menunggu Jadwal (TBA)');
-    }
-  }
-  window.toggleAdminTbaDates = toggleAdminTbaDates;
-
-  function handleAdminDateChange() {
-    const sVal = document.getElementById('admin-input-start-date')?.value || '';
-    let eVal = document.getElementById('admin-input-end-date')?.value || '';
-    if (sVal && (!eVal || eVal < sVal)) {
-      eVal = sVal;
-      setVal('admin-input-end-date', eVal);
-    }
-    if (sVal && eVal) {
-      const d1 = new Date(sVal);
-      const d2 = new Date(eVal);
-      const diffDays = Math.max(1, Math.round((d2 - d1) / 864e5) + 1);
-      setVal('admin-input-duration-day', diffDays);
-      setVal('admin-input-duration-hour', diffDays * 8);
-    }
-    const mode = document.getElementById('admin-form-mode')?.value || 'add';
-    if (mode === 'add' && sVal) {
-      setVal('admin-input-id-jadwal', generateAutoScheduleId(getSelectedAdminScope(), sVal));
-    }
-  }
-  window.handleAdminDateChange = handleAdminDateChange;
-
-  function handleAdminDurationDayInput(val) {
-    const days = Math.max(0, parseInt(val, 10) || 0);
-    setVal('admin-input-duration-hour', days * 8);
-  }
-  window.handleAdminDurationDayInput = handleAdminDurationDayInput;
-
-  function handleAdminKuotaInput(val) {
-    const mode = document.getElementById('admin-form-mode')?.value || 'add';
-    if (mode === 'add') {
-      setVal('admin-input-sisa-kuota', Math.max(0, parseInt(val, 10) || 0));
-    }
-  }
-  window.handleAdminKuotaInput = handleAdminKuotaInput;
-
-  function setVal(id, v) {
-    const el = document.getElementById(id);
-    if (el) el.value = v !== undefined && v !== null ? v : '';
-  }
-
-  // ---------------------------------------------------------------------------
-  // E. SIMPAN SINGLE ADD / EDIT JADWAL PELATIHAN
-  // ---------------------------------------------------------------------------
-  function buildScheduleObjectFromPayload(p) {
-    const scope = p.scope || 'internal';
-    const durDay = Number(p.duration_day) || 0;
-    const durHr = Number(p.duration_hour) || (durDay * 8);
-    let durStr = durDay > 0 ? `${durDay} Hari` : '';
-    if (durHr > 0) durStr += (durStr ? ` (${durHr} Jam)` : `${durHr} Jam`);
-
-    const parsedH = typeof parseStartHour === 'function' ? parseStartHour(p.start_hour || '08:00') : { formatted: '08:00', minutes: 480 };
-    const kuota = Number(p.kuota) || 0;
-    const sisa = p.sisa_kuota !== undefined && p.sisa_kuota !== '' ? Number(p.sisa_kuota) : kuota;
-
-    const baseObj = {
-      id_jadwal: p.id_jadwal,
-      start: p.start_date || '',
-      end: p.end_date || p.start_date || '',
-      duration: durStr || (p.start_date ? '1 Hari (8 Jam)' : 'Menunggu Jadwal'),
-      start_hour: parsedH.formatted || '08:00',
-      start_minutes: parsedH.minutes || 480,
-      agenda: p.agenda,
-      pic: p.pic || 'Tim Trainer L&D',
-      room: p.room || 'Gold Room',
-      batch: p.batch || 'Batch 1',
-      kuota: kuota,
-      sisa_kuota: sisa,
-      total_terdaftar: Math.max(0, kuota - sisa),
-      status: p.status || 'Buka',
-      deskripsi: p.deskripsi || '',
-      peserta: p.peserta || []
-    };
-
-    if (scope === 'external_training' || scope === 'agenda_event') {
-      baseObj.uid = p.uid || `${scope === 'external_training' ? 'EXT' : 'EVT'}-${p.id_jadwal}`;
-      baseObj.source_type = scope;
-      baseObj.source_label = scope === 'external_training' ? 'External Training' : 'Agenda di Luar Training';
-    }
-    return baseObj;
-  }
-
-  function refreshAllScheduleViewsAfterAdminChange() {
-    // 1. Refresh Internal Views & Registration Select
-    if (Array.isArray(LIVE_SCHEDULES)) {
-      LIVE_SCHEDULES = sortSchedulesChronologically(applyAdminOverridesToInternalList(LIVE_SCHEDULES));
-      fetchedJadwalList = LIVE_SCHEDULES;
-    }
-    if (typeof renderMonthGrid === 'function') {
-      renderMonthGrid(currentCalendarYear, currentCalendarMonth);
-    }
-    if (typeof renderDynamicListView === 'function') {
-      renderDynamicListView(getFilteredSchedules());
-    }
-    if (typeof renderDynamicWeekView === 'function') {
-      renderDynamicWeekView(getFilteredSchedules());
-    }
-    if (typeof updateYearViewHighlight === 'function') {
-      updateYearViewHighlight(currentCalendarYear, currentCalendarMonth);
-    }
-    if (typeof renderHome === 'function') {
-      renderHome();
-    }
-    if (typeof renderProgramComboboxList === 'function') renderProgramComboboxList();
-    if (typeof updateProgramComboboxTrigger === 'function') updateProgramComboboxTrigger();
-    if (typeof populateTrainingSuggestions === 'function') populateTrainingSuggestions();
-
-    // 2. Refresh External Views & KPIs
-    if (Array.isArray(window.EXTERNAL_ITEMS)) {
-      window.EXTERNAL_ITEMS = applyAdminOverridesToExternalList(window.EXTERNAL_ITEMS);
-      const extTr = window.EXTERNAL_ITEMS.filter(x => x.source_type === 'external_training');
-      const extEv = window.EXTERNAL_ITEMS.filter(x => x.source_type === 'agenda_event');
-      const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-      setTxt('ext-kpi-total', window.EXTERNAL_ITEMS.length);
-      setTxt('ext-kpi-training', extTr.length);
-      setTxt('ext-kpi-events', extEv.length);
-      if (typeof renderExtAllViews === 'function') renderExtAllViews();
-    }
-  }
-
-  function applyLocalUpsertSchedule(payload, origId, origScope) {
-    const ov = getAdminOverrides();
-    const scope = payload.scope || 'internal';
-    const id = String(payload.id_jadwal || '').trim();
-
-    // Jika saat edit admin mengganti kategori (scope) atau ID, hapus yang lama
-    if (origId && (origId !== id || (origScope && origScope !== scope))) {
-      ov.deleted[(origScope || scope) + ':' + origId] = true;
-      if (origScope === 'internal') {
-        LIVE_SCHEDULES = (LIVE_SCHEDULES || []).filter(s => s.id_jadwal !== origId);
-      } else {
-        window.EXTERNAL_ITEMS = (window.EXTERNAL_ITEMS || []).filter(s => s.id_jadwal !== origId && s.uid !== origId);
-      }
-    }
-
-    // Pertahankan daftar peserta lama jika sedang edit
-    let existingPeserta = [];
-    const existingFound = findScheduleItemAnywhere(origId || id, scope);
-    if (existingFound && existingFound.item && Array.isArray(existingFound.item.peserta)) {
-      existingPeserta = existingFound.item.peserta;
-    }
-
-    const built = buildScheduleObjectFromPayload(Object.assign({}, payload, {
-      peserta: existingPeserta,
-      uid: existingFound && existingFound.item && existingFound.item.uid ? existingFound.item.uid : undefined
-    }));
-
-    delete ov.deleted[scope + ':' + id];
-    delete ov.deleted['any:' + id];
-    ov.upserts[scope + ':' + id] = {
-      scope: scope,
-      id_jadwal: id,
-      item: built,
-      updatedAt: Date.now()
-    };
-    saveAdminOverrides(ov);
-
-    if (scope === 'internal') {
-      const idx = (LIVE_SCHEDULES || []).findIndex(s => s.id_jadwal === id);
-      if (idx >= 0) LIVE_SCHEDULES[idx] = Object.assign({}, LIVE_SCHEDULES[idx], built);
-      else LIVE_SCHEDULES = (LIVE_SCHEDULES || []).concat([built]);
-    } else {
-      const list = Array.isArray(window.EXTERNAL_ITEMS) ? window.EXTERNAL_ITEMS : [];
-      const idx = list.findIndex(s => (s.id_jadwal === id || s.uid === built.uid) && s.source_type === scope);
-      if (idx >= 0) list[idx] = Object.assign({}, list[idx], built);
-      else list.push(built);
-      window.EXTERNAL_ITEMS = list;
-    }
-
-    refreshAllScheduleViewsAfterAdminChange();
-  }
-
-  async function submitAdminSingleSchedule(e) {
-    if (e) e.preventDefault();
-    if (!isAdminAuthenticated()) {
-      openAdminLoginModal(() => submitAdminSingleSchedule());
-      return;
-    }
-
-    const mode = document.getElementById('admin-form-mode')?.value || 'add';
-    const origId = document.getElementById('admin-form-original-id')?.value || '';
-    const origScope = document.getElementById('admin-form-original-scope')?.value || '';
-    const scope = getSelectedAdminScope();
-    const isTba = document.getElementById('admin-input-tba-check')?.checked;
-
-    const agenda = (document.getElementById('admin-input-agenda')?.value || '').trim();
-    const startDate = isTba ? '' : (document.getElementById('admin-input-start-date')?.value || '').trim();
-    const endDate = isTba ? '' : ((document.getElementById('admin-input-end-date')?.value || '').trim() || startDate);
-    let idJadwal = (document.getElementById('admin-input-id-jadwal')?.value || '').trim();
-    if (!idJadwal) idJadwal = generateAutoScheduleId(scope, startDate);
-
-    if (!agenda) {
-      showToast('warning', 'Nama Pelatihan Kosong', 'Harap isi nama pelatihan atau agenda kegiatan.');
-      return;
-    }
-    if (!isTba && !startDate) {
-      showToast('warning', 'Tanggal Mulai Wajib Diisi', 'Pilih tanggal mulai pelaksanaan atau centang opsi TBA (Menyusul).');
-      return;
-    }
-    if (startDate && endDate && endDate < startDate) {
-      showToast('warning', 'Rentang Tanggal Tidak Valid', 'Tanggal selesai tidak boleh mendahului tanggal mulai.');
-      return;
-    }
-
-    const payload = {
-      scope: scope,
-      id_jadwal: idJadwal,
-      original_id_jadwal: origId || idJadwal,
-      agenda: agenda,
-      batch: (document.getElementById('admin-input-batch')?.value || '').trim() || 'Batch 1',
-      status: (document.getElementById('admin-input-status')?.value || '').trim() || 'Buka',
-      start_date: startDate,
-      end_date: endDate,
-      start_hour: (document.getElementById('admin-input-start-hour')?.value || '08:00').trim(),
-      duration_day: Number(document.getElementById('admin-input-duration-day')?.value) || 1,
-      duration_hour: Number(document.getElementById('admin-input-duration-hour')?.value) || 8,
-      kuota: Number(document.getElementById('admin-input-kuota')?.value) || 0,
-      sisa_kuota: Number(document.getElementById('admin-input-sisa-kuota')?.value) || 0,
-      room: (document.getElementById('admin-input-room')?.value || '').trim() || 'Gold Room',
-      pic: (document.getElementById('admin-input-pic')?.value || '').trim() || 'Tim Trainer L&D',
-      deskripsi: (document.getElementById('admin-input-deskripsi')?.value || '').trim(),
-      admin_username: adminSession?.username || 'Admin'
-    };
-
-    const btn = document.getElementById('admin-single-submit-btn');
-    const txt = document.getElementById('admin-single-submit-text');
-    if (btn) btn.disabled = true;
-    if (txt) txt.textContent = 'Menyimpan ke Database...';
-
-    // Update UI & Memori seketika
-    applyLocalUpsertSchedule(payload, origId, origScope);
-
-    // Kirim ke Google Apps Script Backend
-    try {
-      const resp = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: mode === 'edit' ? 'admin_edit_schedule' : 'admin_add_schedule',
-          data: payload
-        })
-      });
-      if (resp.ok) {
-        await resp.json().catch(() => null);
-      }
-    } catch (err) {
-      console.warn('Admin schedule sync notice:', err);
-    } finally {
-      if (btn) btn.disabled = false;
-      if (txt) txt.textContent = mode === 'edit' ? 'Simpan Perubahan Jadwal' : 'Simpan Jadwal';
-    }
-
-    closeAdminScheduleModal();
-    showToast(
-      'success',
-      mode === 'edit' ? 'Jadwal Diperbarui!' : 'Jadwal Ditambahkan!',
-      `Jadwal "${agenda}" (ID: ${idJadwal}) berhasil disimpan ke kalender & daftar agenda.`
-    );
-  }
-  window.submitAdminSingleSchedule = submitAdminSingleSchedule;
-
-  // ---------------------------------------------------------------------------
-  // F. BATCH / MULTIPLE ADD JADWAL PELATIHAN
-  // ---------------------------------------------------------------------------
-  function createEmptyBatchRow(scope = 'internal', seqIdx = 0) {
-    const todayIso = new Date().toISOString().slice(0, 10);
-    const defKuota = scope === 'agenda_event' ? 0 : (scope === 'external_training' ? 15 : 25);
-    return {
-      rowId: 'brow_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
-      scope: scope,
-      id_jadwal: generateAutoScheduleId(scope, todayIso, seqIdx),
-      agenda: '',
-      batch: scope === 'agenda_event' ? 'Agenda Event' : `Batch ${seqIdx + 1}`,
-      start_date: todayIso,
-      end_date: todayIso,
-      start_hour: '08:00',
-      duration_day: 1,
-      duration_hour: 8,
-      kuota: defKuota,
-      sisa_kuota: defKuota,
-      room: scope === 'internal' ? 'Gold Room' : 'Lokasi Eksternal / Site',
-      pic: scope === 'internal' ? 'Tim Trainer L&D' : 'Tim L&D / Vendor Sertifikasi',
-      status: scope === 'agenda_event' ? 'Terjadwal' : 'Buka',
-      deskripsi: ''
-    };
-  }
-
-  function resetAdminBatchRows(defaultScope) {
-    const sc = defaultScope || document.getElementById('admin-batch-default-scope')?.value || 'internal';
-    adminBatchRows = [
-      createEmptyBatchRow(sc, 0),
-      createEmptyBatchRow(sc, 1),
-      createEmptyBatchRow(sc, 2)
-    ];
-    renderAdminBatchTable();
-  }
-  window.resetAdminBatchRows = resetAdminBatchRows;
-
-  function addAdminBatchRow(customRow) {
-    const sc = document.getElementById('admin-batch-default-scope')?.value || 'internal';
-    const nextRow = customRow || createEmptyBatchRow(sc, adminBatchRows.length);
-    adminBatchRows.push(nextRow);
-    renderAdminBatchTable();
-  }
-  window.addAdminBatchRow = addAdminBatchRow;
-
-  function addMultipleAdminBatchRows(count = 5) {
-    const sc = document.getElementById('admin-batch-default-scope')?.value || 'internal';
-    for (let i = 0; i < count; i++) {
-      adminBatchRows.push(createEmptyBatchRow(sc, adminBatchRows.length));
-    }
-    renderAdminBatchTable();
-  }
-  window.addMultipleAdminBatchRows = addMultipleAdminBatchRows;
-
-  function duplicateAdminBatchRow(rowId) {
-    const idx = adminBatchRows.findIndex(r => r.rowId === rowId);
-    if (idx === -1) return;
-    const src = adminBatchRows[idx];
-    const copy = Object.assign({}, src, {
-      rowId: 'brow_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
-      id_jadwal: generateAutoScheduleId(src.scope, src.start_date, adminBatchRows.length + 1)
-    });
-    adminBatchRows.splice(idx + 1, 0, copy);
-    renderAdminBatchTable();
-  }
-  window.duplicateAdminBatchRow = duplicateAdminBatchRow;
-
-  function removeAdminBatchRow(rowId) {
-    if (adminBatchRows.length <= 1) {
-      showToast('info', 'Minimal 1 Baris', 'Tabel Batch Add membutuhkan minimal 1 baris jadwal.');
-      return;
-    }
-    adminBatchRows = adminBatchRows.filter(r => r.rowId !== rowId);
-    renderAdminBatchTable();
-  }
-  window.removeAdminBatchRow = removeAdminBatchRow;
-
-  function applyBatchDefaultScope(newScope) {
-    adminBatchRows.forEach((r, idx) => {
-      r.scope = newScope;
-      r.id_jadwal = generateAutoScheduleId(newScope, r.start_date, idx);
-    });
-    renderAdminBatchTable();
-  }
-  window.applyBatchDefaultScope = applyBatchDefaultScope;
-
-  function handleAdminBatchFieldChange(rowId, field, value) {
-    const row = adminBatchRows.find(r => r.rowId === rowId);
-    if (!row) return;
-    row[field] = value;
-
-    if (field === 'scope') {
-      row.id_jadwal = generateAutoScheduleId(row.scope, row.start_date, adminBatchRows.indexOf(row));
-      renderAdminBatchTable();
-      return;
-    }
-    if (field === 'start_date') {
-      if (!row.end_date || row.end_date < row.start_date) {
-        row.end_date = row.start_date;
-      }
-      if (row.start_date && row.end_date) {
-        const d1 = new Date(row.start_date);
-        const d2 = new Date(row.end_date);
-        const days = Math.max(1, Math.round((d2 - d1) / 864e5) + 1);
-        row.duration_day = days;
-        row.duration_hour = days * 8;
-      }
-      row.id_jadwal = generateAutoScheduleId(row.scope, row.start_date, adminBatchRows.indexOf(row));
-      renderAdminBatchTable();
-      return;
-    }
-    if (field === 'end_date') {
-      if (row.start_date && row.end_date && row.end_date >= row.start_date) {
-        const d1 = new Date(row.start_date);
-        const d2 = new Date(row.end_date);
-        const days = Math.max(1, Math.round((d2 - d1) / 864e5) + 1);
-        row.duration_day = days;
-        row.duration_hour = days * 8;
-        renderAdminBatchTable();
-      }
-      return;
-    }
-    if (field === 'duration_day') {
-      row.duration_hour = Math.max(0, (parseInt(value, 10) || 0) * 8);
-      renderAdminBatchTable();
-      return;
-    }
-    if (field === 'kuota') {
-      row.sisa_kuota = Math.max(0, parseInt(value, 10) || 0);
-    }
-    updateAdminBatchSummary();
-  }
-  window.handleAdminBatchFieldChange = handleAdminBatchFieldChange;
-
-  function updateAdminBatchSummary() {
-    const lbl = document.getElementById('admin-batch-summary-label');
-    if (!lbl) return;
-    const validCount = adminBatchRows.filter(r => (r.agenda || '').trim().length > 0).length;
-    lbl.innerHTML = `Total Baris: <strong>${adminBatchRows.length}</strong> &bull; Siap Disimpan: <strong class="text-primary">${validCount} Jadwal Terisi</strong>`;
-  }
-
-  function renderAdminBatchTable() {
-    const tbody = document.getElementById('admin-batch-tbody');
-    if (!tbody) return;
-
-    tbody.innerHTML = adminBatchRows.map((r, idx) => `
-      <tr class="hover:bg-surface-container-low/40 transition-colors">
-        <td class="py-2 px-2.5 text-center font-mono text-outline font-bold">${idx + 1}</td>
-        <td class="py-2 px-1.5">
-          <select onchange="handleAdminBatchFieldChange('${r.rowId}', 'scope', this.value)" class="w-full h-8 px-2 rounded-lg bg-surface-container-lowest border border-outline-variant/60 text-[11px] font-semibold">
-            <option value="internal" ${r.scope === 'internal' ? 'selected' : ''}>Internal</option>
-            <option value="external_training" ${r.scope === 'external_training' ? 'selected' : ''}>External</option>
-            <option value="agenda_event" ${r.scope === 'agenda_event' ? 'selected' : ''}>Agenda Luar</option>
-          </select>
-        </td>
-        <td class="py-2 px-1.5">
-          <input type="text" value="${escapeHtml(r.id_jadwal)}" readonly class="w-full h-8 px-2 rounded-lg bg-surface-container-low border border-outline-variant/50 font-mono text-[11px] font-bold text-primary">
-        </td>
-        <td class="py-2 px-1.5">
-          <input type="text" value="${escapeHtml(r.agenda)}" oninput="handleAdminBatchFieldChange('${r.rowId}', 'agenda', this.value)" placeholder="Nama Pelatihan / Agenda..." class="w-full h-8 px-2.5 rounded-lg bg-surface-container-lowest border border-outline-variant/70 text-xs font-semibold focus:ring-1 focus:ring-primary">
-        </td>
-        <td class="py-2 px-1.5">
-          <input type="text" value="${escapeHtml(r.batch)}" oninput="handleAdminBatchFieldChange('${r.rowId}', 'batch', this.value)" placeholder="Batch 1" class="w-full h-8 px-2 rounded-lg bg-surface-container-lowest border border-outline-variant/60 text-xs">
-        </td>
-        <td class="py-2 px-1.5">
-          <input type="date" value="${escapeHtml(r.start_date)}" onchange="handleAdminBatchFieldChange('${r.rowId}', 'start_date', this.value)" class="w-full h-8 px-2 rounded-lg bg-surface-container-lowest border border-outline-variant/60 text-[11px]">
-        </td>
-        <td class="py-2 px-1.5">
-          <input type="date" value="${escapeHtml(r.end_date)}" onchange="handleAdminBatchFieldChange('${r.rowId}', 'end_date', this.value)" class="w-full h-8 px-2 rounded-lg bg-surface-container-lowest border border-outline-variant/60 text-[11px]">
-        </td>
-        <td class="py-2 px-1.5">
-          <input type="time" value="${escapeHtml(r.start_hour)}" onchange="handleAdminBatchFieldChange('${r.rowId}', 'start_hour', this.value)" class="w-full h-8 px-1.5 rounded-lg bg-surface-container-lowest border border-outline-variant/60 text-[11px]">
-        </td>
-        <td class="py-2 px-1.5">
-          <input type="number" min="0" value="${Number(r.duration_day) || 1}" onchange="handleAdminBatchFieldChange('${r.rowId}', 'duration_day', this.value)" class="w-full h-8 px-1.5 rounded-lg bg-surface-container-lowest border border-outline-variant/60 text-xs text-center">
-        </td>
-        <td class="py-2 px-1.5">
-          <input type="number" min="0" value="${Number(r.duration_hour) || 8}" oninput="handleAdminBatchFieldChange('${r.rowId}', 'duration_hour', this.value)" class="w-full h-8 px-1.5 rounded-lg bg-surface-container-lowest border border-outline-variant/60 text-xs text-center">
-        </td>
-        <td class="py-2 px-1.5">
-          <input type="number" min="0" value="${Number(r.kuota) || 0}" oninput="handleAdminBatchFieldChange('${r.rowId}', 'kuota', this.value)" class="w-full h-8 px-1.5 rounded-lg bg-surface-container-lowest border border-outline-variant/60 text-xs font-bold text-center">
-        </td>
-        <td class="py-2 px-1.5">
-          <input type="text" value="${escapeHtml(r.room)}" oninput="handleAdminBatchFieldChange('${r.rowId}', 'room', this.value)" placeholder="Gold Room" class="w-full h-8 px-2 rounded-lg bg-surface-container-lowest border border-outline-variant/60 text-xs">
-        </td>
-        <td class="py-2 px-1.5">
-          <input type="text" value="${escapeHtml(r.pic)}" oninput="handleAdminBatchFieldChange('${r.rowId}', 'pic', this.value)" placeholder="Instruktur / PIC" class="w-full h-8 px-2 rounded-lg bg-surface-container-lowest border border-outline-variant/60 text-xs">
-        </td>
-        <td class="py-2 px-1.5">
-          <select onchange="handleAdminBatchFieldChange('${r.rowId}', 'status', this.value)" class="w-full h-8 px-1.5 rounded-lg bg-surface-container-lowest border border-outline-variant/60 text-[11px]">
-            <option value="Buka" ${r.status === 'Buka' ? 'selected' : ''}>Buka</option>
-            <option value="Terjadwal" ${r.status === 'Terjadwal' ? 'selected' : ''}>Terjadwal</option>
-            <option value="Menunggu Jadwal (TBA)" ${r.status === 'Menunggu Jadwal (TBA)' ? 'selected' : ''}>TBA</option>
-            <option value="Kuota Penuh" ${r.status === 'Kuota Penuh' ? 'selected' : ''}>Penuh</option>
-          </select>
-        </td>
-        <td class="py-2 px-1.5">
-          <input type="text" value="${escapeHtml(r.deskripsi)}" oninput="handleAdminBatchFieldChange('${r.rowId}', 'deskripsi', this.value)" placeholder="Deskripsi..." class="w-full h-8 px-2 rounded-lg bg-surface-container-lowest border border-outline-variant/60 text-xs">
-        </td>
-        <td class="py-2 px-2 text-center">
-          <div class="inline-flex items-center gap-1">
-            <button type="button" onclick="duplicateAdminBatchRow('${r.rowId}')" class="w-7 h-7 rounded-lg bg-surface-container hover:bg-primary/15 text-on-surface-variant hover:text-primary inline-flex items-center justify-center transition-colors" title="Duplikat Baris">
-              <span class="material-symbols-outlined text-[15px]">content_copy</span>
-            </button>
-            <button type="button" onclick="removeAdminBatchRow('${r.rowId}')" class="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 inline-flex items-center justify-center transition-colors" title="Hapus Baris">
-              <span class="material-symbols-outlined text-[15px]">delete</span>
-            </button>
-          </div>
-        </td>
-      </tr>
-    `).join('');
-
-    updateAdminBatchSummary();
-  }
-
-  function toggleAdminBatchGenerator(forceState) {
-    const box = document.getElementById('admin-batch-generator-box');
-    if (!box) return;
-    const show = typeof forceState === 'boolean' ? forceState : box.classList.contains('hidden');
-    box.classList.toggle('hidden', !show);
-    box.classList.toggle('flex', show);
-    if (show) {
-      const sInp = document.getElementById('gen-batch-start');
-      if (sInp && !sInp.value) sInp.value = new Date().toISOString().slice(0, 10);
-    }
-  }
-  window.toggleAdminBatchGenerator = toggleAdminBatchGenerator;
-
-  function applyAdminMultiBatchGenerator() {
-    const agenda = (document.getElementById('gen-batch-agenda')?.value || '').trim();
-    const count = Math.min(30, Math.max(1, parseInt(document.getElementById('gen-batch-count')?.value, 10) || 3));
-    const startStr = document.getElementById('gen-batch-start')?.value || new Date().toISOString().slice(0, 10);
-    const daysPerBatch = Math.max(1, parseInt(document.getElementById('gen-batch-days')?.value, 10) || 2);
-    const gapDays = Math.max(0, parseInt(document.getElementById('gen-batch-gap')?.value, 10) || 7);
-    const startHour = document.getElementById('gen-batch-hour')?.value || '08:00';
-    const kuota = Math.max(0, parseInt(document.getElementById('gen-batch-kuota')?.value, 10) || 25);
-    const room = (document.getElementById('gen-batch-room')?.value || 'Gold Room').trim();
-    const pic = (document.getElementById('gen-batch-pic')?.value || 'Tim Trainer L&D').trim();
-    const defScope = document.getElementById('admin-batch-default-scope')?.value || 'internal';
-
-    if (!agenda) {
-      showToast('warning', 'Nama Pelatihan Kosong', 'Masukkan nama pelatihan pada Auto-Generator terlebih dahulu.');
-      return;
-    }
-
-    // Bersihkan baris kosong sebelum menambahkan hasil generator
-    adminBatchRows = adminBatchRows.filter(r => (r.agenda || '').trim() !== '');
-
-    let cursorDate = new Date(startStr);
-    for (let i = 0; i < count; i++) {
-      const bStart = new Date(cursorDate.getTime());
-      const bEnd = new Date(bStart.getTime() + (daysPerBatch - 1) * 864e5);
-      const sIso = bStart.toISOString().slice(0, 10);
-      const eIso = bEnd.toISOString().slice(0, 10);
-
-      adminBatchRows.push({
-        rowId: 'brow_' + Date.now() + '_' + i + '_' + Math.random().toString(36).slice(2, 6),
-        scope: defScope,
-        id_jadwal: generateAutoScheduleId(defScope, sIso, adminBatchRows.length + i + 1),
-        agenda: agenda,
-        batch: `Batch ${i + 1}`,
-        start_date: sIso,
-        end_date: eIso,
-        start_hour: startHour,
-        duration_day: daysPerBatch,
-        duration_hour: daysPerBatch * 8,
-        kuota: kuota,
-        sisa_kuota: kuota,
-        room: room,
-        pic: pic,
-        status: defScope === 'agenda_event' ? 'Terjadwal' : 'Buka',
-        deskripsi: `${agenda} - Pelaksanaan Batch ${i + 1}`
-      });
-
-      cursorDate = new Date(bStart.getTime() + Math.max(daysPerBatch, gapDays) * 864e5);
-    }
-
-    renderAdminBatchTable();
-    toggleAdminBatchGenerator(false);
-    showToast('success', 'Multi-Batch Digenerate', `${count} jadwal berurutan untuk "${agenda}" berhasil ditambahkan ke tabel.`);
-  }
-  window.applyAdminMultiBatchGenerator = applyAdminMultiBatchGenerator;
-
-  function toggleAdminBatchExcelPaste(forceState) {
-    const box = document.getElementById('admin-batch-excel-box');
-    if (!box) return;
-    const show = typeof forceState === 'boolean' ? forceState : box.classList.contains('hidden');
-    box.classList.toggle('hidden', !show);
-    box.classList.toggle('flex', show);
-  }
-  window.toggleAdminBatchExcelPaste = toggleAdminBatchExcelPaste;
-
-  function applyAdminBatchExcelPaste() {
-    const raw = (document.getElementById('admin-batch-excel-textarea')?.value || '').trim();
-    if (!raw) {
-      showToast('warning', 'Data Paste Kosong', 'Silakan paste baris jadwal dari Excel terlebih dahulu.');
-      return;
-    }
-    const defScope = document.getElementById('admin-batch-default-scope')?.value || 'internal';
-    const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-    if (!lines.length) return;
-
-    adminBatchRows = adminBatchRows.filter(r => (r.agenda || '').trim() !== '');
-    let added = 0;
-
-    lines.forEach((line, idx) => {
-      const cols = line.includes('\t') ? line.split('\t') : line.split(';');
-      const agenda = (cols[0] || '').trim();
-      if (!agenda || /^nama[\s_]?pelatihan|^agenda$/i.test(agenda)) return;
-
-      const batch = (cols[1] || `Batch ${idx + 1}`).trim();
-      const sIso = toIsoDateInputValue(cols[2]) || new Date().toISOString().slice(0, 10);
-      const eIso = toIsoDateInputValue(cols[3]) || sIso;
-      const startHour = (cols[4] || '08:00').trim();
-      const d1 = new Date(sIso);
-      const d2 = new Date(eIso);
-      const calcDays = Math.max(1, Math.round((d2 - d1) / 864e5) + 1);
-      const durDays = parseInt(cols[5], 10) || calcDays;
-      const kuota = parseInt(cols[6], 10) || (defScope === 'agenda_event' ? 0 : 25);
-      const room = (cols[7] || 'Gold Room').trim();
-      const pic = (cols[8] || 'Tim Trainer L&D').trim();
-      const desc = (cols[9] || '').trim();
-
-      adminBatchRows.push({
-        rowId: 'brow_' + Date.now() + '_' + idx + '_' + Math.random().toString(36).slice(2, 6),
-        scope: defScope,
-        id_jadwal: generateAutoScheduleId(defScope, sIso, adminBatchRows.length + idx + 1),
-        agenda: agenda,
-        batch: batch,
-        start_date: sIso,
-        end_date: eIso,
-        start_hour: /^\d{1,2}:\d{2}$/.test(startHour) ? startHour.padStart(5, '0') : '08:00',
-        duration_day: durDays,
-        duration_hour: durDays * 8,
-        kuota: kuota,
-        sisa_kuota: kuota,
-        room: room,
-        pic: pic,
-        status: defScope === 'agenda_event' ? 'Terjadwal' : 'Buka',
-        deskripsi: desc
-      });
-      added++;
-    });
-
-    if (added === 0) {
-      showToast('warning', 'Tidak Ada Baris Valid', 'Format baris yang dipaste belum sesuai.');
-      return;
-    }
-    const ta = document.getElementById('admin-batch-excel-textarea');
-    if (ta) ta.value = '';
-    renderAdminBatchTable();
-    toggleAdminBatchExcelPaste(false);
-    showToast('success', 'Data Excel Dimuat', `${added} baris jadwal berhasil dimasukkan ke tabel Batch Add.`);
-  }
-  window.applyAdminBatchExcelPaste = applyAdminBatchExcelPaste;
-
-  async function submitAdminBatchSchedules() {
-    if (!isAdminAuthenticated()) {
-      openAdminLoginModal(() => submitAdminBatchSchedules());
-      return;
-    }
-
-    const validRows = adminBatchRows.filter(r => (r.agenda || '').trim().length > 0);
-    if (validRows.length === 0) {
-      showToast('warning', 'Belum Ada Jadwal Diisi', 'Isi minimal 1 baris Nama Pelatihan / Agenda pada tabel Batch Add.');
-      return;
-    }
-
-    const btn = document.getElementById('admin-batch-submit-btn');
-    const txt = document.getElementById('admin-batch-submit-text');
-    if (btn) btn.disabled = true;
-    if (txt) txt.textContent = `Menyimpan ${validRows.length} Jadwal...`;
-
-    const itemsPayload = validRows.map((r, i) => ({
-      scope: r.scope || 'internal',
-      id_jadwal: r.id_jadwal || generateAutoScheduleId(r.scope, r.start_date, i),
-      agenda: r.agenda.trim(),
-      batch: (r.batch || `Batch ${i + 1}`).trim(),
-      start_date: r.start_date || '',
-      end_date: r.end_date || r.start_date || '',
-      start_hour: r.start_hour || '08:00',
-      duration_day: Number(r.duration_day) || 1,
-      duration_hour: Number(r.duration_hour) || 8,
-      kuota: Number(r.kuota) || 0,
-      sisa_kuota: Number(r.sisa_kuota !== undefined ? r.sisa_kuota : r.kuota) || 0,
-      room: (r.room || 'Gold Room').trim(),
-      pic: (r.pic || 'Tim Trainer L&D').trim(),
-      status: (r.status || 'Buka').trim(),
-      deskripsi: (r.deskripsi || '').trim()
-    }));
-
-    // Update UI & Memori seketika untuk seluruh baris batch
-    itemsPayload.forEach(item => {
-      applyLocalUpsertSchedule(item, '', '');
-    });
-
-    try {
-      const resp = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: 'admin_batch_add_schedule',
-          data: {
-            admin_username: adminSession?.username || 'Admin',
-            items: itemsPayload
-          }
-        })
-      });
-      if (resp.ok) {
-        await resp.json().catch(() => null);
-      }
-    } catch (err) {
-      console.warn('Batch schedule sync notice:', err);
-    } finally {
-      if (btn) btn.disabled = false;
-      if (txt) txt.textContent = 'Simpan Semua Jadwal (Batch)';
-    }
-
-    resetAdminBatchRows();
-    closeAdminScheduleModal();
-    showToast('success', 'Batch Add Berhasil!', `${itemsPayload.length} jadwal pelatihan telah ditambahkan ke kalender & daftar agenda.`);
-  }
-  window.submitAdminBatchSchedules = submitAdminBatchSchedules;
-
-  // ---------------------------------------------------------------------------
-  // G. HAPUS JADWAL PELATIHAN (WAJIB MEMASUKKAN PASSWORD ADMIN LAGI)
-  // ---------------------------------------------------------------------------
-  function triggerDeleteFromEditModal() {
-    const origId = document.getElementById('admin-form-original-id')?.value || document.getElementById('admin-input-id-jadwal')?.value || '';
-    const scope = document.getElementById('admin-form-original-scope')?.value || getSelectedAdminScope();
-    if (!origId) return;
-    closeAdminScheduleModal();
-    openAdminDeleteModal(origId, scope);
-  }
-  window.triggerDeleteFromEditModal = triggerDeleteFromEditModal;
-
-  function openAdminDeleteModal(scheduleKey, scopeHint = 'internal') {
-    if (!isAdminAuthenticated()) {
-      openAdminLoginModal(() => openAdminDeleteModal(scheduleKey, scopeHint));
-      return;
-    }
-
-    const found = findScheduleItemAnywhere(scheduleKey, scopeHint);
-    const item = found ? found.item : null;
-    const scope = found ? found.scope : (scopeHint || 'internal');
-    const idJadwal = item ? (item.id_jadwal || scheduleKey) : scheduleKey;
-    const agenda = item ? (item.agenda || idJadwal) : idJadwal;
-
-    pendingDeleteTarget = {
-      lookupKey: scheduleKey,
-      id_jadwal: idJadwal,
-      uid: item ? item.uid : scheduleKey,
-      scope: scope,
-      agenda: agenda
-    };
-
-    const scopeBadge = document.getElementById('admin-delete-scope-badge');
-    const titleEl = document.getElementById('admin-delete-agenda-title');
-    const idEl = document.getElementById('admin-delete-id-badge');
-    const passInp = document.getElementById('admin-delete-password');
-    const errBox = document.getElementById('admin-delete-error');
-
-    const scopeLabel = scope === 'external_training'
-      ? 'External Training (External_Training_Schedule)'
-      : (scope === 'agenda_event' ? 'Agenda di Luar Training (AGENDA_DILUAR_TRAINING)' : 'Internal Training (Jadwal Pelatihan)');
-
-    if (scopeBadge) scopeBadge.textContent = scopeLabel;
-    if (titleEl) titleEl.textContent = agenda;
-    if (idEl) idEl.textContent = `Kode Jadwal: ${idJadwal}`;
-    if (errBox) errBox.classList.add('hidden');
-
-    // Wajib input ulang password setiap kali modal hapus dibuka
-    if (passInp) {
-      passInp.type = 'password';
-      passInp.value = '';
-    }
-
-    const modal = document.getElementById('admin-delete-modal');
-    if (modal) {
-      modal.classList.remove('hidden');
-      setTimeout(() => {
-        if (passInp) passInp.focus();
-      }, 60);
-    }
-  }
-  window.openAdminDeleteModal = openAdminDeleteModal;
-
-  function closeAdminDeleteModal() {
-    const modal = document.getElementById('admin-delete-modal');
-    const passInp = document.getElementById('admin-delete-password');
-    if (passInp) passInp.value = '';
-    if (modal) modal.classList.add('hidden');
-  }
-  window.closeAdminDeleteModal = closeAdminDeleteModal;
-
-  async function confirmAdminDeleteSchedule(e) {
-    if (e) e.preventDefault();
-    if (!pendingDeleteTarget) return;
-
-    const passInp = document.getElementById('admin-delete-password');
-    const errBox = document.getElementById('admin-delete-error');
-    const errTxt = document.getElementById('admin-delete-error-text');
-    const btn = document.getElementById('admin-delete-submit-btn');
-    const txt = document.getElementById('admin-delete-submit-text');
-
-    const reenteredPassword = (passInp?.value || '').trim();
-    if (!reenteredPassword) {
-      if (errTxt) errTxt.textContent = 'Harap masukkan password admin untuk mengonfirmasi penghapusan.';
-      if (errBox) errBox.classList.remove('hidden');
-      return;
-    }
-
-    if (errBox) errBox.classList.add('hidden');
-    if (btn) btn.disabled = true;
-    if (txt) txt.textContent = 'Memverifikasi & Menghapus...';
-
-    try {
-      // Verifikasi ulang password terhadap sheet "akses_admin"
-      const verifyRes = await verifyAdminCredentials(adminSession?.username || '', reenteredPassword);
-      if (!verifyRes.valid) {
-        if (errTxt) errTxt.textContent = verifyRes.message || 'Password salah! Penghapusan jadwal dibatalkan.';
-        if (errBox) errBox.classList.remove('hidden');
-        return;
-      }
-
-      const target = pendingDeleteTarget;
-      const ov = getAdminOverrides();
-      ov.deleted[target.scope + ':' + target.id_jadwal] = true;
-      if (target.uid) ov.deleted[target.scope + ':' + target.uid] = true;
-      ov.deleted['any:' + target.id_jadwal] = true;
-      delete ov.upserts[target.scope + ':' + target.id_jadwal];
-      saveAdminOverrides(ov);
-
-      if (target.scope === 'internal') {
-        LIVE_SCHEDULES = (LIVE_SCHEDULES || []).filter(s => s.id_jadwal !== target.id_jadwal && s.id_jadwal !== target.lookupKey);
-        fetchedJadwalList = LIVE_SCHEDULES;
-      } else {
-        window.EXTERNAL_ITEMS = (window.EXTERNAL_ITEMS || []).filter(s => s.id_jadwal !== target.id_jadwal && s.uid !== target.uid && s.uid !== target.lookupKey);
-      }
-
-      refreshAllScheduleViewsAfterAdminChange();
-
-      // Kirim perintah hapus ke Google Apps Script Backend
-      try {
-        await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({
-            action: 'admin_delete_schedule',
-            data: {
-              scope: target.scope,
-              id_jadwal: target.id_jadwal,
-              agenda: target.agenda,
-              admin_username: adminSession?.username || '',
-              admin_password: reenteredPassword
-            }
-          })
-        });
-      } catch (apiErr) {
-        console.warn('Delete sync notice:', apiErr);
-      }
-
-      closeAdminDeleteModal();
-      showToast('success', 'Jadwal Dihapus', `Jadwal "${target.agenda}" (${target.id_jadwal}) telah dihapus.`);
-      pendingDeleteTarget = null;
-    } finally {
-      if (btn) btn.disabled = false;
-      if (txt) txt.textContent = 'Verifikasi & Hapus';
-    }
-  }
-  window.confirmAdminDeleteSchedule = confirmAdminDeleteSchedule;
-
-  // ---------------------------------------------------------------------------
-  // H. EKSPOR KALENDER KE CSV / EXCEL
-  // ---------------------------------------------------------------------------
-  function exportSchedulesToCsv(scope = 'internal') {
-    const list = scope === 'internal' ? (LIVE_SCHEDULES || []) : (window.EXTERNAL_ITEMS || []);
-    if (!list.length) {
-      showToast('info', 'Data Kosong', 'Belum ada jadwal untuk diekspor.');
-      return;
-    }
-    const headers = ['ID_Jadwal', 'Nama_Pelatihan', 'Batch', 'Tanggal_Mulai', 'Tanggal_Selesai', 'Jam_Mulai', 'Durasi', 'Kuota', 'Sisa_Kuota', 'Ruangan', 'Instruktur_PIC', 'Status', 'Deskripsi'];
-    const csvRows = [headers.join(',')];
-    list.forEach(it => {
-      const row = [
-        it.id_jadwal || '',
-        it.agenda || '',
-        it.batch || '',
-        it.start || '',
-        it.end || '',
-        it.start_hour || '',
-        it.duration || '',
-        it.kuota != null ? it.kuota : 0,
-        it.sisa_kuota != null ? it.sisa_kuota : 0,
-        it.room || '',
-        it.pic || '',
-        it.status || '',
-        (it.deskripsi || '').replace(/\r?\n/g, ' ')
-      ].map(v => `"${String(v).replace(/"/g, '""')}"`);
-      csvRows.push(row.join(','));
-    });
-
-    const blob = new Blob(['\uFEFF' + csvRows.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Jadwal_Pelatihan_${scope.toUpperCase()}_${new Date().toISOString().slice(0, 10)}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    showToast('success', 'Ekspor Berhasil', `File CSV/Excel berisi ${list.length} jadwal berhasil diunduh.`);
-  }
-  window.exportSchedulesToCsv = exportSchedulesToCsv;
-
-  // ---------------------------------------------------------------------------
-  // I. INISIALISASI SAAT HALAMAN DIMUAT
-  // ---------------------------------------------------------------------------
-  function initAdminScheduleModule() {
-    loadSavedAdminSession();
-    updateAdminHeaderUI();
-
-    document.addEventListener('click', (e) => {
-      const wrapper = document.getElementById('header-admin-wrapper');
-      if (wrapper && !wrapper.contains(e.target)) {
-        closeAdminDropdown();
-      }
-    });
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAdminScheduleModule);
-  } else {
-    initAdminScheduleModule();
-  }
 })();
 </script>
 </body>
