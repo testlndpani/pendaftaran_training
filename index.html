@@ -2334,6 +2334,13 @@
               <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-outline text-[16px] pointer-events-none">expand_more</span>
             </div>
 
+            <!-- Navigasi Minggu (aktif saat filter Minggu) -->
+            <div id="dash-week-nav" class="flex items-center gap-1" style="display:none">
+              <button type="button" onclick="shiftDashboardWeek(-1)" class="h-9 w-9 rounded-xl bg-surface-container-low hover:bg-surface-container border border-outline-variant/50 inline-flex items-center justify-center" title="Minggu sebelumnya"><span class="material-symbols-outlined text-[18px]">chevron_left</span></button>
+              <button type="button" onclick="shiftDashboardWeek(0)" class="h-9 px-3 rounded-xl bg-surface-container-low hover:bg-surface-container border border-outline-variant/50 text-xs font-semibold">Minggu Ini</button>
+              <button type="button" onclick="shiftDashboardWeek(1)" class="h-9 w-9 rounded-xl bg-surface-container-low hover:bg-surface-container border border-outline-variant/50 inline-flex items-center justify-center" title="Minggu berikutnya"><span class="material-symbols-outlined text-[18px]">chevron_right</span></button>
+            </div>
+
             <!-- Filter Kategori Pelatihan -->
             <div class="relative">
               <select id="dash-category-filter" onchange="renderAnalyticsDashboard()" class="h-9 pl-3 pr-8 rounded-xl bg-surface-container-low text-xs font-semibold text-on-surface border border-outline-variant/50 appearance-none focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer">
@@ -12454,7 +12461,8 @@
   'use strict';
 
   var _dashPeriod = 'month'; // 'all', 'year', 'month', 'week'
-  var _selectedMonthKey = '2026-10'; // default Nov 2026 (0-indexed 10)
+  var _selectedMonthKey = new Date().getFullYear() + '-' + new Date().getMonth(); // default: bulan berjalan
+  var _weekOffset = 0; // 0 = minggu berjalan, -1 = minggu lalu, dst.
   var _lastFilteredList = [];
 
   window.setDashboardPeriodFilter = function (period) {
@@ -12468,6 +12476,14 @@
     });
     var mWrap = document.getElementById('dash-month-select-wrap');
     if (mWrap) mWrap.style.display = (period === 'month' || period === 'year') ? '' : 'none';
+    var wNav = document.getElementById('dash-week-nav');
+    if (wNav) wNav.style.display = (period === 'week') ? '' : 'none';
+    if (period === 'week') _weekOffset = 0;
+    window.renderAnalyticsDashboard();
+  };
+
+  window.shiftDashboardWeek = function (delta) {
+    _weekOffset = delta === 0 ? 0 : _weekOffset + delta;
     window.renderAnalyticsDashboard();
   };
 
@@ -12482,42 +12498,71 @@
     return isNaN(d.getTime()) ? null : d;
   }
 
-  function _isInPeriod(dateStr, period) {
-    if (period === 'all') return true;
-    var d = _parseDate(dateStr);
+  var MONTH_FULL = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+  function _dayStart(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+
+  /* Rentang tanggal aktif [awal, akhir] sesuai filter; null = semua data. Senin = awal minggu. */
+  function _periodRange() {
+    if (_dashPeriod === 'all') return null;
+    var parts = String(_selectedMonthKey).split('-');
+    var y = parseInt(parts[0], 10) || new Date().getFullYear();
+    if (_dashPeriod === 'year' || parts[1] === 'all') return [new Date(y, 0, 1), new Date(y, 11, 31)];
+    if (_dashPeriod === 'month') {
+      var m = parseInt(parts[1], 10);
+      return [new Date(y, m, 1), new Date(y, m + 1, 0)];
+    }
+    var now = new Date(), dow = now.getDay() || 7;
+    var mon = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dow + 1 + _weekOffset * 7);
+    return [mon, new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6)];
+  }
+
+  function _itemDates(s) {
+    var a = _ymd(s.start);
+    if (!a) return null;
+    var b = _ymd(s.end) || a;
+    var d1 = new Date(a.year, a.month - 1, a.day), d2 = new Date(b.year, b.month - 1, b.day);
+    if (d2 < d1) d2 = d1;
+    return [d1, d2];
+  }
+
+  /* Kelas masuk periode bila rentang pelaksanaannya beririsan dengan periode (bukan hanya tanggal mulai) */
+  function _inPeriod(s) {
+    var r = _periodRange();
+    if (!r) return true;
+    var d = _itemDates(s);
     if (!d) return false;
+    return d[0] <= r[1] && d[1] >= r[0];
+  }
 
-    var now = new Date();
-    var curYear = now.getFullYear();
-    var curMonth = now.getMonth();
+  function _fmtDay(d) { return d.getDate() + ' ' + MONTH_FULL[d.getMonth()].slice(0, 3) + ' ' + d.getFullYear(); }
 
-    if (period === 'year') {
-      if (_selectedMonthKey && _selectedMonthKey.endsWith('-all')) {
-        var y = parseInt(_selectedMonthKey.split('-')[0], 10);
-        return d.getFullYear() === y;
-      }
-      return d.getFullYear() === curYear;
-    }
+  function _periodLabel() {
+    var r = _periodRange();
+    if (!r) return 'Semua Riwayat Data';
+    if (_dashPeriod === 'week') return 'Minggu ' + _fmtDay(r[0]) + ' – ' + _fmtDay(r[1]) + (_weekOffset === 0 ? ' (minggu ini)' : '');
+    if (_dashPeriod === 'month' && String(_selectedMonthKey).indexOf('-all') === -1) return MONTH_FULL[r[0].getMonth()] + ' ' + r[0].getFullYear();
+    return 'Tahun ' + r[0].getFullYear();
+  }
 
-    if (period === 'month') {
-      if (_selectedMonthKey && !_selectedMonthKey.endsWith('-all')) {
-        var parts = _selectedMonthKey.split('-');
-        var targetYear = parseInt(parts[0], 10);
-        var targetMonth = parseInt(parts[1], 10);
-        return d.getFullYear() === targetYear && d.getMonth() === targetMonth;
-      }
-      return d.getFullYear() === curYear && d.getMonth() === curMonth;
-    }
-
-    if (period === 'week') {
-      // 7 hari terakhir / minggu berjalan
-      var dayOfWeek = now.getDay() || 7;
-      var startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 1);
-      var endOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() + (7 - dayOfWeek), 23, 59, 59);
-      return d >= startOfWeek && d <= endOfWeek;
-    }
-
-    return true;
+  /* Isi ulang pilihan bulan/tahun dari tahun-tahun yang ada di data (±1 tahun dari sekarang) */
+  function _buildMonthOptions(list) {
+    var sel = document.getElementById('dash-month-picker');
+    if (!sel) return;
+    var cy = new Date().getFullYear(), years = {};
+    years[cy - 1] = years[cy] = years[cy + 1] = true;
+    (list || []).forEach(function (s) { var a = _ymd(s.start); if (a) years[a.year] = true; });
+    var ys = Object.keys(years).map(Number).sort(function (a, b) { return b - a; });
+    var sig = ys.join(',') + '|' + _selectedMonthKey;
+    if (sel.getAttribute('data-sig') === sig) return;
+    var html = '';
+    ys.forEach(function (y) {
+      html += '<option value="' + y + '-all">Sepanjang Tahun ' + y + '</option>';
+      MONTH_FULL.forEach(function (n, i) { html += '<option value="' + y + '-' + i + '">' + n + ' ' + y + '</option>'; });
+    });
+    sel.innerHTML = html;
+    sel.value = _selectedMonthKey;
+    sel.setAttribute('data-sig', sig);
   }
 
   window.renderAnalyticsDashboard = function () {
@@ -12567,10 +12612,10 @@
     }
 
     // Filter per periode
-    var filtered = allSchedules.filter(function (s) {
-      var hasValidStart = _isInPeriod(s.start, _dashPeriod);
-      var hasValidEnd = _isInPeriod(s.end, _dashPeriod);
-      return hasValidStart || hasValidEnd || (_dashPeriod === 'all');
+    _buildMonthOptions(allSchedules);
+    var filtered = allSchedules.filter(_inPeriod).sort(function (a, b) {
+      var da = _itemDates(a), db = _itemDates(b);
+      return (da ? da[0].getTime() : 9e15) - (db ? db[0].getTime() : 9e15);
     });
 
     _lastFilteredList = filtered;
@@ -12639,16 +12684,7 @@
     _setTxt('dash-kpi-utilisasi-detail', totalPeserta + ' / ' + totalKuota + ' kursi');
 
     // Update Label Periode
-    var pLabel = 'Semua Riwayat Data';
-    if (_dashPeriod === 'year') pLabel = 'Tahun ' + (_selectedMonthKey.split('-')[0] || '2026');
-    else if (_dashPeriod === 'month') {
-      var mNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-      var parts = _selectedMonthKey.split('-');
-      var mIdx = parseInt(parts[1], 10);
-      pLabel = (mNames[mIdx] || 'Bulan') + ' ' + (parts[0] || '2026');
-    } else if (_dashPeriod === 'week') {
-      pLabel = 'Minggu Berjalan (7 Hari)';
-    }
+    var pLabel = _periodLabel();
     _setTxt('dash-period-display-label', pLabel + ' (' + totalPelatihan + ' kelas)');
 
     // Render Breakdown Departemen
@@ -12714,28 +12750,65 @@
     _renderPieChart();
   }
 
-  /* Tren bulanan: batang = jumlah pelatihan (sumbu kiri), garis = jumlah peserta (sumbu kanan) */
+  /* Tren: batang = jumlah pelatihan (sumbu kiri), garis = jumlah peserta (sumbu kanan).
+     Sumbu X mengikuti filter: Minggu = 7 hari, Bulan = tanggal 1..akhir bulan, Tahun = 12 bulan, Semua = per bulan/tahun. */
+  function _timeBuckets() {
+    var r = _periodRange(), list = _chartCache.filtered, buckets = [], i, d;
+    var DOW = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+    if (_dashPeriod === 'week') {
+      for (i = 0; i < 7; i++) { d = new Date(r[0].getFullYear(), r[0].getMonth(), r[0].getDate() + i); buckets.push({ label: DOW[i], sub: d.getDate(), from: d, to: d, title: DOW[i] + ', ' + _fmtDay(d) }); }
+      return { buckets: buckets, unit: 'hari', scope: 'Minggu ini' };
+    }
+    if (_dashPeriod === 'month' && String(_selectedMonthKey).indexOf('-all') === -1) {
+      var n = r[1].getDate();
+      for (i = 1; i <= n; i++) { d = new Date(r[0].getFullYear(), r[0].getMonth(), i); buckets.push({ label: String(i), sub: '', from: d, to: d, title: _fmtDay(d) }); }
+      return { buckets: buckets, unit: 'tanggal', scope: MONTH_FULL[r[0].getMonth()] + ' ' + r[0].getFullYear() };
+    }
+    var y0, m0, y1, m1;
+    if (r) { y0 = r[0].getFullYear(); m0 = 0; y1 = y0; m1 = 11; }
+    else {
+      var mn = null, mx = null;
+      list.forEach(function (s) { var dd = _itemDates(s); if (!dd) return; if (!mn || dd[0] < mn) mn = dd[0]; if (!mx || dd[0] > mx) mx = dd[0]; });
+      if (!mn) return { buckets: [], unit: 'bulan', scope: 'Semua data' };
+      y0 = mn.getFullYear(); m0 = mn.getMonth(); y1 = mx.getFullYear(); m1 = mx.getMonth();
+      if ((y1 - y0) * 12 + (m1 - m0) + 1 > 24) {
+        for (i = y0; i <= y1; i++) buckets.push({ label: String(i), sub: '', from: new Date(i, 0, 1), to: new Date(i, 11, 31), title: 'Tahun ' + i });
+        return { buckets: buckets, unit: 'tahun', scope: 'Semua data' };
+      }
+    }
+    var cy = y0, cm = m0;
+    while (cy < y1 || (cy === y1 && cm <= m1)) {
+      buckets.push({ label: MONTH_SHORT[cm], sub: r ? '' : String(cy).slice(2), from: new Date(cy, cm, 1), to: new Date(cy, cm + 1, 0), title: MONTH_FULL[cm] + ' ' + cy });
+      cm++; if (cm > 11) { cm = 0; cy++; }
+    }
+    return { buckets: buckets, unit: 'bulan', scope: r ? 'Tahun ' + y0 : 'Semua data' };
+  }
+
   function _renderTimeChart() {
     var box = document.getElementById('dash-chart-time');
     if (!box || !_chartCache) return;
-    var year = parseInt(String(_selectedMonthKey).split('-')[0], 10) || new Date().getFullYear();
-    var kelas = new Array(12).fill(0), orang = new Array(12).fill(0);
-    _chartCache.all.forEach(function (s) {
-      var d = _ymd(s.start);
-      if (!d || d.year !== year || d.month < 1 || d.month > 12) return;
-      kelas[d.month - 1]++;
-      orang[d.month - 1] += _activeCount(s);
+    var tb = _timeBuckets(), bk = tb.buckets, n = bk.length;
+    var kelas = new Array(n).fill(0), orang = new Array(n).fill(0);
+    _chartCache.filtered.forEach(function (s) {
+      var dd = _itemDates(s);
+      if (!dd) return;
+      var t = dd[0].getTime();            // satu kelas dihitung di bucket tanggal mulainya
+      var rng = _periodRange();
+      if (rng && t < rng[0].getTime()) t = rng[0].getTime();   // kelas yang mulai sebelum periode dihitung di awal periode
+      for (var i = 0; i < n; i++) {
+        if (t >= bk[i].from.getTime() && t <= bk[i].to.getTime()) { kelas[i]++; orang[i] += _activeCount(s); break; }
+      }
     });
     var totK = kelas.reduce(function (a, b) { return a + b; }, 0), totP = orang.reduce(function (a, b) { return a + b; }, 0);
     var sub = document.getElementById('dash-chart-time-sub');
-    if (sub) sub.textContent = 'Tahun ' + year + ' • total ' + totK + ' pelatihan, ' + totP + ' peserta';
-    if (!totK && !totP) { box.innerHTML = _empty('Belum ada pelatihan pada tahun ' + year + '.'); return; }
+    if (sub) sub.textContent = _periodLabel() + ' • per ' + tb.unit + ' • total ' + totK + ' pelatihan, ' + totP + ' peserta';
+    if (!totK && !totP) { box.innerHTML = _empty('Belum ada pelatihan pada periode ini.'); return; }
 
-    var W = 760, H = 300, L = 46, R = 46, T = 26, B = 38, pw = W - L - R, ph = H - T - B;
+    var W = 760, H = 300, L = 46, R = 46, T = 26, B = 44, pw = W - L - R, ph = H - T - B;
     var stepK = _niceStep(Math.max.apply(null, kelas)), maxK = stepK * 4;
     var stepP = _niceStep(Math.max.apply(null, orang)), maxP = stepP * 4;
-    var slot = pw / 12, bw = Math.min(34, slot * 0.55);
-    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="w-full min-w-[560px] h-auto" role="img" aria-label="Grafik tren bulanan jumlah pelatihan dan peserta tahun ' + year + '">';
+    var slot = pw / n, bw = Math.min(34, slot * 0.6), dense = n > 16;
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" class="w-full min-w-[560px] h-auto" role="img" aria-label="Grafik tren jumlah pelatihan dan peserta">';
     for (var t = 0; t <= 4; t++) {
       var y = T + ph - (ph * t / 4);
       svg += '<line x1="' + L + '" y1="' + y + '" x2="' + (W - R) + '" y2="' + y + '" stroke="#cbd5e1" stroke-width="1" ' + (t ? 'stroke-dasharray="3 3"' : '') + '/>';
@@ -12743,24 +12816,26 @@
       svg += '<text x="' + (W - R + 6) + '" y="' + (y + 3.5) + '" text-anchor="start" font-size="10" fill="' + C_AMBER + '">' + (stepP * t) + '</text>';
     }
     var pts = [];
-    for (var i = 0; i < 12; i++) {
-      var cx = L + slot * i + slot / 2;
-      var hK = ph * kelas[i] / maxK, yK = T + ph - hK;
+    for (var i = 0; i < n; i++) {
+      var cx = L + slot * i + slot / 2, hK = ph * kelas[i] / maxK, yK = T + ph - hK;
+      var tip = bk[i].title + ': ' + kelas[i] + ' pelatihan, ' + orang[i] + ' peserta';
       if (kelas[i]) {
-        svg += '<rect x="' + (cx - bw / 2) + '" y="' + yK + '" width="' + bw + '" height="' + hK + '" rx="3" fill="' + C_PRIMARY + '" opacity="0.88"><title>' + MONTH_SHORT[i] + ' ' + year + ': ' + kelas[i] + ' pelatihan, ' + orang[i] + ' peserta</title></rect>';
-        svg += '<text x="' + cx + '" y="' + (yK - 4) + '" text-anchor="middle" font-size="10" font-weight="700" fill="' + C_PRIMARY + '">' + kelas[i] + '</text>';
+        svg += '<rect x="' + (cx - bw / 2) + '" y="' + yK + '" width="' + bw + '" height="' + hK + '" rx="3" fill="' + C_PRIMARY + '" opacity="0.88"><title>' + _esc(tip) + '</title></rect>';
+        svg += '<text x="' + cx + '" y="' + (yK - 4) + '" text-anchor="middle" font-size="' + (dense ? 8 : 10) + '" font-weight="700" fill="' + C_PRIMARY + '">' + kelas[i] + '</text>';
       }
       var yP = T + ph - ph * orang[i] / maxP;
-      pts.push([cx, yP, orang[i]]);
-      svg += '<text x="' + cx + '" y="' + (H - B + 16) + '" text-anchor="middle" font-size="11" fill="#475569">' + MONTH_SHORT[i] + '</text>';
+      pts.push([cx, yP, orang[i], tip]);
+      if (!dense || i % 2 === 0 || n - i <= 1) {
+        svg += '<text x="' + cx + '" y="' + (H - B + 15) + '" text-anchor="middle" font-size="' + (dense ? 9 : 11) + '" fill="#475569">' + _esc(bk[i].label) + '</text>';
+        if (bk[i].sub !== '') svg += '<text x="' + cx + '" y="' + (H - B + 28) + '" text-anchor="middle" font-size="9" fill="#94a3b8">' + _esc(bk[i].sub) + '</text>';
+      }
     }
     svg += '<polyline fill="none" stroke="' + C_AMBER + '" stroke-width="2.4" stroke-linejoin="round" points="' + pts.map(function (p) { return p[0] + ',' + p[1]; }).join(' ') + '"/>';
-    pts.forEach(function (p, i) {
-      svg += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="4" fill="#fff" stroke="' + C_AMBER + '" stroke-width="2.2"><title>' + MONTH_SHORT[i] + ' ' + year + ': ' + p[2] + ' peserta</title></circle>';
-      if (p[2]) svg += '<text x="' + p[0] + '" y="' + (p[1] - 9) + '" text-anchor="middle" font-size="10" font-weight="700" fill="' + C_AMBER + '">' + p[2] + '</text>';
+    pts.forEach(function (p) {
+      svg += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="' + (dense ? 2.8 : 4) + '" fill="#fff" stroke="' + C_AMBER + '" stroke-width="2"><title>' + _esc(p[3]) + '</title></circle>';
+      if (p[2] && !dense) svg += '<text x="' + p[0] + '" y="' + (p[1] - 9) + '" text-anchor="middle" font-size="10" font-weight="700" fill="' + C_AMBER + '">' + p[2] + '</text>';
     });
-    svg += '</svg>';
-    box.innerHTML = svg;
+    box.innerHTML = svg + '</svg>';
   }
 
   /* Grafik batang horizontal: peserta vs kuota per pelatihan, atau peserta per departemen */
@@ -12961,7 +13036,7 @@
         '<td class="py-2.5 px-3 text-center text-on-surface-variant font-mono">' + (i + 1) + '</td>' +
         '<td class="py-2.5 px-3 font-semibold text-on-surface"><div class="truncate max-w-[260px]" title="' + it.agenda + '">' + it.agenda + '</div><div class="text-[10px] text-on-surface-variant">' + (it.batch || '-') + '</div></td>' +
         '<td class="py-2.5 px-3">' + catBadge + '</td>' +
-        '<td class="py-2.5 px-3 text-on-surface"><div class="font-medium">' + (it.start || 'TBA') + '</div><div class="text-[10px] text-on-surface-variant">' + it.room + '</div></td>' +
+        '<td class="py-2.5 px-3 text-on-surface"><div class="font-medium">' + (it.start || 'TBA') + (it.end && it.end !== it.start ? ' – ' + it.end : '') + '</div><div class="text-[10px] text-on-surface-variant">' + it.room + '</div></td>' +
         '<td class="py-2.5 px-3 text-on-surface-variant truncate max-w-[140px]">' + it.pic + '</td>' +
         '<td class="py-2.5 px-3 text-center font-bold">' + it.kuota + '</td>' +
         '<td class="py-2.5 px-3 text-center font-bold text-primary">' + (it.peserta ? it.peserta.length : 0) + '</td>' +
