@@ -278,7 +278,7 @@
           Annual Training Master Plan 2026
         </h1>
         <p id="page-subtitle" class="text-xs text-slate-500 mt-1">
-          Ringkasan program tahunan (Jan &ndash; Des), Plan vs Actual peserta, status jadwal, dan budget.
+          Ringkasan program tahunan (Jan &ndash; Des), Plan vs Actual peserta, status jadwal, serta budget dan biaya per peserta.
         </p>
       </div>
 
@@ -358,7 +358,7 @@
       <!-- KPI 4: Anggaran (Budget vs Actual Budget - ATMP) -->
       <div id="kpi-budget-card" class="bg-white rounded-2xl border border-slate-200/80 shadow-[0_1px_2px_rgba(15,23,42,0.03)] p-4 flex flex-col justify-between gap-2">
         <div class="flex items-center justify-between gap-2">
-          <span class="text-xs font-medium text-slate-500">Budget vs Actual</span>
+          <span class="text-xs font-medium text-slate-500">Biaya Actual vs Plan</span>
           <span id="kpi-budget-pct" class="px-2 py-0.5 rounded-full bg-blue-50 text-primary text-[10.5px] font-bold">-</span>
         </div>
         <div class="flex items-baseline gap-2">
@@ -390,6 +390,7 @@
             <button type="button" onclick="setChartMetric('sessions')" id="btn-metric-sessions" class="px-2.5 py-0.5 rounded-md font-bold bg-white text-primary shadow-2xs cursor-pointer">Sesi</button>
             <button type="button" onclick="setChartMetric('participants')" id="btn-metric-participants" class="px-2.5 py-0.5 rounded-md font-medium text-slate-500 hover:text-slate-800 cursor-pointer">Peserta</button>
             <button type="button" onclick="setChartMetric('hours')" id="btn-metric-hours" class="px-2.5 py-0.5 rounded-md font-medium text-slate-500 hover:text-slate-800 cursor-pointer">Jam</button>
+            <button type="button" onclick="setChartMetric('cost')" id="btn-metric-cost" class="px-2.5 py-0.5 rounded-md font-medium text-slate-500 hover:text-slate-800 cursor-pointer">Biaya</button>
           </div>
         </div>
         <div class="relative">
@@ -449,6 +450,10 @@
           <button type="button" onclick="switchMasterView('table')" id="view-tab-table" class="master-view-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-white/70 text-xs font-medium transition-all cursor-pointer shrink-0">
             <span class="material-symbols-outlined text-[16px]">table_rows</span>
             <span>Tabel Master</span>
+          </button>
+          <button type="button" onclick="switchMasterView('budget')" id="view-tab-budget" class="master-view-tab flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-white/70 text-xs font-medium transition-all cursor-pointer shrink-0">
+            <span class="material-symbols-outlined text-[16px]">payments</span>
+            <span>Budget &amp; Realisasi</span>
           </button>
         </div>
 
@@ -682,6 +687,73 @@
       </div>
     </section>
 
+    <!-- VIEW 5: BUDGET & REALISASI -->
+    <section id="panel-budget" class="hidden flex-col gap-4">
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-[0_1px_2px_rgba(15,23,42,0.03)] px-4 sm:px-5 py-3.5 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="material-symbols-outlined text-primary text-[22px]">payments</span>
+          <div class="min-w-0">
+            <h3 id="budget-panel-title" class="font-display text-sm sm:text-base font-bold text-slate-900">Budget &amp; Realisasi Training</h3>
+            <p class="text-[11px] text-slate-500">Total biaya = budget per peserta &times; jumlah peserta. Rencana memakai peserta target (Plan), realisasi memakai peserta aktual (Actual).</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <button type="button" onclick="exportBudgetCsv()" class="h-9 px-3 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-800 text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer" title="Unduh ringkasan, kuartal, bulan, kategori, dan detail training">
+            <span class="material-symbols-outlined text-[17px] text-emerald-700">table_view</span>
+            <span>Ekspor CSV</span>
+          </button>
+          <button type="button" onclick="printBudgetPdf()" class="h-9 px-3 rounded-xl bg-red-700 hover:bg-red-800 text-white text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer" title="Cetak atau simpan laporan Budget dan Realisasi sebagai PDF">
+            <span class="material-symbols-outlined text-[17px]">picture_as_pdf</span>
+            <span>Cetak PDF</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="budget-plafon-card"></div>
+      <div id="budget-summary-cards" class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3"></div>
+      <div id="budget-variance-strip" class="hidden"></div>
+      <div id="budget-quality-strip" class="hidden"></div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <div class="xl:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-[0_1px_2px_rgba(15,23,42,0.03)] overflow-hidden">
+          <div class="px-4 sm:px-5 py-3 border-b border-slate-100 bg-slate-50/50">
+            <h4 class="font-display text-sm font-bold text-slate-900">Rencana vs realisasi biaya per bulan</h4>
+            <p class="text-[11px] text-slate-500">Sesi dihitung pada bulan mulainya. Proyeksi memakai actual bila sudah ada, kalau belum memakai rencana.</p>
+          </div>
+          <div id="budget-quarter-strip" class="grid grid-cols-2 md:grid-cols-4 gap-2 p-3 border-b border-slate-100"></div>
+          <div id="budget-month-container" class="overflow-x-auto smooth-scroll-x"></div>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-[0_1px_2px_rgba(15,23,42,0.03)] overflow-hidden">
+          <div class="px-4 sm:px-5 py-3 border-b border-slate-100 bg-slate-50/50">
+            <h4 class="font-display text-sm font-bold text-slate-900">Biaya per kategori</h4>
+            <p class="text-[11px] text-slate-500">Rencana dan realisasi setiap kategori pelatihan.</p>
+          </div>
+          <div id="budget-category-container" class="overflow-x-auto smooth-scroll-x"></div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-[0_1px_2px_rgba(15,23,42,0.03)] overflow-hidden">
+        <div class="px-4 sm:px-5 py-3 border-b border-slate-100 bg-slate-50/50 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h4 class="font-display text-sm font-bold text-slate-900">Budget per training per peserta</h4>
+            <p class="text-[11px] text-slate-500">Klik baris untuk membuka detail sesi. Filter di atas (cari, kategori, kuartal, status) ikut berlaku.</p>
+          </div>
+          <div class="flex items-center gap-2 text-xs">
+            <span class="text-slate-500">Urutkan:</span>
+            <select id="budget-sort-select" onchange="rerenderBudgetView()" class="h-8 px-2.5 rounded-lg bg-white border border-slate-200 text-xs font-semibold text-slate-800 cursor-pointer">
+              <option value="cost-desc">Rencana biaya terbesar</option>
+              <option value="perpax-desc">Budget per peserta tertinggi</option>
+              <option value="pax-desc">Target peserta terbanyak</option>
+              <option value="gap-desc">Selisih biaya terbesar</option>
+              <option value="date-asc">Tanggal mulai</option>
+              <option value="agenda-asc">Nama pelatihan (A &ndash; Z)</option>
+            </select>
+          </div>
+        </div>
+        <div id="budget-detail-container" class="overflow-x-auto smooth-scroll-x max-h-[680px] overflow-y-auto"></div>
+      </div>
+    </section>
+
   </main>
 
   <!-- FOOTER -->
@@ -778,21 +850,31 @@
         <!-- Budget Strip (Sheet ATMP) -->
         <div id="modal-budget-strip" class="hidden p-4 rounded-xl border border-outline-variant/40 bg-surface-container-lowest flex flex-col gap-2.5">
           <div class="flex flex-wrap items-center justify-between gap-2">
-            <span class="text-xs font-bold text-on-surface">Rencana Budget vs Actual Budget</span>
+            <span class="text-xs font-bold text-on-surface">Rencana Biaya vs Realisasi Biaya</span>
             <span id="modal-budget-pct-badge" class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-primary">-</span>
           </div>
           <div class="grid grid-cols-3 gap-3 text-center">
             <div class="p-2.5 rounded-lg bg-surface-container-low">
-              <div class="text-[11px] text-on-surface-variant">Budget Plan</div>
+              <div class="text-[11px] text-on-surface-variant">Total Biaya Plan</div>
               <div id="modal-budget-plan" class="font-display text-sm sm:text-base font-bold text-on-surface truncate">-</div>
             </div>
             <div class="p-2.5 rounded-lg bg-surface-container-low">
-              <div class="text-[11px] text-on-surface-variant">Actual Budget</div>
+              <div class="text-[11px] text-on-surface-variant">Total Biaya Actual</div>
               <div id="modal-budget-actual" class="font-display text-sm sm:text-base font-bold text-primary truncate">-</div>
             </div>
             <div class="p-2.5 rounded-lg bg-surface-container-low">
               <div class="text-[11px] text-on-surface-variant">Sisa / Selisih</div>
               <div id="modal-budget-diff" class="font-display text-sm sm:text-base font-bold text-emerald-700 truncate">-</div>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div class="p-2.5 rounded-lg border border-outline-variant/40">
+              <div class="text-[11px] text-on-surface-variant">Plan: budget per peserta &times; target peserta</div>
+              <div id="modal-budget-formula-plan" class="font-semibold text-on-surface mt-0.5">-</div>
+            </div>
+            <div class="p-2.5 rounded-lg border border-outline-variant/40">
+              <div class="text-[11px] text-on-surface-variant">Actual: budget per peserta &times; peserta aktual</div>
+              <div id="modal-budget-formula-actual" class="font-semibold text-on-surface mt-0.5">-</div>
             </div>
           </div>
         </div>
@@ -880,6 +962,11 @@
     let QUARTER_HIDE_EMPTY = true;
     let CURRENT_MODAL_ITEM = null;
     let __gvizCounter = 0;
+
+    // Rumus biaya: Total Biaya = Budget per peserta x jumlah peserta.
+    // BUDGET dan ACTUAL BUDGET di sheet ATMP dibaca sebagai biaya PER PESERTA.
+    // Ubah ke false bila kolom ACTUAL BUDGET di sheet sudah berisi total biaya sesi.
+    const ACTUAL_BUDGET_PER_PAX = true;
 
     // Fallback logo header & lock screen jika file lokal tidak tersedia
     (function setupLogoFallback() {
@@ -1474,6 +1561,15 @@
       return sign + "Rp " + Math.round(abs).toLocaleString("id-ID");
     }
 
+    function computeCosts(budgetPerPax, actualPerPax, planPax, actualPax) {
+      const planCost = (budgetPerPax !== null && budgetPerPax !== undefined) ? budgetPerPax * (planPax || 0) : null;
+      let actualCost = null;
+      if (actualPerPax !== null && actualPerPax !== undefined) {
+        actualCost = ACTUAL_BUDGET_PER_PAX ? actualPerPax * (actualPax || 0) : actualPerPax;
+      }
+      return { planCost, actualCost };
+    }
+
     function formatShortIsoDateToken(d) {
       if (!d) return "";
       const mShortEn = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -1510,6 +1606,7 @@
       const effectiveYear = yearOverride || startYear;
       const budget = parseBudgetValue(raw.budget);
       const actualBudget = parseBudgetValue(raw.actual_budget);
+      const costs = computeCosts(budget, actualBudget, kuota, registered);
       const cleanStart = range ? (/^Date\(/i.test(String(raw.start || "")) || !raw.start ? formatShortIsoDateToken(range[0]) : String(raw.start).trim()) : "";
       const cleanEnd = range ? (/^Date\(/i.test(String(raw.end || "")) || !raw.end ? formatShortIsoDateToken(range[1]) : String(raw.end).trim()) : "";
 
@@ -1537,6 +1634,8 @@
         _hasYearMismatch: Boolean(yearOverride && startYear && yearOverride !== startYear),
         _budget: budget,
         _actualBudget: actualBudget,
+        _planCost: costs.planCost,
+        _actualCost: costs.actualCost,
         is_request: !!raw.is_request,
         is_synced: !!raw.is_synced,
         synced_schedule_id: raw.synced_schedule_id || "",
@@ -2369,8 +2468,10 @@
       const budgetCard = document.getElementById("kpi-budget-card");
       const budgetPlanCount = items.filter(x => x._budget !== null && x._budget !== undefined).length;
       const budgetActualCount = items.filter(x => x._actualBudget !== null && x._actualBudget !== undefined).length;
-      const totBudget = items.reduce((acc, x) => acc + (x._budget || 0), 0);
-      const totActualBudget = items.reduce((acc, x) => acc + (x._actualBudget || 0), 0);
+      const totBudget = items.reduce((acc, x) => acc + (x._planCost || 0), 0);
+      const totActualBudget = items.reduce((acc, x) => acc + (x._actualCost || 0), 0);
+      const paxWithBudget = items.reduce((acc, x) => acc + (x._budget != null ? (x.kuota || 0) : 0), 0);
+      const avgBudgetPerPax = paxWithBudget > 0 ? totBudget / paxWithBudget : null;
       const hasBudgetData = budgetPlanCount > 0 || budgetActualCount > 0;
       if (budgetCard) {
         budgetCard.classList.toggle("hidden", !isAtmp && !hasBudgetData);
@@ -2384,7 +2485,7 @@
           const budgetPct = totBudget > 0 ? Math.round((totActualBudget / totBudget) * 100) : 0;
           setTxt("kpi-budget-actual", budgetActualCount > 0 ? formatIdr(totActualBudget, true) : "Rp 0");
           setTxt("kpi-budget-pct", totBudget > 0 ? `${budgetPct}% terserap` : `${budgetActualCount}/${items.length} terisi`);
-          setTxt("kpi-budget-sub", `Plan: ${totBudget > 0 ? formatIdr(totBudget, true) : "-"} • ${Math.max(budgetPlanCount, budgetActualCount)}/${items.length} sesi`);
+          setTxt("kpi-budget-sub", `Plan ${totBudget > 0 ? formatIdr(totBudget, true) : "-"} • rata-rata ${avgBudgetPerPax !== null ? formatIdr(avgBudgetPerPax, true) : "-"}/peserta`);
         }
       }
 
@@ -2435,9 +2536,11 @@
         const hours = mItems.reduce((s, it) => s + (it._hours || 0), 0);
         const doneHours = doneItems.reduce((s, it) => s + (it._hours || 0), 0);
 
-        const val = CHART_METRIC === "participants" ? regs : (CHART_METRIC === "hours" ? hours : mItems.length);
-        const doneVal = CHART_METRIC === "participants" ? doneRegs : (CHART_METRIC === "hours" ? doneHours : done);
-        const unitSuffix = CHART_METRIC === "hours" ? "j" : "";
+        const costM = Math.round(mItems.reduce((s, it) => s + (it._planCost || 0), 0) / 1e6);
+        const doneCostM = Math.round(doneItems.reduce((s, it) => s + (it._planCost || 0), 0) / 1e6);
+        const val = CHART_METRIC === "cost" ? costM : (CHART_METRIC === "participants" ? regs : (CHART_METRIC === "hours" ? hours : mItems.length));
+        const doneVal = CHART_METRIC === "cost" ? doneCostM : (CHART_METRIC === "participants" ? doneRegs : (CHART_METRIC === "hours" ? doneHours : done));
+        const unitSuffix = CHART_METRIC === "cost" ? "jt" : (CHART_METRIC === "hours" ? "j" : "");
         return { mIdx, total: mItems.length, done, plan, regs, hours, val, doneVal, unitSuffix };
       });
 
@@ -2474,7 +2577,7 @@
       }
 
       setTxt("chart-active-months", `${activeMonths} / 12 bulan`);
-      const peakMetricWord = CHART_METRIC === "participants" ? "peserta" : (CHART_METRIC === "hours" ? "jam" : "sesi");
+      const peakMetricWord = CHART_METRIC === "cost" ? "juta rencana biaya" : (CHART_METRIC === "participants" ? "peserta" : (CHART_METRIC === "hours" ? "jam" : "sesi"));
       setTxt("chart-peak-label", peak.val > 0 ? `Puncak: ${MONTH_SHORT[peak.mIdx]} (${peak.val} ${peakMetricWord})` : "Puncak: -");
 
       // Category Breakdown (1 clean stacked bar + interactive pills with hours & dimmed empty state)
@@ -2540,7 +2643,7 @@
 
     function setChartMetric(metric) {
       CHART_METRIC = metric;
-      ["sessions", "participants", "hours"].forEach(m => {
+      ["sessions", "participants", "hours", "cost"].forEach(m => {
         const b = document.getElementById("btn-metric-" + m);
         if (!b) return;
         b.className = m === metric
@@ -2555,7 +2658,7 @@
     // =========================================================================
     function switchMasterView(viewKey) {
       ACTIVE_VIEW = viewKey;
-      ["matrix", "gantt", "quarters", "table"].forEach(k => {
+      ["matrix", "gantt", "quarters", "table", "budget"].forEach(k => {
         const panel = document.getElementById("panel-" + k);
         const tab = document.getElementById("view-tab-" + k);
         const on = k === viewKey;
@@ -2586,7 +2689,7 @@
     }
 
     function renderActiveViewPanel(items) {
-      ["matrix", "gantt", "quarters", "table"].forEach(k => {
+      ["matrix", "gantt", "quarters", "table", "budget"].forEach(k => {
         const panel = document.getElementById("panel-" + k);
         if (panel) {
           panel.classList.toggle("hidden", k !== ACTIVE_VIEW);
@@ -2598,6 +2701,7 @@
       else if (ACTIVE_VIEW === "gantt") renderGanttView(items);
       else if (ACTIVE_VIEW === "quarters") renderQuartersView(items);
       else if (ACTIVE_VIEW === "table") renderMasterTableView(items);
+      else if (ACTIVE_VIEW === "budget") renderBudgetView(items);
     }
 
     // =========================================================================
@@ -3309,7 +3413,7 @@
             ${showBudgetCol ? `
             <td class="py-2.5 px-3 text-xs whitespace-nowrap">
               ${hasRowBudget
-                ? `<div class="font-semibold text-on-surface">${escapeHtml(budActTxt)}</div><div class="text-[10px] text-on-surface-variant">Plan: ${escapeHtml(budPlanTxt)}</div>`
+                ? `<div class="font-semibold text-on-surface">Plan ${escapeHtml(it._planCost != null ? formatIdr(it._planCost, true) : "-")}</div><div class="text-[10px] text-on-surface-variant">@${escapeHtml(budPlanTxt)} &times; ${it.kuota || 0} peserta</div>${it._actualCost != null ? `<div class="text-[10px] font-semibold text-primary">Actual ${escapeHtml(formatIdr(it._actualCost, true))} <span class="font-normal text-on-surface-variant">(@${escapeHtml(budActTxt)} &times; ${it.registered || 0})</span></div>` : ""}`
                 : `<div class="font-semibold text-on-surface-variant">-</div><div class="text-[10px] text-outline">Belum diisi</div>`}
             </td>` : ""}
             <td class="py-2.5 px-3 whitespace-nowrap">
@@ -3330,15 +3434,15 @@
       const totDays = items.reduce((s, it) => s + (it._days || 0), 0);
       const totReg = items.reduce((s, it) => s + (it.registered || 0), 0);
       const totQuota = items.reduce((s, it) => s + (it.kuota || 0), 0);
-      const totBudget = items.reduce((s, it) => s + (it._budget || 0), 0);
-      const totActualBudget = items.reduce((s, it) => s + (it._actualBudget || 0), 0);
+      const totBudget = items.reduce((s, it) => s + (it._planCost || 0), 0);
+      const totActualBudget = items.reduce((s, it) => s + (it._actualCost || 0), 0);
       const hasBudgetRows = items.some(x => (x._budget !== null && x._budget !== undefined) || (x._actualBudget !== null && x._actualBudget !== undefined));
       const tblReal = items.filter(x => x._tracking && x._tracking.code === "REAL").length;
       const tblPlan = items.filter(x => x._tracking && x._tracking.code === "PLAN").length;
       const tblShift = items.filter(x => x._tracking && x._tracking.isShifted).length;
 
       container.innerHTML = `
-        <table class="w-full border-collapse text-left ${showBudgetCol ? "min-w-[1140px]" : "min-w-[1040px]"}">
+        <table class="w-full border-collapse text-left ${showBudgetCol ? "min-w-[1260px]" : "min-w-[1040px]"}">
           <thead class="bg-surface-container-low border-b border-outline-variant/50 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider sticky top-0 z-10">
             <tr>
               <th class="py-3 px-3 text-center w-10">No</th>
@@ -3349,7 +3453,7 @@
               <th class="py-3 px-3">Ruangan</th>
               <th class="py-3 px-3">Instruktur / PIC</th>
               <th class="py-3 px-3"><button type="button" onclick="setTableSort('participants')" class="hover:text-primary cursor-pointer font-bold uppercase">${isAtmp ? "Actual / Plan" : "Peserta / Kuota"}${sortArrow("participants")}</button></th>
-              ${showBudgetCol ? `<th class="py-3 px-3">Actual / Budget</th>` : ""}
+              ${showBudgetCol ? `<th class="py-3 px-3">Biaya Plan / Actual</th>` : ""}
               <th class="py-3 px-3">Kode Plan</th>
               <th class="py-3 px-3 text-center">Status</th>
             </tr>
@@ -3373,6 +3477,779 @@
     // =========================================================================
     // MODAL DETAIL SESI & PESERTA
     // =========================================================================
+    // =========================================================================
+    // VIEW 5: BUDGET & REALISASI (biaya = budget per peserta x peserta)
+    // Plafon tahunan, proyeksi akhir tahun, ekspor CSV / PDF
+    // =========================================================================
+    const PLAFON_STORE_KEY = "lnd_atmp_plafon_v1";
+    let PLAFON_MEM = {};
+
+    function readPlafonStore() {
+      let stored = {};
+      try { stored = JSON.parse(localStorage.getItem(PLAFON_STORE_KEY) || "{}") || {}; } catch (e) { stored = {}; }
+      return Object.assign({}, PLAFON_MEM, stored);
+    }
+
+    function getPlafon(year) {
+      const v = Number(readPlafonStore()[String(year)]);
+      return v > 0 ? v : null;
+    }
+
+    function writePlafonStore(year, valueOrNull) {
+      const next = readPlafonStore();
+      if (valueOrNull === null) delete next[String(year)]; else next[String(year)] = valueOrNull;
+      PLAFON_MEM = next;
+      try { localStorage.setItem(PLAFON_STORE_KEY, JSON.stringify(next)); return true; } catch (e) { return false; }
+    }
+
+    function formatPlafonInput(el) {
+      const d = String(el.value || "").replace(/\D/g, "");
+      el.value = d ? Number(d).toLocaleString("id-ID") : "";
+    }
+
+    function savePlafonFromInput() {
+      if (SELECTED_YEAR === "all") return;
+      const el = document.getElementById("budget-plafon-input");
+      const n = Number(String(el ? el.value : "").replace(/\D/g, ""));
+      if (!n) {
+        showToast("warning", "Plafon belum valid", "Isi total anggaran ATMP setahun dalam rupiah, misalnya 3.500.000.000.");
+        return;
+      }
+      const persisted = writePlafonStore(SELECTED_YEAR, n);
+      showToast(persisted ? "success" : "warning",
+        persisted ? "Plafon tersimpan" : "Plafon dipakai sementara",
+        persisted ? `Plafon ${SELECTED_YEAR}: ${formatIdr(n)}` : "Browser memblokir penyimpanan lokal, plafon hilang setelah halaman ditutup.");
+      rerenderBudgetView();
+    }
+
+    function clearPlafon() {
+      if (SELECTED_YEAR === "all") return;
+      writePlafonStore(SELECTED_YEAR, null);
+      showToast("info", "Plafon dihapus", `Plafon ${SELECTED_YEAR} dihapus dari browser ini.`);
+      rerenderBudgetView();
+    }
+
+    function getCostMonthIdx(it) {
+      if (!it._range) return null;
+      const r = (SELECTED_YEAR === "all") ? it._range : (getDisplayRangeForYear(it, SELECTED_YEAR) || it._range);
+      return r[0].getMonth();
+    }
+
+    // Biaya yang dipakai untuk proyeksi: actual bila sudah ada, kalau belum memakai rencana
+    function projectedCostOf(it) {
+      return it._actualCost != null ? it._actualCost : (it._planCost || 0);
+    }
+
+    function aggBudget(list) {
+      const a = {
+        sessions: list.length, planPax: 0, actualPax: 0,
+        planCost: 0, actualCost: 0, planCostRealized: 0, projected: 0,
+        paxWithBudget: 0, paxWithActual: 0, withBudget: 0, withActual: 0,
+        volVar: 0, priceVar: 0
+      };
+      list.forEach(it => {
+        const p = it.kuota || 0, ac = it.registered || 0;
+        a.planPax += p;
+        a.actualPax += ac;
+        a.projected += projectedCostOf(it);
+        if (it._planCost != null) { a.planCost += it._planCost; a.withBudget++; a.paxWithBudget += p; }
+        if (it._actualCost != null) {
+          a.actualCost += it._actualCost; a.withActual++; a.paxWithActual += ac;
+          a.planCostRealized += (it._planCost || 0);
+          const b = it._budget || 0;
+          a.volVar += (ac - p) * b;
+          if (ACTUAL_BUDGET_PER_PAX) a.priceVar += ac * ((it._actualBudget || 0) - b);
+        }
+      });
+      return a;
+    }
+
+    // Proyeksi akhir tahun = realisasi (sesi yang sudah punya actual) + rencana sesi lainnya
+    function buildProjection(list) {
+      const P = { realized: 0, realizedN: 0, remaining: 0, remainingN: 0, overdue: 0, overdueN: 0, unbudgetedN: 0, projected: 0 };
+      list.forEach(it => {
+        if (it._planCost == null && it._actualCost == null) { P.unbudgetedN++; return; }
+        if (it._actualCost != null) {
+          P.realized += it._actualCost; P.realizedN++;
+        } else {
+          const c = it._planCost || 0;
+          P.remaining += c; P.remainingN++;
+          if (it._status && it._status.key === "completed") { P.overdue += c; P.overdueN++; }
+        }
+      });
+      P.projected = P.realized + P.remaining;
+      return P;
+    }
+
+    const fmtSigned = (v) => (v > 0 ? "+" : (v < 0 ? "-" : "")) + formatIdr(Math.abs(v), true);
+    const pctOf = (n, d) => (d > 0 ? Math.round((n / d) * 100) : null);
+
+    function sortBudgetList(items, mode) {
+      const gapOf = (it) => (it._planCost != null && it._actualCost != null) ? Math.abs(it._planCost - it._actualCost) : -1;
+      const list = [...items];
+      if (mode === "cost-desc") list.sort((a, b) => (b._planCost || 0) - (a._planCost || 0));
+      else if (mode === "perpax-desc") list.sort((a, b) => (b._budget || 0) - (a._budget || 0));
+      else if (mode === "pax-desc") list.sort((a, b) => (b.kuota || 0) - (a.kuota || 0));
+      else if (mode === "gap-desc") list.sort((a, b) => gapOf(b) - gapOf(a));
+      else if (mode === "agenda-asc") list.sort((a, b) => a.agenda.localeCompare(b.agenda));
+      return list;
+    }
+
+    // Satu model hitung dipakai tampilan, CSV, dan PDF agar angkanya selalu sama
+    function computeBudgetModel(items) {
+      const yearItems = getScopedBaseList().filter(it => doesItemMatchYear(it, SELECTED_YEAR));
+      const A = aggBudget(items);
+      const Y = aggBudget(yearItems);
+      const P = buildProjection(yearItems);
+      const plafon = SELECTED_YEAR === "all" ? null : getPlafon(SELECTED_YEAR);
+      const isFullYear = items.length === yearItems.length;
+
+      const monthLists = Array.from({ length: 12 }, () => []);
+      const undated = [];
+      items.forEach(it => {
+        const m = getCostMonthIdx(it);
+        if (m === null) undated.push(it); else monthLists[m].push(it);
+      });
+      const monthStats = monthLists.map(l => aggBudget(l));
+      const undatedStats = aggBudget(undated);
+
+      let cum = 0, firstOver = null;
+      const monthCum = monthStats.map((s, m) => {
+        cum += s.projected;
+        if (plafon && isFullYear && firstOver === null && cum > plafon) firstOver = m;
+        return cum;
+      });
+      const totalCum = cum + undatedStats.projected;
+      if (plafon && isFullYear && firstOver === null && undated.length && totalCum > plafon) firstOver = "undated";
+
+      const quarterStats = [0, 1, 2, 3].map(q =>
+        aggBudget([].concat(monthLists[q * 3], monthLists[q * 3 + 1], monthLists[q * 3 + 2])));
+
+      const catRows = CATEGORIES.map(c => ({ c, s: aggBudget(items.filter(it => it._category === c.key)) }))
+        .filter(r => r.s.sessions > 0).sort((a, b) => b.s.planCost - a.s.planCost);
+
+      return { items, yearItems, A, Y, P, plafon, isFullYear, monthStats, monthCum, undated, undatedStats, totalCum, firstOver, quarterStats, catRows };
+    }
+
+    function rerenderBudgetView() {
+      renderBudgetView(sortByChronological(getFilteredItems()));
+    }
+
+    function renderPlafonCard(M) {
+      const el = document.getElementById("budget-plafon-card");
+      if (!el) return;
+      const boxCls = "bg-white rounded-2xl border border-slate-200/80 shadow-[0_1px_2px_rgba(15,23,42,0.03)] p-4 sm:p-5 flex flex-col gap-3.5";
+
+      if (SELECTED_YEAR === "all") {
+        el.className = boxCls;
+        el.innerHTML = `<div class="text-xs text-slate-500">Pilih satu tahun (misalnya 2027) di bagian atas untuk mengatur plafon anggaran dan melihat proyeksi akhir tahun.</div>`;
+        return;
+      }
+
+      const { plafon, Y, P } = M;
+      const yr = SELECTED_YEAR;
+      const planPct = plafon ? pctOf(Y.planCost, plafon) : null;
+      const projPct = plafon ? pctOf(P.projected, plafon) : null;
+      const leftProj = plafon ? plafon - P.projected : null;
+      const leftPlan = plafon ? plafon - Y.planCost : null;
+
+      let alerts = "";
+      const alertBox = (tone, icon, html) => {
+        const tones = {
+          red: "bg-red-50 border-red-200 text-red-900",
+          amber: "bg-amber-50 border-amber-200 text-amber-900",
+          green: "bg-emerald-50 border-emerald-200 text-emerald-900"
+        };
+        return `<div class="p-3 rounded-xl border text-xs flex items-start gap-2 ${tones[tone]}"><span class="material-symbols-outlined text-[18px] shrink-0">${icon}</span><span>${html}</span></div>`;
+      };
+      if (plafon) {
+        if (Y.planCost > plafon) {
+          alerts += alertBox("red", "warning", `<strong>Rencana biaya melebihi plafon</strong> sebesar ${formatIdr(Y.planCost - plafon)} (${planPct}% dari plafon). Kurangi target peserta atau agenda sampai rencana kembali di bawah ${formatIdr(plafon, true)}.`);
+        } else if (P.projected > plafon) {
+          alerts += alertBox("red", "trending_up", `<strong>Proyeksi akhir tahun melebihi plafon</strong> sebesar ${formatIdr(P.projected - plafon)}. Rencana masih muat, tetapi realisasi yang sudah masuk lebih besar dari rencananya.`);
+        } else if (planPct !== null && planPct >= 90) {
+          alerts += alertBox("amber", "info", `Rencana biaya sudah memakai ${planPct}% plafon. Sisa ruang hanya ${formatIdr(leftPlan, true)}.`);
+        } else {
+          alerts += alertBox("green", "check_circle", `Rencana biaya masih di dalam plafon. Sisa plafon terhadap rencana ${formatIdr(leftPlan, true)}.`);
+        }
+      }
+      if (P.overdueN > 0) {
+        alerts += alertBox("amber", "event_busy", `${P.overdueN} sesi sudah lewat tanggalnya tetapi belum punya data actual. Biayanya (${formatIdr(P.overdue, true)}) masih dihitung memakai rencana di proyeksi.`);
+      }
+      if (P.unbudgetedN > 0) {
+        alerts += alertBox("amber", "info", `${P.unbudgetedN} sesi tahun ${yr} belum punya budget, jadi belum masuk hitungan plafon dan proyeksi.`);
+      }
+
+      const base = Math.max(plafon || 0, P.projected, 1);
+      const wReal = (P.realized / base) * 100;
+      const wRem = (P.remaining / base) * 100;
+      const markerLeft = plafon ? Math.min(100, (plafon / base) * 100) : null;
+      const barHtml = plafon ? `
+        <div class="flex flex-col gap-1.5">
+          <div class="relative h-3 rounded-full bg-slate-100 overflow-hidden">
+            <div class="absolute inset-y-0 left-0 bg-emerald-600" style="width:${wReal}%"></div>
+            <div class="absolute inset-y-0 bg-primary" style="left:${wReal}%; width:${wRem}%"></div>
+            <div class="absolute inset-y-0 w-0.5 bg-slate-900" style="left:${markerLeft}%"></div>
+          </div>
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-500">
+            <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-600"></span>Realisasi ${formatIdr(P.realized, true)} (${P.realizedN} sesi)</span>
+            <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-primary"></span>Rencana sesi yang belum jalan ${formatIdr(P.remaining, true)} (${P.remainingN} sesi)</span>
+            <span class="inline-flex items-center gap-1"><span class="w-0.5 h-3 bg-slate-900"></span>Plafon ${formatIdr(plafon, true)}</span>
+          </div>
+        </div>` : "";
+
+      const metric = (label, value, sub, tone) => `
+        <div class="p-3 rounded-xl bg-slate-50 min-w-0">
+          <div class="text-[11px] text-slate-500">${label}</div>
+          <div class="font-display text-base sm:text-lg font-bold ${tone || "text-slate-900"} truncate">${value}</div>
+          <div class="text-[11px] text-slate-500 leading-snug">${sub}</div>
+        </div>`;
+
+      const savedVal = plafon ? Number(plafon).toLocaleString("id-ID") : "";
+      el.className = boxCls;
+      el.innerHTML = `
+        <div class="flex flex-wrap items-start justify-between gap-3">
+          <div class="min-w-0">
+            <h4 class="font-display text-sm font-bold text-slate-900">Plafon anggaran ${yr} dan proyeksi akhir tahun</h4>
+            <p class="text-[11px] text-slate-500">Dihitung dari seluruh sesi tahun ${yr}, tidak terpengaruh filter. Proyeksi = realisasi sesi yang sudah punya actual + rencana sesi lainnya.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">Rp</span>
+              <input id="budget-plafon-input" type="text" inputmode="numeric" autocomplete="off" value="${savedVal}" placeholder="Total anggaran ATMP ${yr}" oninput="formatPlafonInput(this)" onkeydown="if(event.key==='Enter'){savePlafonFromInput();}" class="h-9 w-56 pl-9 pr-3 rounded-xl bg-white border border-slate-200 text-xs font-semibold text-slate-900 focus:outline-none focus:border-primary" aria-label="Plafon anggaran ${yr} dalam rupiah">
+            </div>
+            <button type="button" onclick="savePlafonFromInput()" class="h-9 px-3.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary text-xs font-semibold cursor-pointer">Simpan plafon</button>
+            ${plafon ? `<button type="button" onclick="clearPlafon()" class="h-9 px-3 rounded-xl bg-white border border-slate-200 hover:border-red-300 text-xs font-semibold text-slate-600 cursor-pointer">Hapus</button>` : ""}
+          </div>
+        </div>
+        ${plafon ? "" : `<div class="text-xs text-slate-500">Plafon ${yr} belum diisi. Masukkan total anggaran ATMP setahun untuk melihat sisa plafon dan peringatan. Nilai disimpan di browser ini.</div>`}
+        <div class="grid grid-cols-2 xl:grid-cols-4 gap-3">
+          ${metric("Plafon " + yr, plafon ? formatIdr(plafon, true) : "Belum diisi", plafon ? "Total anggaran ATMP setahun" : "Isi di kolom atas")}
+          ${metric("Rencana biaya " + yr, formatIdr(Y.planCost, true), planPct !== null ? planPct + "% dari plafon" : "Budget per peserta &times; target peserta", "text-primary")}
+          ${metric("Proyeksi akhir tahun", formatIdr(P.projected, true), projPct !== null ? projPct + "% dari plafon" : "Realisasi + rencana sisa", "text-slate-900")}
+          ${metric("Sisa plafon", leftProj !== null ? formatIdr(leftProj, true) : "-", leftProj !== null ? "Terhadap rencana " + formatIdr(leftPlan, true) : "Menunggu plafon", leftProj !== null && leftProj < 0 ? "text-red-700" : "text-emerald-700")}
+        </div>
+        ${barHtml}
+        ${alerts ? `<div class="flex flex-col gap-2">${alerts}</div>` : ""}`;
+    }
+
+    function renderBudgetView(items) {
+      const cardsEl = document.getElementById("budget-summary-cards");
+      if (!cardsEl) return;
+
+      const titleEl = document.getElementById("budget-panel-title");
+      if (titleEl) titleEl.textContent = `Budget & Realisasi Training ${SELECTED_YEAR === "all" ? "(Semua Tahun)" : SELECTED_YEAR}`;
+
+      const M = computeBudgetModel(items);
+      const { A, plafon } = M;
+      renderPlafonCard(M);
+
+      const avgPlan = A.paxWithBudget > 0 ? A.planCost / A.paxWithBudget : null;
+      const avgAct = A.paxWithActual > 0 ? A.actualCost / A.paxWithActual : null;
+      const paxPct = pctOf(A.actualPax, A.planPax);
+      const absorbPct = pctOf(A.actualCost, A.planCost);
+      const remaining = A.planCost - A.actualCost;
+
+      const card = (label, value, sub, tone) => `
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-[0_1px_2px_rgba(15,23,42,0.03)] p-3.5 flex flex-col gap-1.5 min-w-0">
+          <span class="text-xs font-medium text-slate-500">${label}</span>
+          <span class="font-display text-lg sm:text-xl font-bold ${tone || "text-slate-900"} truncate">${value}</span>
+          <span class="text-[11px] text-slate-500 leading-snug">${sub}</span>
+        </div>`;
+
+      cardsEl.innerHTML = [
+        card("Target peserta", A.planPax.toLocaleString("id-ID"), `${A.sessions} sesi, ${A.withBudget} sudah punya budget`),
+        card("Rencana biaya", formatIdr(A.planCost, true), "Budget per peserta &times; target peserta", "text-primary"),
+        card("Budget rata-rata", avgPlan !== null ? formatIdr(avgPlan, true) : "-", `per peserta (plan)${avgAct !== null ? `, actual ${formatIdr(avgAct, true)}` : ""}`),
+        card("Peserta terealisasi", A.actualPax.toLocaleString("id-ID"), paxPct !== null ? `${paxPct}% dari target ${A.planPax.toLocaleString("id-ID")}` : "Target belum diisi"),
+        card("Realisasi biaya", formatIdr(A.actualCost, true), absorbPct !== null ? `${absorbPct}% dari rencana terserap` : "Belum ada rencana biaya", "text-emerald-700"),
+        card("Sisa anggaran", formatIdr(remaining, true), "Rencana biaya dikurangi realisasi", remaining < 0 ? "text-red-700" : "text-slate-900")
+      ].join("");
+
+      // Selisih sesi yang sudah terealisasi: pisahkan efek jumlah peserta dan efek harga
+      const varEl = document.getElementById("budget-variance-strip");
+      if (varEl) {
+        if (A.withActual > 0) {
+          const diff = A.actualCost - A.planCostRealized;
+          const tone = (v) => v > 0 ? "text-red-700" : (v < 0 ? "text-emerald-700" : "text-slate-700");
+          varEl.className = "bg-white rounded-2xl border border-slate-200/80 p-3.5 sm:p-4 flex flex-col gap-2";
+          varEl.innerHTML = `
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-xs font-bold text-slate-900">Selisih pada ${A.withActual} sesi yang sudah punya data actual</span>
+              <span class="text-[11px] text-slate-500">Tanda + berarti melebihi rencana, tanda - berarti di bawah rencana</span>
+            </div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+              <div class="p-2.5 rounded-lg bg-slate-50"><div class="text-[11px] text-slate-500">Rencana sesi tersebut</div><div class="font-bold text-slate-900 mt-0.5">${formatIdr(A.planCostRealized, true)}</div></div>
+              <div class="p-2.5 rounded-lg bg-slate-50"><div class="text-[11px] text-slate-500">Actual</div><div class="font-bold text-slate-900 mt-0.5">${formatIdr(A.actualCost, true)}</div></div>
+              <div class="p-2.5 rounded-lg bg-slate-50"><div class="text-[11px] text-slate-500">Karena jumlah peserta</div><div class="font-bold ${tone(A.volVar)} mt-0.5">${fmtSigned(A.volVar)}</div></div>
+              <div class="p-2.5 rounded-lg bg-slate-50"><div class="text-[11px] text-slate-500">Karena budget per peserta</div><div class="font-bold ${tone(A.priceVar)} mt-0.5">${ACTUAL_BUDGET_PER_PAX ? fmtSigned(A.priceVar) : "-"}</div></div>
+            </div>
+            <div class="text-[11px] text-slate-500">Total selisih <strong class="${tone(diff)}">${fmtSigned(diff)}</strong>: selisih peserta dihitung (peserta actual &minus; target) &times; budget plan, selisih harga dihitung peserta actual &times; (budget actual &minus; budget plan).</div>`;
+        } else {
+          varEl.className = "hidden";
+          varEl.innerHTML = "";
+        }
+      }
+
+      // Catatan kelengkapan data
+      const qEl = document.getElementById("budget-quality-strip");
+      if (qEl) {
+        const noBudget = items.filter(x => x._budget == null).length;
+        const noTarget = items.filter(x => !(x.kuota > 0)).length;
+        const noDate = items.filter(x => !x._range).length;
+        const notes = [];
+        if (noBudget) notes.push(`${noBudget} sesi belum punya budget`);
+        if (noTarget) notes.push(`${noTarget} sesi belum punya target peserta`);
+        if (noDate) notes.push(`${noDate} sesi belum punya tanggal valid`);
+        if (notes.length) {
+          qEl.className = "p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-start gap-2";
+          qEl.innerHTML = `<span class="material-symbols-outlined text-[18px] shrink-0">info</span><span>${notes.join(", ")}. Sesi tersebut belum masuk penuh ke total biaya. Lengkapi kolom BUDGET, PLAN, START di sheet ATMP.</span>`;
+        } else {
+          qEl.className = "hidden";
+          qEl.innerHTML = "";
+        }
+      }
+
+      // Kuartal
+      const qStrip = document.getElementById("budget-quarter-strip");
+      if (qStrip) {
+        qStrip.innerHTML = M.quarterStats.map((qs, q) => {
+          const ab = pctOf(qs.actualCost, qs.planCost);
+          return `
+            <div class="p-3 rounded-xl border border-slate-200/80 bg-slate-50/60 flex flex-col gap-0.5">
+              <div class="flex items-center justify-between"><span class="text-xs font-bold text-slate-900">Q${q + 1}</span><span class="text-[10px] text-slate-500">${qs.sessions} sesi, ${qs.planPax.toLocaleString("id-ID")} peserta</span></div>
+              <div class="text-sm font-bold text-primary">${formatIdr(qs.planCost, true)}</div>
+              <div class="text-[11px] text-slate-500">Actual ${formatIdr(qs.actualCost, true)}${ab !== null ? ` (${ab}%)` : ""}</div>
+              <div class="text-[11px] text-slate-500">Proyeksi ${formatIdr(qs.projected, true)}</div>
+            </div>`;
+        }).join("");
+      }
+
+      // Bulan
+      const monthEl = document.getElementById("budget-month-container");
+      if (monthEl) {
+        const showLeft = !!(plafon && M.isFullYear);
+        const maxPlanMonth = Math.max(1, ...M.monthStats.map(s => s.planCost));
+        const leftCell = (cumVal) => {
+          if (!showLeft) return "";
+          const left = plafon - cumVal;
+          return `<td class="py-2 px-3 text-xs text-right whitespace-nowrap font-semibold ${left < 0 ? "text-red-700" : "text-emerald-700"}">${left < 0 ? "Lebih " : ""}${formatIdr(Math.abs(left), true)}</td>`;
+        };
+        const rows = M.monthStats.map((s, m) => {
+          if (s.sessions === 0) return "";
+          const barW = Math.max(3, Math.round((s.planCost / maxPlanMonth) * 100));
+          const ab = pctOf(s.actualCost, s.planCost);
+          const over = M.firstOver === m;
+          return `
+            <tr class="${over ? "bg-red-50/70" : "hover:bg-slate-50/70"}">
+              <td class="py-2 px-3 text-xs font-semibold text-slate-900 whitespace-nowrap">${MONTH_NAMES[m]}${over ? ` <span class="ml-1 px-1.5 py-0.5 rounded bg-red-100 text-red-800 text-[10px] font-bold">melewati plafon</span>` : ""}</td>
+              <td class="py-2 px-3 text-xs text-right">${s.sessions}</td>
+              <td class="py-2 px-3 text-xs text-right">${s.planPax.toLocaleString("id-ID")}</td>
+              <td class="py-2 px-3 text-xs min-w-[150px]"><div class="font-semibold text-slate-900 text-right">${formatIdr(s.planCost, true)}</div><div class="h-1.5 rounded-full bg-slate-100 mt-1 overflow-hidden"><div class="h-full rounded-full bg-primary" style="width:${barW}%"></div></div></td>
+              <td class="py-2 px-3 text-xs text-right">${s.actualPax.toLocaleString("id-ID")}</td>
+              <td class="py-2 px-3 text-xs text-right font-semibold text-emerald-700">${s.withActual ? formatIdr(s.actualCost, true) : "-"}</td>
+              <td class="py-2 px-3 text-xs text-right">${ab !== null && s.withActual ? ab + "%" : "-"}</td>
+              <td class="py-2 px-3 text-xs text-right whitespace-nowrap">${formatIdr(s.projected, true)}</td>
+              <td class="py-2 px-3 text-xs text-right text-slate-500 whitespace-nowrap">${formatIdr(M.monthCum[m], true)}</td>
+              ${leftCell(M.monthCum[m])}
+            </tr>`;
+        }).join("");
+        const U = M.undatedStats;
+        const undatedRow = M.undated.length ? `
+            <tr class="${M.firstOver === "undated" ? "bg-red-50/70" : "bg-amber-50/50"}">
+              <td class="py-2 px-3 text-xs font-semibold text-amber-900">Belum terjadwal</td>
+              <td class="py-2 px-3 text-xs text-right">${U.sessions}</td>
+              <td class="py-2 px-3 text-xs text-right">${U.planPax.toLocaleString("id-ID")}</td>
+              <td class="py-2 px-3 text-xs text-right font-semibold">${formatIdr(U.planCost, true)}</td>
+              <td class="py-2 px-3 text-xs text-right">${U.actualPax.toLocaleString("id-ID")}</td>
+              <td class="py-2 px-3 text-xs text-right font-semibold text-emerald-700">${U.withActual ? formatIdr(U.actualCost, true) : "-"}</td>
+              <td class="py-2 px-3 text-xs text-right">-</td>
+              <td class="py-2 px-3 text-xs text-right whitespace-nowrap">${formatIdr(U.projected, true)}</td>
+              <td class="py-2 px-3 text-xs text-right text-slate-500 whitespace-nowrap">${formatIdr(M.totalCum, true)}</td>
+              ${leftCell(M.totalCum)}
+            </tr>` : "";
+        const overNote = (showLeft && M.firstOver !== null)
+          ? `<div class="px-4 py-2.5 text-xs text-red-800 bg-red-50 border-t border-red-100">Kumulatif proyeksi melewati plafon ${formatIdr(plafon, true)} mulai ${M.firstOver === "undated" ? "sesi yang belum terjadwal" : MONTH_NAMES[M.firstOver]}.</div>`
+          : "";
+        const filterNote = (plafon && !M.isFullYear)
+          ? `<div class="px-4 py-2.5 text-xs text-slate-600 bg-slate-50 border-t border-slate-100">Filter sedang aktif (${M.items.length} dari ${M.yearItems.length} sesi), jadi kolom sisa plafon disembunyikan. Reset filter untuk melihatnya.</div>`
+          : "";
+        monthEl.innerHTML = items.length ? `
+          <table class="w-full border-collapse text-left ${showLeft ? "min-w-[1020px]" : "min-w-[900px]"}">
+            <thead class="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold text-slate-500">
+              <tr>
+                <th class="py-2.5 px-3">Bulan</th>
+                <th class="py-2.5 px-3 text-right">Sesi</th>
+                <th class="py-2.5 px-3 text-right">Target peserta</th>
+                <th class="py-2.5 px-3 text-right">Rencana biaya</th>
+                <th class="py-2.5 px-3 text-right">Peserta actual</th>
+                <th class="py-2.5 px-3 text-right">Realisasi biaya</th>
+                <th class="py-2.5 px-3 text-right">Terserap</th>
+                <th class="py-2.5 px-3 text-right">Proyeksi</th>
+                <th class="py-2.5 px-3 text-right">Kumulatif proyeksi</th>
+                ${showLeft ? `<th class="py-2.5 px-3 text-right">Sisa plafon</th>` : ""}
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">${rows}${undatedRow}</tbody>
+            <tfoot class="bg-slate-50 border-t-2 border-slate-200 text-xs font-bold text-slate-900">
+              <tr>
+                <td class="py-2.5 px-3">Total</td>
+                <td class="py-2.5 px-3 text-right">${A.sessions}</td>
+                <td class="py-2.5 px-3 text-right">${A.planPax.toLocaleString("id-ID")}</td>
+                <td class="py-2.5 px-3 text-right">${formatIdr(A.planCost, true)}</td>
+                <td class="py-2.5 px-3 text-right">${A.actualPax.toLocaleString("id-ID")}</td>
+                <td class="py-2.5 px-3 text-right text-emerald-700">${formatIdr(A.actualCost, true)}</td>
+                <td class="py-2.5 px-3 text-right">${absorbPct !== null ? absorbPct + "%" : "-"}</td>
+                <td class="py-2.5 px-3 text-right">${formatIdr(A.projected, true)}</td>
+                <td class="py-2.5 px-3"></td>
+                ${showLeft ? `<td class="py-2.5 px-3"></td>` : ""}
+              </tr>
+            </tfoot>
+          </table>${overNote}${filterNote}` : `<div class="p-8 text-center text-xs text-slate-500">Tidak ada sesi yang sesuai dengan filter saat ini.</div>`;
+      }
+
+      // Kategori
+      const catEl = document.getElementById("budget-category-container");
+      if (catEl) {
+        catEl.innerHTML = M.catRows.length ? `
+          <table class="w-full border-collapse text-left min-w-[360px]">
+            <thead class="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold text-slate-500">
+              <tr><th class="py-2.5 px-3">Kategori</th><th class="py-2.5 px-3 text-right">Peserta</th><th class="py-2.5 px-3 text-right">Rencana</th><th class="py-2.5 px-3 text-right">Actual</th></tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              ${M.catRows.map(({ c, s }) => {
+                const share = pctOf(s.planCost, A.planCost);
+                return `
+                <tr>
+                  <td class="py-2 px-3 text-xs"><div class="flex items-center gap-1.5 font-semibold text-slate-900"><span class="w-2 h-2 rounded-full ${c.barClass} shrink-0"></span>${escapeHtml(c.key)}</div><div class="text-[10px] text-slate-500 mt-0.5">${s.sessions} sesi${share !== null ? `, ${share}% dari rencana` : ""}</div></td>
+                  <td class="py-2 px-3 text-xs text-right">${s.planPax.toLocaleString("id-ID")}</td>
+                  <td class="py-2 px-3 text-xs text-right font-semibold">${formatIdr(s.planCost, true)}</td>
+                  <td class="py-2 px-3 text-xs text-right text-emerald-700 font-semibold">${s.withActual ? formatIdr(s.actualCost, true) : "-"}</td>
+                </tr>`;
+              }).join("")}
+            </tbody>
+          </table>` : `<div class="p-8 text-center text-xs text-slate-500">Belum ada data kategori.</div>`;
+      }
+
+      // Detail per training per peserta
+      const detEl = document.getElementById("budget-detail-container");
+      if (!detEl) return;
+      const sortMode = document.getElementById("budget-sort-select")?.value || "cost-desc";
+      const list = sortBudgetList(items, sortMode);
+
+      if (!list.length) {
+        detEl.innerHTML = `<div class="p-10 text-center text-xs text-slate-500">Tidak ada sesi yang sesuai dengan filter saat ini.</div>`;
+        return;
+      }
+
+      const rowsHtml = list.map((it, idx) => {
+        const catMeta = getCategoryMeta(it._category);
+        const hasAct = it._actualCost != null;
+        const gap = (it._planCost != null && hasAct) ? it._planCost - it._actualCost : null;
+        const ab = (it._planCost > 0 && hasAct) ? Math.round((it._actualCost / it._planCost) * 100) : null;
+        const barCls = ab === null ? "bg-slate-300" : (ab > 100 ? "bg-red-600" : "bg-emerald-600");
+        const mIdx = getCostMonthIdx(it);
+        return `
+          <tr onclick="openDetailModal('${escapeHtml(it._uid)}')" class="${idx % 2 ? "bg-slate-50/50" : "bg-white"} hover:bg-primary-fixed/25 transition-colors cursor-pointer">
+            <td class="py-2.5 px-3 text-center text-xs text-slate-500">${idx + 1}</td>
+            <td class="py-2.5 px-3">
+              <div class="text-xs font-bold text-slate-900">${escapeHtml(it.agenda)}</div>
+              <div class="flex flex-wrap items-center gap-1.5 mt-0.5">
+                <span class="text-[10px] font-semibold text-primary">${escapeHtml(it.id_jadwal)}</span>
+                <span class="px-1.5 rounded border text-[10px] font-semibold ${catMeta.bgClass}">${escapeHtml(it._category)}</span>
+                <span class="text-[10px] text-slate-500">${mIdx !== null ? MONTH_SHORT[mIdx] : "Belum terjadwal"}</span>
+              </div>
+            </td>
+            <td class="py-2.5 px-3 text-xs text-right whitespace-nowrap font-semibold">${it._budget != null ? formatIdr(it._budget) : "-"}</td>
+            <td class="py-2.5 px-3 text-xs text-right">${it.kuota || 0}</td>
+            <td class="py-2.5 px-3 text-xs text-right whitespace-nowrap font-bold text-slate-900">${it._planCost != null ? formatIdr(it._planCost) : "-"}</td>
+            <td class="py-2.5 px-3 text-xs text-right">${it.registered || 0}</td>
+            <td class="py-2.5 px-3 text-xs text-right whitespace-nowrap">${it._actualBudget != null ? formatIdr(it._actualBudget) : "-"}</td>
+            <td class="py-2.5 px-3 text-xs text-right whitespace-nowrap font-bold text-emerald-700">${hasAct ? formatIdr(it._actualCost) : "-"}</td>
+            <td class="py-2.5 px-3 text-xs text-right whitespace-nowrap font-semibold ${gap === null ? "text-slate-400" : (gap >= 0 ? "text-emerald-700" : "text-red-700")}">${gap === null ? "-" : (gap >= 0 ? "Sisa " : "Lebih ") + formatIdr(Math.abs(gap), true)}</td>
+            <td class="py-2.5 px-3 text-xs min-w-[96px]">
+              <div class="text-right font-semibold">${ab !== null ? ab + "%" : "-"}</div>
+              <div class="h-1.5 rounded-full bg-slate-100 mt-1 overflow-hidden"><div class="h-full ${barCls} rounded-full" style="width:${Math.min(100, ab || 0)}%"></div></div>
+            </td>
+            <td class="py-2.5 px-3 text-center whitespace-nowrap">
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full border text-[10.5px] font-bold ${it._status.badgeCls}"><span class="w-1.5 h-1.5 rounded-full ${it._status.dotCls}"></span>${escapeHtml(it._status.label)}</span>
+            </td>
+          </tr>`;
+      }).join("");
+
+      detEl.innerHTML = `
+        <table class="w-full border-collapse text-left min-w-[1280px]">
+          <thead class="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold text-slate-500 sticky top-0 z-10">
+            <tr>
+              <th class="py-3 px-3 text-center w-10">No</th>
+              <th class="py-3 px-3">Training</th>
+              <th class="py-3 px-3 text-right">Budget plan / peserta</th>
+              <th class="py-3 px-3 text-right">Target peserta</th>
+              <th class="py-3 px-3 text-right">Total biaya plan</th>
+              <th class="py-3 px-3 text-right">Peserta actual</th>
+              <th class="py-3 px-3 text-right">Budget actual / peserta</th>
+              <th class="py-3 px-3 text-right">Total biaya actual</th>
+              <th class="py-3 px-3 text-right">Sisa / lebih</th>
+              <th class="py-3 px-3 text-right">Terserap</th>
+              <th class="py-3 px-3 text-center">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">${rowsHtml}</tbody>
+          <tfoot class="bg-slate-50 border-t-2 border-slate-200 text-xs font-bold text-slate-900 sticky bottom-0">
+            <tr>
+              <td colspan="2" class="py-2.5 px-3">Total ${list.length} sesi</td>
+              <td class="py-2.5 px-3 text-right whitespace-nowrap">${avgPlan !== null ? "rata-rata " + formatIdr(avgPlan, true) : "-"}</td>
+              <td class="py-2.5 px-3 text-right">${A.planPax.toLocaleString("id-ID")}</td>
+              <td class="py-2.5 px-3 text-right whitespace-nowrap">${formatIdr(A.planCost)}</td>
+              <td class="py-2.5 px-3 text-right">${A.actualPax.toLocaleString("id-ID")}</td>
+              <td class="py-2.5 px-3 text-right whitespace-nowrap">${avgAct !== null ? "rata-rata " + formatIdr(avgAct, true) : "-"}</td>
+              <td class="py-2.5 px-3 text-right whitespace-nowrap text-emerald-700">${formatIdr(A.actualCost)}</td>
+              <td class="py-2.5 px-3 text-right whitespace-nowrap ${remaining < 0 ? "text-red-700" : ""}">${remaining < 0 ? "Lebih " : "Sisa "}${formatIdr(Math.abs(remaining), true)}</td>
+              <td class="py-2.5 px-3 text-right">${absorbPct !== null ? absorbPct + "%" : "-"}</td>
+              <td class="py-2.5 px-3"></td>
+            </tr>
+          </tfoot>
+        </table>`;
+    }
+
+    // ---------------------------- EKSPOR CSV ----------------------------
+    function exportBudgetCsv() {
+      const items = sortByChronological(getFilteredItems());
+      if (!items.length) {
+        showToast("info", "Data Kosong", "Tidak ada sesi untuk diekspor.");
+        return;
+      }
+      const M = computeBudgetModel(items);
+      const { A, Y, P, plafon } = M;
+      const yr = SELECTED_YEAR === "all" ? "Semua_Tahun" : SELECTED_YEAR;
+      const esc = (v) => `"${String(v == null ? "" : v).replace(/"/g, '""')}"`;
+      const rnd = (v) => (v == null ? "" : Math.round(v));
+      const pct = (n, d) => { const p = pctOf(n, d); return p === null ? "" : p; };
+      const lines = [];
+      const push = (arr) => lines.push(arr.map(esc).join(","));
+
+      push(["Budget dan Realisasi Annual Training Master Plan", yr]);
+      push(["Tanggal ekspor", new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })]);
+      push(["Sesi dalam ekspor", `${items.length} dari ${M.yearItems.length} sesi pada tahun terpilih`]);
+      push(["Rumus", "Total biaya = budget per peserta x jumlah peserta. Plan memakai target peserta, actual memakai peserta aktual."]);
+      push([]);
+
+      push(["RINGKASAN (sesi dalam ekspor)"]);
+      push(["Target_Peserta", A.planPax]);
+      push(["Rencana_Biaya", rnd(A.planCost)]);
+      push(["Budget_Rata2_per_Peserta_Plan", A.paxWithBudget ? rnd(A.planCost / A.paxWithBudget) : ""]);
+      push(["Peserta_Actual", A.actualPax]);
+      push(["Realisasi_Biaya", rnd(A.actualCost)]);
+      push(["Terserap_Persen", pct(A.actualCost, A.planCost)]);
+      push(["Sisa_Anggaran_Rencana_dikurangi_Realisasi", rnd(A.planCost - A.actualCost)]);
+      push([]);
+
+      push(["PLAFON DAN PROYEKSI (seluruh sesi tahun terpilih, tidak terpengaruh filter)"]);
+      push(["Plafon_Anggaran", plafon ? rnd(plafon) : "Belum diisi"]);
+      push(["Rencana_Biaya_Setahun", rnd(Y.planCost)]);
+      push(["Realisasi_Sesi_yang_Punya_Actual", rnd(P.realized)]);
+      push(["Rencana_Sesi_yang_Belum_Punya_Actual", rnd(P.remaining)]);
+      push(["Proyeksi_Akhir_Tahun", rnd(P.projected)]);
+      push(["Sisa_Plafon_terhadap_Rencana", plafon ? rnd(plafon - Y.planCost) : ""]);
+      push(["Sisa_Plafon_terhadap_Proyeksi", plafon ? rnd(plafon - P.projected) : ""]);
+      push(["Status_Plafon", !plafon ? "Plafon belum diisi" : (Y.planCost > plafon ? "Rencana melebihi plafon" : (P.projected > plafon ? "Proyeksi melebihi plafon" : "Di dalam plafon"))]);
+      push(["Sesi_Lewat_Tanpa_Actual", P.overdueN]);
+      push(["Sesi_Belum_Punya_Budget", P.unbudgetedN]);
+      push([]);
+
+      push(["PER KUARTAL"]);
+      push(["Kuartal", "Sesi", "Target_Peserta", "Rencana_Biaya", "Peserta_Actual", "Realisasi_Biaya", "Terserap_Persen", "Proyeksi_Biaya"]);
+      M.quarterStats.forEach((s, q) => push([`Q${q + 1}`, s.sessions, s.planPax, rnd(s.planCost), s.actualPax, rnd(s.actualCost), pct(s.actualCost, s.planCost), rnd(s.projected)]));
+      push([]);
+
+      push(["PER BULAN"]);
+      push(["Bulan", "Sesi", "Target_Peserta", "Rencana_Biaya", "Peserta_Actual", "Realisasi_Biaya", "Terserap_Persen", "Proyeksi_Biaya", "Kumulatif_Proyeksi", "Sisa_Plafon"]);
+      const showLeft = !!(plafon && M.isFullYear);
+      M.monthStats.forEach((s, m) => {
+        if (!s.sessions) return;
+        push([MONTH_NAMES[m], s.sessions, s.planPax, rnd(s.planCost), s.actualPax, rnd(s.actualCost), pct(s.actualCost, s.planCost), rnd(s.projected), rnd(M.monthCum[m]), showLeft ? rnd(plafon - M.monthCum[m]) : ""]);
+      });
+      if (M.undated.length) {
+        const U = M.undatedStats;
+        push(["Belum terjadwal", U.sessions, U.planPax, rnd(U.planCost), U.actualPax, rnd(U.actualCost), pct(U.actualCost, U.planCost), rnd(U.projected), rnd(M.totalCum), showLeft ? rnd(plafon - M.totalCum) : ""]);
+      }
+      push([]);
+
+      push(["PER KATEGORI"]);
+      push(["Kategori", "Sesi", "Target_Peserta", "Rencana_Biaya", "Peserta_Actual", "Realisasi_Biaya", "Proyeksi_Biaya"]);
+      M.catRows.forEach(({ c, s }) => push([c.key, s.sessions, s.planPax, rnd(s.planCost), s.actualPax, rnd(s.actualCost), rnd(s.projected)]));
+      push([]);
+
+      push(["DETAIL PER TRAINING"]);
+      push(["No", "ID_Jadwal", "Nama_Pelatihan", "Kategori", "Bulan", "Budget_per_Peserta_Plan", "Target_Peserta", "Total_Biaya_Plan", "Peserta_Actual", "Budget_per_Peserta_Actual", "Total_Biaya_Actual", "Sisa_Selisih_Biaya", "Terserap_Persen", "Proyeksi_Biaya", "Status"]);
+      const sortMode = document.getElementById("budget-sort-select")?.value || "cost-desc";
+      sortBudgetList(items, sortMode).forEach((it, i) => {
+        const m = getCostMonthIdx(it);
+        push([i + 1, it.id_jadwal, it.agenda, it._category, m !== null ? MONTH_NAMES[m] : "Belum terjadwal",
+          rnd(it._budget), it.kuota || 0, rnd(it._planCost), it.registered || 0, rnd(it._actualBudget), rnd(it._actualCost),
+          (it._planCost != null && it._actualCost != null) ? rnd(it._planCost - it._actualCost) : "",
+          (it._planCost > 0 && it._actualCost != null) ? Math.round((it._actualCost / it._planCost) * 100) : "",
+          rnd(projectedCostOf(it)), it._status ? it._status.label : ""]);
+      });
+
+      const csv = "\uFEFF" + lines.join("\r\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Budget_Realisasi_ATMP_${yr}_PGP.csv`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+      showToast("success", "CSV Diunduh", `Ringkasan, kuartal, bulan, kategori, dan ${items.length} sesi berhasil diekspor.`);
+    }
+
+    // ---------------------------- CETAK PDF ----------------------------
+    function printBudgetPdf() {
+      const items = sortByChronological(getFilteredItems());
+      if (!items.length) {
+        showToast("info", "Data Kosong", "Tidak ada sesi untuk dicetak.");
+        return;
+      }
+      const M = computeBudgetModel(items);
+      const { A, Y, P, plafon } = M;
+      const yrLabel = SELECTED_YEAR === "all" ? "Multi-Tahun" : SELECTED_YEAR;
+      const printDate = new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
+      const showLeft = !!(plafon && M.isFullYear);
+      const avgPlan = A.paxWithBudget > 0 ? A.planCost / A.paxWithBudget : null;
+      const absorbPct = pctOf(A.actualCost, A.planCost);
+      const sortMode = document.getElementById("budget-sort-select")?.value || "cost-desc";
+
+      const td = (v, extra) => `<td style="border:1px solid #cbd5e1; padding:4px; ${extra || ""}">${v}</td>`;
+      const tdR = (v, extra) => td(v, "text-align:right; white-space:nowrap; " + (extra || ""));
+      const th = (v, extra) => `<th style="${extra || ""}">${v}</th>`;
+
+      const statusText = !plafon ? "Plafon belum diisi"
+        : (Y.planCost > plafon ? "Rencana melebihi plafon"
+          : (P.projected > plafon ? "Proyeksi melebihi plafon" : "Di dalam plafon"));
+      const statusColor = !plafon ? "#475569" : ((Y.planCost > plafon || P.projected > plafon) ? "#b91c1c" : "#047857");
+
+      const kpi = (cls, label, val, sub) => `<div class="kpi ${cls}"><div class="kpi-lbl">${label}</div><div class="kpi-val">${val}</div><div style="font-size:8.5px; color:#475569; margin-top:2px;">${sub}</div></div>`;
+      const kpisHtml = [
+        kpi("", "Rencana biaya", escapeHtml(formatIdr(A.planCost, true)), `${A.planPax.toLocaleString("id-ID")} peserta target${avgPlan !== null ? `, rata-rata ${escapeHtml(formatIdr(avgPlan, true))}/peserta` : ""}`),
+        kpi("kpi-4", "Realisasi biaya", escapeHtml(formatIdr(A.actualCost, true)), `${A.actualPax.toLocaleString("id-ID")} peserta actual${absorbPct !== null ? `, ${absorbPct}% terserap` : ""}`),
+        kpi("kpi-5", "Plafon " + yrLabel, plafon ? escapeHtml(formatIdr(plafon, true)) : "Belum diisi", plafon ? `Sisa terhadap rencana ${escapeHtml(formatIdr(plafon - Y.planCost, true))}` : "Isi plafon di halaman"),
+        kpi("kpi-2", "Proyeksi akhir tahun", escapeHtml(formatIdr(P.projected, true)), plafon ? `Sisa plafon ${escapeHtml(formatIdr(plafon - P.projected, true))}` : "Realisasi + rencana sisa"),
+        kpi("kpi-3", "Status plafon", `<span style="color:${statusColor}; font-size:12px;">${statusText}</span>`, `${P.overdueN} sesi lewat tanpa actual, ${P.unbudgetedN} tanpa budget`)
+      ].join("");
+
+      const qRows = M.quarterStats.map((s, q) => `<tr>${td("Q" + (q + 1), "font-weight:700;")}${tdR(s.sessions)}${tdR(s.planPax.toLocaleString("id-ID"))}${tdR(escapeHtml(formatIdr(s.planCost)))}${tdR(s.actualPax.toLocaleString("id-ID"))}${tdR(escapeHtml(formatIdr(s.actualCost)))}${tdR(pctOf(s.actualCost, s.planCost) !== null ? pctOf(s.actualCost, s.planCost) + "%" : "-")}${tdR(escapeHtml(formatIdr(s.projected)))}</tr>`).join("");
+
+      const mRows = M.monthStats.map((s, m) => {
+        if (!s.sessions) return "";
+        const left = showLeft ? plafon - M.monthCum[m] : null;
+        return `<tr>${td(MONTH_NAMES[m], "font-weight:700;")}${tdR(s.sessions)}${tdR(s.planPax.toLocaleString("id-ID"))}${tdR(escapeHtml(formatIdr(s.planCost)))}${tdR(s.actualPax.toLocaleString("id-ID"))}${tdR(s.withActual ? escapeHtml(formatIdr(s.actualCost)) : "-")}${tdR(escapeHtml(formatIdr(s.projected)))}${tdR(escapeHtml(formatIdr(M.monthCum[m])))}${showLeft ? tdR((left < 0 ? "Lebih " : "") + escapeHtml(formatIdr(Math.abs(left))), left < 0 ? "color:#b91c1c; font-weight:700;" : "") : ""}</tr>`;
+      }).join("") + (M.undated.length ? `<tr style="background:#fffbeb;">${td("Belum terjadwal", "font-weight:700;")}${tdR(M.undatedStats.sessions)}${tdR(M.undatedStats.planPax.toLocaleString("id-ID"))}${tdR(escapeHtml(formatIdr(M.undatedStats.planCost)))}${tdR(M.undatedStats.actualPax.toLocaleString("id-ID"))}${tdR(M.undatedStats.withActual ? escapeHtml(formatIdr(M.undatedStats.actualCost)) : "-")}${tdR(escapeHtml(formatIdr(M.undatedStats.projected)))}${tdR(escapeHtml(formatIdr(M.totalCum)))}${showLeft ? tdR(escapeHtml(formatIdr(plafon - M.totalCum))) : ""}</tr>` : "");
+
+      const cRows = M.catRows.map(({ c, s }) => `<tr>${td(escapeHtml(c.key), "font-weight:700;")}${tdR(s.sessions)}${tdR(s.planPax.toLocaleString("id-ID"))}${tdR(escapeHtml(formatIdr(s.planCost)))}${tdR(s.actualPax.toLocaleString("id-ID"))}${tdR(s.withActual ? escapeHtml(formatIdr(s.actualCost)) : "-")}</tr>`).join("");
+
+      const dRows = sortBudgetList(items, sortMode).map((it, i) => {
+        const m = getCostMonthIdx(it);
+        const gap = (it._planCost != null && it._actualCost != null) ? it._planCost - it._actualCost : null;
+        return `<tr style="background:${i % 2 ? "#f8fafc" : "#ffffff"};">${td(i + 1, "text-align:center;")}${td(escapeHtml(it.id_jadwal), "font-weight:700; color:#0f3b7a; white-space:nowrap;")}${td(escapeHtml(it.agenda), "font-weight:700;")}${td(m !== null ? MONTH_SHORT[m] : "TBA", "text-align:center;")}${tdR(it._budget != null ? escapeHtml(formatIdr(it._budget)) : "-")}${tdR(it.kuota || 0)}${tdR(it._planCost != null ? escapeHtml(formatIdr(it._planCost)) : "-", "font-weight:700;")}${tdR(it.registered || 0)}${tdR(it._actualBudget != null ? escapeHtml(formatIdr(it._actualBudget)) : "-")}${tdR(it._actualCost != null ? escapeHtml(formatIdr(it._actualCost)) : "-", "font-weight:700; color:#047857;")}${tdR(gap === null ? "-" : (gap >= 0 ? "Sisa " : "Lebih ") + escapeHtml(formatIdr(Math.abs(gap))), gap !== null && gap < 0 ? "color:#b91c1c;" : "")}</tr>`;
+      }).join("");
+
+      const html = `<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>Budget dan Realisasi ATMP ${yrLabel} - Pani Gold Project</title>
+  <style>
+    @page { size: A4 landscape; margin: 10mm 12mm; }
+    * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    body { font-family: Arial, Helvetica, sans-serif; color: #0f172a; margin: 0; padding: 16px; font-size: 10px; }
+    .no-print { display: flex; justify-content: space-between; align-items: center; background: #0f172a; color: #fff; padding: 10px 16px; border-radius: 8px; margin-bottom: 14px; }
+    .no-print button { border: none; border-radius: 6px; padding: 7px 14px; font-weight: 700; cursor: pointer; font-size: 11px; }
+    .btn-pdf { background: #dc2626; color: #fff; }
+    .btn-close { background: #334155; color: #fff; margin-left: 6px; }
+    .hdr { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #0f3b7a; padding-bottom: 8px; margin-bottom: 10px; }
+    .kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 12px; }
+    .kpi { border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; background: #f8fafc; border-top: 3px solid #0037b0; }
+    .kpi.kpi-2 { background: #fdf6e3; border-top-color: #9D7828; }
+    .kpi.kpi-3 { background: #f0fdfa; border-top-color: #0f766e; }
+    .kpi.kpi-4 { background: #ecfdf5; border-top-color: #047857; }
+    .kpi.kpi-5 { background: #fffbeb; border-top-color: #b45309; }
+    .kpi-lbl { font-size: 8.5px; color: #475569; font-weight: 700; }
+    .kpi-val { font-size: 14px; font-weight: 800; color: #0f172a; margin-top: 2px; }
+    .sec { font-weight: 800; font-size: 11px; margin: 6px 0 5px; color: #0f3b7a; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+    thead { display: table-header-group; }
+    tr { page-break-inside: avoid; }
+    th { background: #0f3b7a; border: 1px solid #1e40af; border-bottom: 2px solid #9D7828; padding: 5px 4px; font-size: 9px; font-weight: 700; color: #ffffff; }
+    .note { font-size: 8.5px; color: #475569; margin: -8px 0 12px; }
+    .sign-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 18px; page-break-inside: avoid; }
+    .sign-box { border: 1px solid #cbd5e1; border-top: 2.5px solid #0f3b7a; background: #f8fafc; border-radius: 6px; padding: 8px; text-align: center; }
+    .sign-space { height: 44px; }
+    .sign-line { border-top: 1px dashed #64748b; padding-top: 4px; font-weight: 700; }
+    @media print { .no-print { display: none !important; } body { padding: 0; background: #fff !important; } .page-break { page-break-before: always; } }
+  </style>
+</head>
+<body>
+  <div class="no-print">
+    <div><strong>Pratinjau Cetak PDF</strong> &mdash; Budget dan Realisasi ATMP ${yrLabel} (A4 Landscape)</div>
+    <div>
+      <button class="btn-pdf" onclick="window.print()">Simpan PDF / Cetak</button>
+      <button class="btn-close" onclick="window.close()">Tutup</button>
+    </div>
+  </div>
+
+  <div class="hdr">
+    <div>
+      <div style="font-size:9px; font-weight:800; color:#9D7828;">PT MERDEKA COPPER GOLD TBK &bull; PANI GOLD PROJECT</div>
+      <div style="font-size:16px; font-weight:900; color:#0f3b7a; margin-top:2px;">BUDGET DAN REALISASI ANNUAL TRAINING MASTER PLAN ${yrLabel}</div>
+      <div style="font-size:10px; color:#334155;">Learning &amp; Development Department &bull; Total biaya = budget per peserta &times; jumlah peserta</div>
+    </div>
+    <div style="text-align:right; font-size:9px; color:#475569;">
+      <div>Dicetak: <strong>${printDate}</strong></div>
+      <div>Sesi dalam laporan: <strong style="color:#0f3b7a;">${items.length}</strong> dari ${M.yearItems.length}</div>
+    </div>
+  </div>
+
+  <div class="kpis">${kpisHtml}</div>
+  <div class="note">Plafon, rencana setahun, dan proyeksi dihitung dari seluruh ${M.yearItems.length} sesi tahun ${yrLabel}. Proyeksi = realisasi sesi yang sudah punya actual + rencana sesi lainnya. Kartu rencana dan realisasi mengikuti ${items.length} sesi dalam laporan.</div>
+
+  <div class="sec">I. RINGKASAN PER KUARTAL</div>
+  <table>
+    <thead><tr>${th("Kuartal")}${th("Sesi")}${th("Target peserta")}${th("Rencana biaya")}${th("Peserta actual")}${th("Realisasi biaya")}${th("Terserap")}${th("Proyeksi")}</tr></thead>
+    <tbody>${qRows}</tbody>
+  </table>
+
+  <div class="sec">II. RINGKASAN PER BULAN</div>
+  <table>
+    <thead><tr>${th("Bulan")}${th("Sesi")}${th("Target peserta")}${th("Rencana biaya")}${th("Peserta actual")}${th("Realisasi biaya")}${th("Proyeksi")}${th("Kumulatif proyeksi")}${showLeft ? th("Sisa plafon") : ""}</tr></thead>
+    <tbody>${mRows}</tbody>
+  </table>
+
+  <div class="sec">III. BIAYA PER KATEGORI</div>
+  <table>
+    <thead><tr>${th("Kategori")}${th("Sesi")}${th("Target peserta")}${th("Rencana biaya")}${th("Peserta actual")}${th("Realisasi biaya")}</tr></thead>
+    <tbody>${cRows}</tbody>
+  </table>
+
+  <div class="page-break"></div>
+  <div class="sec">IV. BUDGET PER TRAINING PER PESERTA</div>
+  <table>
+    <thead><tr>${th("No")}${th("ID Jadwal")}${th("Training", "text-align:left;")}${th("Bulan")}${th("Budget plan / peserta")}${th("Target peserta")}${th("Total biaya plan")}${th("Peserta actual")}${th("Budget actual / peserta")}${th("Total biaya actual")}${th("Sisa / lebih")}</tr></thead>
+    <tbody>${dRows}</tbody>
+    <tfoot><tr style="background:#f1f5f9; font-weight:800;">${td("", "")}${td("", "")}${td("Total " + items.length + " sesi", "")}${td("", "")}${tdR(avgPlan !== null ? "rata-rata " + escapeHtml(formatIdr(avgPlan, true)) : "-")}${tdR(A.planPax.toLocaleString("id-ID"))}${tdR(escapeHtml(formatIdr(A.planCost)))}${tdR(A.actualPax.toLocaleString("id-ID"))}${tdR("")}${tdR(escapeHtml(formatIdr(A.actualCost)))}${tdR((A.planCost - A.actualCost < 0 ? "Lebih " : "Sisa ") + escapeHtml(formatIdr(Math.abs(A.planCost - A.actualCost), true)))}</tr></tfoot>
+  </table>
+
+  <div class="sign-grid">
+    <div class="sign-box"><div style="font-size:9px; color:#475569;">Disusun Oleh,</div><div class="sign-space"></div><div class="sign-line">Learning &amp; Development Officer</div><div style="font-size:8.5px; color:#64748b;">HR Department</div></div>
+    <div class="sign-box"><div style="font-size:9px; color:#475569;">Diperiksa Oleh,</div><div class="sign-space"></div><div class="sign-line">L&amp;D Superintendent / HR Manager</div><div style="font-size:8.5px; color:#64748b;">Pani Gold Project</div></div>
+    <div class="sign-box"><div style="font-size:9px; color:#475569;">Disetujui Oleh,</div><div class="sign-space"></div><div class="sign-line">Kepala Teknik Tambang / Site Manager</div><div style="font-size:8.5px; color:#64748b;">PT Merdeka Copper Gold Tbk</div></div>
+  </div>
+</body>
+</html>`;
+
+      openPrintWindow(html);
+    }
+
     function openDetailModal(uid) {
       const item = ALL_RAW_SCHEDULES.find(x => x._uid === uid || x.id_jadwal === uid);
       if (!item) return;
@@ -3443,8 +4320,8 @@
         budStrip.classList.toggle("hidden", !isAtmp && !hasBudget);
       }
       if (isAtmp || hasBudget) {
-        const bPlan = item._budget;
-        const bAct = item._actualBudget;
+        const bPlan = item._planCost;
+        const bAct = item._actualCost;
         const bPct = bPlan > 0 && bAct !== null && bAct !== undefined ? Math.round((bAct / bPlan) * 100) : null;
         setTxt("modal-budget-pct-badge", bPct !== null ? `${bPct}% terserap` : (hasBudget ? "Terisi sebagian" : "Belum diisi"));
         setTxt("modal-budget-plan", bPlan !== null && bPlan !== undefined ? formatIdr(bPlan) : "-");
@@ -3455,6 +4332,10 @@
         } else {
           setTxt("modal-budget-diff", "-");
         }
+        setTxt("modal-budget-formula-plan", item._budget != null ? `${formatIdr(item._budget)} \u00d7 ${item.kuota || 0} peserta = ${bPlan != null ? formatIdr(bPlan) : "-"}` : "-");
+        setTxt("modal-budget-formula-actual", item._actualBudget != null
+          ? (ACTUAL_BUDGET_PER_PAX ? `${formatIdr(item._actualBudget)} \u00d7 ${item.registered || 0} peserta = ${formatIdr(bAct)}` : `${formatIdr(item._actualBudget)} (total sesi)`)
+          : "-");
       }
 
       setTxt("modal-part-count", item.peserta.length || item.registered);
@@ -3526,7 +4407,7 @@
         isAtmp ? "Plan_Peserta" : "Kuota",
         isAtmp ? "Actual_Peserta" : "Terdaftar",
         isAtmp ? "Selisih_Peserta" : "Sisa_Kuota",
-        "Budget_Plan", "Actual_Budget",
+        "Budget_Plan_per_Peserta", "Total_Biaya_Plan", "Actual_Budget_per_Peserta", "Total_Biaya_Actual", "Sisa_Selisih_Biaya",
         "Kode_Realisasi", "Keterangan_Realisasi", "Status_Jadwal_Sheet", "Tanggal_Rencana_Awal", "Kode_Pergeseran", "Detail_Pergeseran",
         "Status", "Deskripsi"
       ];
@@ -3556,7 +4437,10 @@
           it.registered,
           isAtmp ? (it.registered - it.kuota) : it.sisa_kuota,
           it._budget !== null && it._budget !== undefined ? it._budget : "",
+          it._planCost !== null && it._planCost !== undefined ? it._planCost : "",
           it._actualBudget !== null && it._actualBudget !== undefined ? it._actualBudget : "",
+          it._actualCost !== null && it._actualCost !== undefined ? it._actualCost : "",
+          (it._planCost != null && it._actualCost != null) ? (it._planCost - it._actualCost) : "",
           tr.code || "",
           tr.label || "",
           tr.sheetTag || "",
@@ -3674,7 +4558,7 @@
           ? `<div style="font-size:7.8px; color:#92400e; font-weight:700; margin-top:2px;">${escapeHtml(tr.shiftNote || ("Plan: " + tr.planDateLabel))}</div>`
           : "";
         const budCellHtml = showBudgetCol
-          ? `<td style="border:1px solid #cbd5e1; padding:4px; text-align:right; font-size:8.5px; white-space:nowrap;">${(it._budget !== null || it._actualBudget !== null) ? `<strong>${escapeHtml(it._actualBudget !== null ? formatIdr(it._actualBudget, true) : "-")}</strong><div style="color:#64748b;">Plan: ${escapeHtml(it._budget !== null ? formatIdr(it._budget, true) : "-")}</div>` : "-"}</td>`
+          ? `<td style="border:1px solid #cbd5e1; padding:4px; text-align:right; font-size:8.5px; white-space:nowrap;">${(it._budget !== null || it._actualBudget !== null) ? `<strong>Plan ${escapeHtml(formatIdr(it._planCost, true))}</strong><div style="color:#64748b;">@${escapeHtml(formatIdr(it._budget, true))} &times; ${it.kuota || 0}</div>${it._actualCost != null ? `<div style="color:#0f3b7a;">Act ${escapeHtml(formatIdr(it._actualCost, true))}</div>` : ""}` : "-"}</td>`
           : "";
         return `
         <tr style="background:${rowBg};">
@@ -3702,8 +4586,8 @@
       const totalHrs = items.reduce((s, x) => s + x._hours, 0);
       const totalReg = items.reduce((s, x) => s + x.registered, 0);
       const totalQuota = items.reduce((s, x) => s + (x.kuota || 0), 0);
-      const totBudget = items.reduce((s, x) => s + (x._budget || 0), 0);
-      const totActualBudget = items.reduce((s, x) => s + (x._actualBudget || 0), 0);
+      const totBudget = items.reduce((s, x) => s + (x._planCost || 0), 0);
+      const totActualBudget = items.reduce((s, x) => s + (x._actualCost || 0), 0);
 
       const html = `<!DOCTYPE html>
 <html lang="id">
@@ -3771,7 +4655,7 @@
     <div class="kpi kpi-2"><div class="kpi-lbl">Program Pelatihan Unik</div><div class="kpi-val" style="color:#725210;">${progRows.length} Program</div></div>
     <div class="kpi kpi-3"><div class="kpi-lbl">Akumulasi Jam Pelatihan</div><div class="kpi-val" style="color:#0f766e;">${totalHrs.toLocaleString("id-ID")} Jam</div></div>
     <div class="kpi kpi-4"><div class="kpi-lbl">${isAtmp ? "Actual / Plan Peserta" : "Total Peserta Terdaftar"}</div><div class="kpi-val" style="color:#047857;">${isAtmp ? `${totalReg.toLocaleString("id-ID")} / ${totalQuota.toLocaleString("id-ID")}` : `${totalReg.toLocaleString("id-ID")} Orang`}</div></div>
-    ${showBudgetCol ? `<div class="kpi kpi-5"><div class="kpi-lbl">Actual / Plan Budget</div><div class="kpi-val" style="color:#92400e; font-size:12px;">${hasBudgetRows ? `${escapeHtml(formatIdr(totActualBudget, true))} / ${escapeHtml(formatIdr(totBudget, true))}` : "Belum Diisi"}</div></div>` : ""}
+    ${showBudgetCol ? `<div class="kpi kpi-5"><div class="kpi-lbl">Biaya Actual / Plan</div><div class="kpi-val" style="color:#92400e; font-size:12px;">${hasBudgetRows ? `${escapeHtml(formatIdr(totActualBudget, true))} / ${escapeHtml(formatIdr(totBudget, true))}` : "Belum Diisi"}</div></div>` : ""}
   </div>
 
   <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:5px;">
@@ -3805,7 +4689,7 @@
     <thead>
       <tr>
         <th>No</th><th>ID Jadwal</th><th style="text-align:left;">Program Pelatihan</th><th>Batch</th>
-        <th>Tanggal</th><th>Durasi</th><th>Ruangan</th><th>PIC / Trainer</th><th>${isAtmp ? "Actual/Plan" : "Peserta/Kuota"}</th>${showBudgetCol ? "<th>Actual/Budget</th>" : ""}<th>Kode Plan</th><th>Status</th>
+        <th>Tanggal</th><th>Durasi</th><th>Ruangan</th><th>PIC / Trainer</th><th>${isAtmp ? "Actual/Plan" : "Peserta/Kuota"}</th>${showBudgetCol ? "<th>Biaya Plan/Actual</th>" : ""}<th>Kode Plan</th><th>Status</th>
       </tr>
     </thead>
     <tbody>${detailRows}</tbody>
@@ -3910,7 +4794,7 @@
     <tr><td class="lbl">Ruangan</td><td>${escapeHtml(it.room)}</td><td class="lbl">Instruktur / PIC</td><td>${escapeHtml(it.pic)}</td></tr>
     <tr><td class="lbl">${(DATA_SOURCE === "atmp" || it.is_atmp) ? "Actual / Plan Peserta" : "Peserta / Kuota"}</td><td>${it.registered} / ${it.kuota || "-"}</td><td class="lbl">Status Pendaftaran</td><td><span style="display:inline-block; padding:2px 8px; border-radius:999px; font-weight:800; ${stBadgeStyle}">${escapeHtml(it._status.label)}</span></td></tr>
     ${(DATA_SOURCE === "atmp" || it.is_atmp || it._budget !== null || it._actualBudget !== null)
-      ? `<tr><td class="lbl">Budget Plan</td><td>${it._budget !== null && it._budget !== undefined ? escapeHtml(formatIdr(it._budget)) : "-"}</td><td class="lbl">Actual Budget</td><td>${it._actualBudget !== null && it._actualBudget !== undefined ? escapeHtml(formatIdr(it._actualBudget)) : "-"}</td></tr>`
+      ? `<tr><td class="lbl">Budget Plan / Peserta</td><td>${it._budget !== null && it._budget !== undefined ? escapeHtml(formatIdr(it._budget)) : "-"}</td><td class="lbl">Actual Budget / Peserta</td><td>${it._actualBudget !== null && it._actualBudget !== undefined ? escapeHtml(formatIdr(it._actualBudget)) : "-"}</td></tr><tr><td class="lbl">Total Biaya Plan</td><td>${it._planCost != null ? escapeHtml(formatIdr(it._planCost)) + " (" + (it.kuota || 0) + " peserta)" : "-"}</td><td class="lbl">Total Biaya Actual</td><td>${it._actualCost != null ? escapeHtml(formatIdr(it._actualCost)) + " (" + (it.registered || 0) + " peserta)" : "-"}</td></tr>`
       : ""}
     ${(() => {
       const tr = it._tracking;
