@@ -1,0 +1,1838 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="shell-type" content="web_dashboard">
+  <title>Work Flow &amp; Pusat Informasi L&amp;D - Pani Gold Project</title>
+
+  <!-- Favicon & Brand Icons -->
+  <link rel="icon" type="image/png" sizes="256x256" href="favicon.png">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+  <link rel="apple-touch-icon" sizes="256x256" href="favicon.png">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+  <style>
+    @layer base {
+      html {
+        font-size: clamp(14px, 0.25vw + 13px, 16px);
+        text-size-adjust: 100%;
+        -webkit-text-size-adjust: 100%;
+        scroll-padding-top: 5.5rem;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        overflow-x: hidden;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      }
+      *, *::before, *::after {
+        box-sizing: border-box;
+        min-width: 0;
+      }
+    }
+
+    h1, h2, h3, .font-display {
+      font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+      text-wrap: balance;
+    }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-thumb { background: #c4c5d7; border-radius: 9999px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    :focus-visible { outline: 2px solid #0037b0; outline-offset: 2px; }
+
+    .smooth-scroll-x {
+      -webkit-overflow-scrolling: touch;
+      overflow-x: auto;
+    }
+    .smooth-scroll-x::-webkit-scrollbar { height: 4px; }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+      user-select: none;
+      line-height: 1;
+    }
+
+    .view {
+      display: none;
+      scroll-margin-top: 5.5rem;
+    }
+    .view.active {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      animation: viewFadeUp 0.34s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    }
+
+    @keyframes viewFadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Interactive Step Card State */
+    .step-card {
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+    }
+    .step-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(0, 55, 176, 0.4);
+      box-shadow: 0 8px 20px -12px rgba(0, 55, 176, 0.35);
+    }
+    .step-card.is-current {
+      background-color: #f2f3ff;
+      border-color: #0037b0;
+      box-shadow: 0 0 0 1px rgba(0, 55, 176, 0.22), 0 10px 24px -14px rgba(0, 55, 176, 0.45);
+    }
+    .step-card.is-current .step-badge {
+      background-color: #0037b0;
+      color: #ffffff;
+      border-color: #0037b0;
+    }
+
+    /* FAQ Accordion smooth arrow */
+    details.faq-item summary {
+      list-style: none;
+      cursor: pointer;
+    }
+    details.faq-item summary::-webkit-details-marker {
+      display: none;
+    }
+    details.faq-item[open] .faq-chevron {
+      transform: rotate(180deg);
+      color: #0037b0;
+    }
+    details.faq-item[open] {
+      border-color: rgba(0, 55, 176, 0.35);
+      background-color: #fafaff;
+    }
+
+    /* Ambassador composition on #home hero */
+    .wf-ambassador {
+      filter: drop-shadow(0 12px 20px rgba(0, 21, 81, 0.28));
+      transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+    .wf-hero-visual:hover .wf-ambassador.female {
+      transform: translateY(-4px) scale(1.015);
+    }
+    .wf-hero-visual:hover .wf-ambassador.male {
+      transform: translateY(-6px) scale(1.015);
+    }
+
+    @media (max-width: 768px) {
+      input[type="text"], input[type="search"] {
+        font-size: 16px !important;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+
+  <script>
+    (function() {
+      var origWarn = console.warn;
+      console.warn = function() {
+        if (arguments[0] && typeof arguments[0] === 'string' && arguments[0].indexOf('cdn.tailwindcss.com') !== -1) return;
+        return origWarn.apply(console, arguments);
+      };
+    })();
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#0037b0",
+            "surface": "#faf8ff",
+            "primary-container": "#1d4ed8",
+            "on-primary": "#ffffff",
+            "primary-fixed": "#dce1ff",
+            "primary-fixed-dim": "#b7c4ff",
+            "on-primary-fixed": "#001551",
+            "on-primary-fixed-variant": "#0039b5",
+            "secondary": "#4e45d5",
+            "on-secondary": "#ffffff",
+            "secondary-fixed": "#e3dfff",
+            "tertiary": "#004870",
+            "on-tertiary": "#ffffff",
+            "tertiary-fixed": "#cce5ff",
+            "background": "#faf8ff",
+            "on-background": "#131b2e",
+            "on-surface": "#131b2e",
+            "on-surface-variant": "#434655",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f2f3ff",
+            "surface-container": "#eaedff",
+            "surface-container-high": "#e2e7ff",
+            "surface-container-highest": "#dae2fd",
+            "outline": "#747686",
+            "outline-variant": "#c4c5d7",
+            "error": "#ba1a1a",
+            "error-container": "#ffdad6",
+            "on-error-container": "#93000a"
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col">
+
+  <!-- TOPBAR HEADER -->
+  <header class="fixed top-0 right-0 left-0 h-16 bg-surface/95 backdrop-blur-xl border-b border-outline-variant/50 z-50 flex items-center justify-between gap-2 sm:gap-3 px-3 sm:px-6 lg:px-8">
+    <!-- Left: Mobile Drawer Trigger + Brand + Title -->
+    <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+      <button type="button" id="mobileMenu" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="mobile-nav-drawer" class="lg:hidden w-9 h-9 rounded-xl border border-outline-variant/60 bg-surface-container-lowest text-on-surface hover:bg-surface-container-low inline-flex items-center justify-center shrink-0 transition-colors cursor-pointer">
+        <span class="material-symbols-outlined text-[20px]">menu</span>
+      </button>
+
+      <a href="index.html" class="flex items-center gap-2 shrink min-w-0 hover:opacity-90 transition-opacity" title="Kembali ke Portal Pendaftaran Training">
+        <img id="header-brand-logo" alt="Merdeka Gold Resources" class="h-6 sm:h-8 w-auto max-w-[140px] sm:max-w-none object-contain shrink-0" src="Logo-MGR-Long-default.png">
+      </a>
+
+      <span class="hidden sm:inline-block w-px h-5 bg-outline-variant/60 shrink-0"></span>
+
+      <div class="hidden sm:flex flex-col min-w-0">
+        <div class="flex items-center gap-2">
+          <span class="font-display text-sm font-bold text-primary leading-tight truncate">Work Flow &amp; Panduan L&amp;D</span>
+          <span class="hidden xl:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary-fixed text-on-primary-fixed-variant border border-primary/20 uppercase tracking-wider shrink-0">Knowledge Hub</span>
+        </div>
+        <span class="text-[11px] text-on-surface-variant font-medium truncate">L&amp;D Pani Gold Project &bull; PT Merdeka Copper Gold Tbk</span>
+      </div>
+    </div>
+
+    <!-- Right: Search + Portal Links -->
+    <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <!-- Desktop / Tablet Quick Search -->
+      <div class="relative hidden md:block w-52 lg:w-60 xl:w-72" id="searchWrap">
+        <span class="material-symbols-outlined text-[18px] text-outline absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">search</span>
+        <input id="menuSearch" type="search" placeholder="Cari panduan atau topik..." autocomplete="off" aria-label="Cari panduan atau topik L&D" aria-controls="searchResults" class="w-full h-9 pl-9 pr-3 rounded-xl bg-surface-container-low/70 border border-outline-variant/60 text-xs text-on-surface placeholder:text-outline focus:bg-surface-container-lowest focus:border-primary focus:outline-none transition-colors">
+        <div id="searchResults" role="listbox" aria-label="Hasil pencarian" class="hidden absolute right-0 left-0 top-[calc(100%+6px)] bg-surface-container-lowest border border-outline-variant/70 rounded-xl shadow-xl p-1.5 z-50 max-h-72 overflow-y-auto"></div>
+      </div>
+
+      <a href="annual-training-master-plan.html" class="hidden sm:inline-flex h-9 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant/60 hover:bg-surface-container-low text-on-surface text-xs font-semibold items-center gap-1.5 transition-colors shrink-0" title="Buka Annual Training Master Plan">
+        <span class="material-symbols-outlined text-[17px] text-primary">view_timeline</span>
+        <span class="hidden lg:inline">Master Plan</span>
+      </a>
+
+      <a href="index.html" class="h-9 px-3 rounded-xl bg-primary hover:bg-primary-container text-on-primary text-xs font-semibold inline-flex items-center gap-1.5 transition-colors shrink-0 shadow-2xs" title="Buka Portal Pendaftaran Training">
+        <span class="material-symbols-outlined text-[17px]">open_in_new</span>
+        <span class="hidden sm:inline">Portal Pendaftaran</span>
+        <span class="sm:hidden">Portal</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- MOBILE SLIDE-DOWN NAVIGATION DRAWER (Hidden on Desktop) -->
+  <div id="mobile-nav-drawer" class="hidden fixed inset-0 top-16 z-40 lg:hidden bg-slate-950/45 backdrop-blur-xs">
+    <nav class="bg-surface-container-lowest border-b border-outline-variant/60 shadow-xl max-h-[calc(100vh-4rem)] overflow-y-auto p-4 flex flex-col gap-4" aria-label="Menu Navigasi Work Flow Mobile">
+      <div class="flex items-center justify-between pb-2 border-b border-outline-variant/40">
+        <span class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Kategori Panduan L&amp;D</span>
+        <button type="button" id="mobileDrawerClose" class="px-2.5 py-1 rounded-lg bg-surface-container-low text-xs font-semibold text-on-surface hover:bg-surface-container cursor-pointer">Tutup</button>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-3" id="mobile-drawer-groups">
+        <div class="flex flex-col gap-1">
+          <div class="text-[11px] font-bold uppercase tracking-wider text-outline px-2">01 · Dashboard &amp; Overview</div>
+          <button type="button" data-view="home" class="nav-item w-full text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[18px]">home</span><span>Beranda Informasi</span></button>
+        </div>
+        <div class="flex flex-col gap-1">
+          <div class="text-[11px] font-bold uppercase tracking-wider text-outline px-2">02 · Trainer</div>
+          <button type="button" data-view="mentor" class="nav-item w-full text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[18px]">support_agent</span><span>Peran Trainer / Mentor</span></button>
+        </div>
+        <div class="flex flex-col gap-1">
+          <div class="text-[11px] font-bold uppercase tracking-wider text-outline px-2">03 · Training Administration</div>
+          <button type="button" data-view="internship" class="nav-item w-full text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[18px]">badge</span><span>Alur Magang / PKL</span></button>
+          <button type="button" data-view="registration" class="nav-item w-full text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[18px]">app_registration</span><span>Pendaftaran Training</span></button>
+          <button type="button" data-view="request" class="nav-item w-full text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[18px]">send</span><span>Permintaan Training</span></button>
+          <button type="button" data-view="accommodation" class="nav-item w-full text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[18px]">hotel</span><span>Akomodasi / Process</span></button>
+        </div>
+        <div class="flex flex-col gap-1">
+          <div class="text-[11px] font-bold uppercase tracking-wider text-outline px-2">04–06 · Program, Dokumen &amp; FAQ</div>
+          <button type="button" data-view="program" class="nav-item w-full text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[18px]">event_note</span><span>Program &amp; Jadwal Training</span></button>
+          <button type="button" data-view="documents" class="nav-item w-full text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[18px]">folder_open</span><span>Dokumen &amp; Administrasi</span></button>
+          <button type="button" data-view="faq" class="nav-item w-full text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer"><span class="material-symbols-outlined text-[18px]">help</span><span>FAQ &amp; Kontak L&amp;D</span></button>
+        </div>
+      </div>
+      <div class="pt-2 border-t border-outline-variant/40 flex flex-wrap gap-2">
+        <a href="index.html#pendaftaran" class="px-3 py-2 rounded-xl bg-primary text-on-primary text-xs font-semibold inline-flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">how_to_reg</span>Form Pendaftaran</a>
+        <a href="index.html#jadwal" class="px-3 py-2 rounded-xl bg-surface-container-low text-on-surface text-xs font-semibold inline-flex items-center gap-1.5 border border-outline-variant/50"><span class="material-symbols-outlined text-[16px] text-primary">calendar_month</span>Kalender Training</a>
+        <a href="annual-training-master-plan.html" class="px-3 py-2 rounded-xl bg-surface-container-low text-on-surface text-xs font-semibold inline-flex items-center gap-1.5 border border-outline-variant/50"><span class="material-symbols-outlined text-[16px] text-primary">view_timeline</span>Annual Master Plan</a>
+      </div>
+    </nav>
+  </div>
+
+  <!-- MAIN CONTENT SHELL -->
+  <main class="w-full overflow-x-hidden pt-20 sm:pt-24 pb-16 px-3.5 sm:px-6 lg:px-8 max-w-[1400px] mx-auto flex-1 flex flex-col gap-5">
+
+    <!-- MOBILE QUICK SEARCH + QUICK TOPIC STRIP -->
+    <div class="flex flex-col gap-2.5 lg:hidden">
+      <div class="relative md:hidden" id="mobileSearchWrap">
+        <span class="material-symbols-outlined text-[18px] text-outline absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">search</span>
+        <input id="mobileMenuSearch" type="search" placeholder="Cari panduan, magang, pendaftaran, dokumen..." autocomplete="off" aria-label="Cari panduan mobile" aria-controls="mobileSearchResults" class="w-full h-10 pl-9 pr-3 rounded-xl bg-surface-container-lowest border border-outline-variant/60 text-sm text-on-surface placeholder:text-outline focus:border-primary focus:outline-none">
+        <div id="mobileSearchResults" role="listbox" aria-label="Hasil pencarian mobile" class="hidden absolute right-0 left-0 top-[calc(100%+6px)] bg-surface-container-lowest border border-outline-variant/70 rounded-xl shadow-xl p-1.5 z-40 max-h-64 overflow-y-auto"></div>
+      </div>
+
+      <div class="flex items-center gap-1.5 p-1 rounded-xl bg-surface-container-low/80 border border-outline-variant/50 overflow-x-auto smooth-scroll-x" aria-label="Navigasi Cepat Topik">
+        <button type="button" data-view="home" class="nav-pill shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer">Beranda</button>
+        <button type="button" data-view="internship" class="nav-pill shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer">Magang / PKL</button>
+        <button type="button" data-view="registration" class="nav-pill shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer">Pendaftaran</button>
+        <button type="button" data-view="request" class="nav-pill shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer">Permintaan</button>
+        <button type="button" data-view="mentor" class="nav-pill shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer">Trainer / Mentor</button>
+        <button type="button" data-view="program" class="nav-pill shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer">Program &amp; Jadwal</button>
+        <button type="button" data-view="accommodation" class="nav-pill shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer">Akomodasi</button>
+        <button type="button" data-view="documents" class="nav-pill shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer">Dokumen</button>
+        <button type="button" data-view="faq" class="nav-pill shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer">FAQ &amp; Kontak</button>
+      </div>
+    </div>
+
+    <!-- TWO-COLUMN WORKSPACE: SIDEBAR + GUIDE VIEWS -->
+    <div class="grid grid-cols-1 lg:grid-cols-[272px_minmax(0,1fr)] xl:grid-cols-[288px_minmax(0,1fr)] gap-6 items-start">
+
+      <!-- LEFT STICKY NAVIGATION RAIL (Desktop) -->
+      <aside class="hidden lg:flex lg:flex-col sticky top-20 bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-4 shadow-2xs gap-4" aria-label="Menu Panduan Work Flow L&D">
+        <div class="flex items-center justify-between px-1 pb-2.5 border-b border-outline-variant/40">
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-primary block">L&amp;D Navigation</span>
+            <span class="text-xs text-on-surface-variant font-medium">Panduan Alur &amp; Layanan</span>
+          </div>
+          <span class="px-2 py-0.5 rounded-md bg-amber-50 text-[#9D7828] border border-amber-200/80 text-[10px] font-bold uppercase tracking-wider">Pani Gold</span>
+        </div>
+
+        <nav class="flex flex-col gap-3.5">
+          <!-- 01 -->
+          <div class="flex flex-col gap-1">
+            <div class="px-2 text-[11px] font-bold uppercase tracking-wider text-outline flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[15px] text-primary">space_dashboard</span>
+              <span>01 · Dashboard &amp; Overview</span>
+            </div>
+            <button type="button" data-view="home" class="nav-item w-full text-left px-3 py-2 rounded-xl text-[13px] flex items-center gap-2.5 transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">home</span>
+              <span>Beranda Informasi</span>
+            </button>
+          </div>
+
+          <!-- 02 -->
+          <div class="flex flex-col gap-1">
+            <div class="px-2 text-[11px] font-bold uppercase tracking-wider text-outline flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[15px] text-primary">school</span>
+              <span>02 · Trainer</span>
+            </div>
+            <button type="button" data-view="mentor" class="nav-item w-full text-left px-3 py-2 rounded-xl text-[13px] flex items-center gap-2.5 transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">support_agent</span>
+              <span>Peran Trainer / Mentor</span>
+            </button>
+          </div>
+
+          <!-- 03 -->
+          <div class="flex flex-col gap-1">
+            <div class="px-2 text-[11px] font-bold uppercase tracking-wider text-outline flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[15px] text-primary">assignment</span>
+              <span>03 · Training Administration</span>
+            </div>
+            <button type="button" data-view="internship" class="nav-item w-full text-left px-3 py-2 rounded-xl text-[13px] flex items-center gap-2.5 transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">badge</span>
+              <span>Alur Magang / PKL</span>
+            </button>
+            <button type="button" data-view="registration" class="nav-item w-full text-left px-3 py-2 rounded-xl text-[13px] flex items-center gap-2.5 transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">app_registration</span>
+              <span>Pendaftaran Training</span>
+            </button>
+            <button type="button" data-view="request" class="nav-item w-full text-left px-3 py-2 rounded-xl text-[13px] flex items-center gap-2.5 transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">send</span>
+              <span>Permintaan Training</span>
+            </button>
+            <button type="button" data-view="accommodation" class="nav-item w-full text-left px-3 py-2 rounded-xl text-[13px] flex items-center gap-2.5 transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">hotel</span>
+              <span>Akomodasi / Process</span>
+            </button>
+          </div>
+
+          <!-- 04 -->
+          <div class="flex flex-col gap-1">
+            <div class="px-2 text-[11px] font-bold uppercase tracking-wider text-outline flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[15px] text-primary">calendar_month</span>
+              <span>04 · Training Program</span>
+            </div>
+            <button type="button" data-view="program" class="nav-item w-full text-left px-3 py-2 rounded-xl text-[13px] flex items-center gap-2.5 transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">event_note</span>
+              <span>Program &amp; Jadwal Training</span>
+            </button>
+          </div>
+
+          <!-- 05 -->
+          <div class="flex flex-col gap-1">
+            <div class="px-2 text-[11px] font-bold uppercase tracking-wider text-outline flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[15px] text-primary">folder_managed</span>
+              <span>05 · Document Management</span>
+            </div>
+            <button type="button" data-view="documents" class="nav-item w-full text-left px-3 py-2 rounded-xl text-[13px] flex items-center gap-2.5 transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">folder_open</span>
+              <span>Dokumen &amp; Administrasi</span>
+            </button>
+          </div>
+
+          <!-- 06 -->
+          <div class="flex flex-col gap-1">
+            <div class="px-2 text-[11px] font-bold uppercase tracking-wider text-outline flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[15px] text-primary">quiz</span>
+              <span>06 · Help &amp; Support</span>
+            </div>
+            <button type="button" data-view="faq" class="nav-item w-full text-left px-3 py-2 rounded-xl text-[13px] flex items-center gap-2.5 transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">help</span>
+              <span>FAQ &amp; Kontak L&amp;D</span>
+            </button>
+          </div>
+        </nav>
+
+        <!-- Direct Portal Shortcuts inside Sidebar -->
+        <div class="pt-3 border-t border-outline-variant/40 flex flex-col gap-2">
+          <span class="px-1 text-[11px] font-bold uppercase tracking-wider text-outline">Akses Portal Langsung</span>
+          <a href="index.html#pendaftaran" class="px-3 py-2 rounded-xl bg-surface-container-low hover:bg-primary-fixed/50 text-xs font-semibold text-on-surface hover:text-primary flex items-center justify-between transition-colors">
+            <span class="inline-flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-primary">how_to_reg</span>Form Pendaftaran</span>
+            <span class="material-symbols-outlined text-[15px] text-outline">arrow_outward</span>
+          </a>
+          <a href="index.html#jadwal" class="px-3 py-2 rounded-xl bg-surface-container-low hover:bg-primary-fixed/50 text-xs font-semibold text-on-surface hover:text-primary flex items-center justify-between transition-colors">
+            <span class="inline-flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-700">calendar_month</span>Kalender Training</span>
+            <span class="material-symbols-outlined text-[15px] text-outline">arrow_outward</span>
+          </a>
+          <a href="annual-training-master-plan.html" class="px-3 py-2 rounded-xl bg-surface-container-low hover:bg-primary-fixed/50 text-xs font-semibold text-on-surface hover:text-primary flex items-center justify-between transition-colors">
+            <span class="inline-flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-secondary">view_timeline</span>Annual Master Plan</span>
+            <span class="material-symbols-outlined text-[15px] text-outline">arrow_outward</span>
+          </a>
+        </div>
+      </aside>
+
+      <!-- RIGHT CONTENT PANEL -->
+      <div class="min-w-0 flex flex-col gap-5">
+
+        <!-- Breadcrumb Bar -->
+        <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl px-4 sm:px-5 py-3 flex flex-wrap items-center justify-between gap-2 shadow-2xs">
+          <div class="flex items-center gap-1.5 text-xs sm:text-[13px] text-on-surface-variant flex-wrap">
+            <a href="index.html" class="hover:text-primary transition-colors font-medium inline-flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px] text-primary">home</span>
+              <span>Portal L&amp;D</span>
+            </a>
+            <span class="text-outline">/</span>
+            <span class="font-medium">Work Flow &amp; Panduan</span>
+            <span class="text-outline">/</span>
+            <b id="crumb" class="text-on-surface font-bold">Beranda Informasi</b>
+          </div>
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[11px] font-bold text-emerald-800 uppercase tracking-wider">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+            Information Hub
+          </span>
+        </div>
+
+        <!-- VIEW 1: BERANDA INFORMASI -->
+        <section class="view active" id="home">
+          <!-- Branded Hero matching Portal Beranda aesthetic -->
+          <div class="relative grid grid-cols-1 lg:grid-cols-[1.12fr_1fr] items-stretch border border-outline-variant/60 rounded-2xl bg-surface-container-low overflow-hidden shadow-2xs">
+            <div class="relative z-10 flex flex-col justify-center gap-4 p-5 sm:p-9 lg:p-11">
+              <div class="inline-flex items-center gap-2 self-start px-3 py-1 rounded-full bg-primary-fixed/80 border border-primary/20 text-on-primary-fixed-variant text-xs font-bold tracking-wide">
+                <span class="material-symbols-outlined text-[15px] shrink-0">auto_stories</span>
+                <span>Learning &amp; Development Hub</span>
+              </div>
+              <h1 class="font-display text-2xl sm:text-3xl lg:text-[34px] font-extrabold text-on-surface leading-[1.18] tracking-tight">
+                Belajar, Bertumbuh, dan Bekerja dengan Aman
+              </h1>
+              <p class="text-sm sm:text-[15px] text-on-surface-variant leading-relaxed max-w-lg">
+                Pusat informasi L&amp;D Pani Gold Project untuk panduan magang, pendaftaran training, permintaan pelatihan, jadwal program, dan administrasi pembelajaran.
+              </p>
+              <div class="flex flex-col sm:flex-row flex-wrap gap-2.5 pt-1">
+                <button type="button" onclick="show('internship')" class="w-full sm:w-auto h-11 px-5 rounded-xl bg-primary hover:bg-primary-container text-on-primary text-sm font-semibold inline-flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs">
+                  <span class="material-symbols-outlined text-[19px]">route</span>
+                  <span>Lihat Alur Magang</span>
+                </button>
+                <button type="button" onclick="show('registration')" class="w-full sm:w-auto h-11 px-5 rounded-xl border border-outline-variant bg-surface-container-lowest hover:bg-surface-container text-on-surface text-sm font-semibold inline-flex items-center justify-center gap-2 transition-colors cursor-pointer">
+                  <span class="material-symbols-outlined text-[19px] text-primary">how_to_reg</span>
+                  <span>Pendaftaran Training</span>
+                </button>
+                <a href="index.html#pendaftaran" class="w-full sm:w-auto h-11 px-5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-sm font-semibold inline-flex items-center justify-center gap-2 transition-colors shadow-xs">
+                  <span class="material-symbols-outlined text-[19px]">open_in_new</span>
+                  <span>Buka Form Portal</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Branded Polygon & Merdeka Gold Visual Panel -->
+            <div class="wf-hero-visual relative h-[220px] sm:h-[300px] lg:h-auto lg:min-h-[360px] overflow-hidden">
+              <div class="absolute right-0 bottom-0 w-[94%] h-[88%] bg-primary" style="clip-path:polygon(16% 0,100% 0,100% 100%,0 100%)"></div>
+              <div class="absolute right-0 bottom-0 w-[94%] h-1.5 bg-[#9D7828] z-20"></div>
+              <div class="relative z-10 h-full w-full flex items-end justify-center sm:justify-end pr-1 sm:pr-5">
+                <img src="ambassador-1.webp" alt="Ilustrasi pekerja perempuan mengenakan seragam dan helm keselamatan" class="wf-ambassador female h-[195px] sm:h-[280px] lg:h-[325px] max-w-[48%] w-auto object-contain object-bottom -mr-3 sm:-mr-6 shrink select-none">
+                <img src="ambassador-2.webp" alt="Ilustrasi pekerja laki-laki mengenakan APD keselamatan lengkap" class="wf-ambassador male h-[210px] sm:h-[295px] lg:h-[345px] max-w-[50%] w-auto object-contain object-bottom shrink select-none">
+              </div>
+              <div class="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-surface-container-lowest/95 backdrop-blur-md border border-outline-variant/40 text-[10px] sm:text-[11px] font-bold text-primary shadow-sm tracking-wide">
+                <span class="material-symbols-outlined text-[14px] sm:text-[15px] text-emerald-700">verified_user</span>
+                <span>SAFE &middot; SKILLED &middot; READY</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section Header: Panduan Utama -->
+          <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 pt-1">
+            <div>
+              <h2 class="font-display text-lg sm:text-xl font-bold text-on-surface">Panduan Utama</h2>
+              <p class="text-xs sm:text-sm text-on-surface-variant">Pilih informasi atau alur kerja yang ingin Anda pelajari.</p>
+            </div>
+            <span class="inline-flex items-center gap-1.5 self-start sm:self-auto px-3 py-1 rounded-xl bg-surface-container-lowest border border-outline-variant/60 text-xs font-medium text-on-surface-variant">
+              <span class="material-symbols-outlined text-[16px] text-primary">touch_app</span>
+              <span>Gunakan pencarian di atas atau klik kartu panduan</span>
+            </span>
+          </div>
+
+          <!-- 6 Guide Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <article class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 flex flex-col justify-between gap-4 hover:border-primary/40 hover:shadow-md transition-all">
+              <div class="flex flex-col gap-3">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="w-10 h-10 rounded-xl bg-primary-fixed text-primary flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[21px]">badge</span>
+                  </div>
+                  <span class="px-2.5 py-0.5 rounded-full bg-primary-fixed/60 text-on-primary-fixed-variant text-[11px] font-bold tracking-wider uppercase">Internship</span>
+                </div>
+                <div>
+                  <h3 class="font-display text-base font-bold text-on-surface">Magang / Praktik Kerja</h3>
+                  <p class="text-xs sm:text-[13px] text-on-surface-variant leading-relaxed mt-1">Alur permohonan, review, administrasi, induksi, penempatan, pembimbingan, hingga penutupan program.</p>
+                </div>
+              </div>
+              <button type="button" onclick="show('internship')" class="self-start inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-primary-container transition-colors cursor-pointer">
+                <span>Lihat alur</span>
+                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </button>
+            </article>
+
+            <article class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 flex flex-col justify-between gap-4 hover:border-emerald-500/40 hover:shadow-md transition-all">
+              <div class="flex flex-col gap-3">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200/70">
+                    <span class="material-symbols-outlined text-[21px]">app_registration</span>
+                  </div>
+                  <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/70 text-[11px] font-bold tracking-wider uppercase">Registration</span>
+                </div>
+                <div>
+                  <h3 class="font-display text-base font-bold text-on-surface">Pendaftaran Training</h3>
+                  <p class="text-xs sm:text-[13px] text-on-surface-variant leading-relaxed mt-1">Langkah pendaftaran peserta, verifikasi data, konfirmasi jadwal, dan keikutsertaan training.</p>
+                </div>
+              </div>
+              <button type="button" onclick="show('registration')" class="self-start inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-800 transition-colors cursor-pointer">
+                <span>Lihat alur</span>
+                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </button>
+            </article>
+
+            <article class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 flex flex-col justify-between gap-4 hover:border-amber-500/40 hover:shadow-md transition-all">
+              <div class="flex flex-col gap-3">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="w-10 h-10 rounded-xl bg-amber-50 text-[#9D7828] flex items-center justify-center border border-amber-200/80">
+                    <span class="material-symbols-outlined text-[21px]">send</span>
+                  </div>
+                  <span class="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-900 border border-amber-200/80 text-[11px] font-bold tracking-wider uppercase">Training Request</span>
+                </div>
+                <div>
+                  <h3 class="font-display text-base font-bold text-on-surface">Permintaan Training</h3>
+                  <p class="text-xs sm:text-[13px] text-on-surface-variant leading-relaxed mt-1">Proses pengajuan kebutuhan training oleh departemen hingga penjadwalan dan realisasi.</p>
+                </div>
+              </div>
+              <button type="button" onclick="show('request')" class="self-start inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 hover:text-amber-900 transition-colors cursor-pointer">
+                <span>Lihat alur</span>
+                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </button>
+            </article>
+
+            <article class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 flex flex-col justify-between gap-4 hover:border-emerald-500/40 hover:shadow-md transition-all">
+              <div class="flex flex-col gap-3">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200/70">
+                    <span class="material-symbols-outlined text-[21px]">calendar_month</span>
+                  </div>
+                  <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/70 text-[11px] font-bold tracking-wider uppercase">Training Program</span>
+                </div>
+                <div>
+                  <h3 class="font-display text-base font-bold text-on-surface">Program &amp; Jadwal</h3>
+                  <p class="text-xs sm:text-[13px] text-on-surface-variant leading-relaxed mt-1">Informasi program, kalender training, jadwal pelaksanaan, dan koordinasi peserta.</p>
+                </div>
+              </div>
+              <button type="button" onclick="show('program')" class="self-start inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 hover:text-emerald-800 transition-colors cursor-pointer">
+                <span>Lihat informasi</span>
+                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </button>
+            </article>
+
+            <article class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 flex flex-col justify-between gap-4 hover:border-primary/40 hover:shadow-md transition-all">
+              <div class="flex flex-col gap-3">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="w-10 h-10 rounded-xl bg-primary-fixed text-primary flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[21px]">folder_open</span>
+                  </div>
+                  <span class="px-2.5 py-0.5 rounded-full bg-primary-fixed/60 text-on-primary-fixed-variant text-[11px] font-bold tracking-wider uppercase">Documents</span>
+                </div>
+                <div>
+                  <h3 class="font-display text-base font-bold text-on-surface">Dokumen &amp; Administrasi</h3>
+                  <p class="text-xs sm:text-[13px] text-on-surface-variant leading-relaxed mt-1">Daftar dokumen pendukung untuk proses magang, pendaftaran, dan realisasi training.</p>
+                </div>
+              </div>
+              <button type="button" onclick="show('documents')" class="self-start inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-primary-container transition-colors cursor-pointer">
+                <span>Lihat dokumen</span>
+                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </button>
+            </article>
+
+            <article class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 flex flex-col justify-between gap-4 hover:border-amber-500/40 hover:shadow-md transition-all">
+              <div class="flex flex-col gap-3">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="w-10 h-10 rounded-xl bg-amber-50 text-[#9D7828] flex items-center justify-center border border-amber-200/80">
+                    <span class="material-symbols-outlined text-[21px]">support_agent</span>
+                  </div>
+                  <span class="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-900 border border-amber-200/80 text-[11px] font-bold tracking-wider uppercase">Support</span>
+                </div>
+                <div>
+                  <h3 class="font-display text-base font-bold text-on-surface">FAQ &amp; Kontak L&amp;D</h3>
+                  <p class="text-xs sm:text-[13px] text-on-surface-variant leading-relaxed mt-1">Jawaban atas pertanyaan umum serta arahan untuk menghubungi PIC L&amp;D terkait.</p>
+                </div>
+              </div>
+              <button type="button" onclick="show('faq')" class="self-start inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 hover:text-amber-900 transition-colors cursor-pointer">
+                <span>Lihat bantuan</span>
+                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </button>
+            </article>
+          </div>
+
+          <!-- Nilai Pembelajaran di Pani -->
+          <div class="flex flex-col gap-3 pt-1">
+            <div>
+              <h2 class="font-display text-lg sm:text-xl font-bold text-on-surface">Nilai Pembelajaran di Pani</h2>
+              <p class="text-xs sm:text-sm text-on-surface-variant">Elemen pendukung untuk membangun kompetensi dan budaya kerja yang aman.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-4 flex items-start gap-3.5 shadow-2xs">
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/70 flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-[20px]">health_and_safety</span>
+                </div>
+                <div>
+                  <h3 class="font-display text-sm font-bold text-on-surface">Safety First</h3>
+                  <p class="text-xs text-on-surface-variant leading-relaxed mt-0.5">Keselamatan menjadi bagian utama dari setiap proses belajar di area proyek.</p>
+                </div>
+              </div>
+              <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-4 flex items-start gap-3.5 shadow-2xs">
+                <div class="w-10 h-10 rounded-xl bg-primary-fixed text-primary flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-[20px]">school</span>
+                </div>
+                <div>
+                  <h3 class="font-display text-sm font-bold text-on-surface">Continuous Learning</h3>
+                  <p class="text-xs text-on-surface-variant leading-relaxed mt-0.5">Pengembangan pengetahuan dan kompetensi karyawan secara berkelanjutan.</p>
+                </div>
+              </div>
+              <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-4 flex items-start gap-3.5 shadow-2xs">
+                <div class="w-10 h-10 rounded-xl bg-amber-50 text-[#9D7828] border border-amber-200/80 flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-[20px]">fact_check</span>
+                </div>
+                <div>
+                  <h3 class="font-display text-sm font-bold text-on-surface">Organized Learning Records</h3>
+                  <p class="text-xs text-on-surface-variant leading-relaxed mt-0.5">Administrasi dan rekaman training tersusun rapi serta mudah ditelusuri.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer Note Callout -->
+          <div class="p-4 rounded-2xl bg-surface-container-low border border-outline-variant/60 flex items-start gap-3 text-xs sm:text-sm text-on-surface-variant">
+            <span class="material-symbols-outlined text-[20px] text-primary shrink-0 mt-0.5">info</span>
+            <p class="leading-relaxed"><strong class="text-on-surface">Catatan:</strong> Halaman ini merupakan panduan informasi. Formulir, persetujuan, PIC, dan ketentuan resmi tetap mengikuti prosedur perusahaan yang berlaku.</p>
+          </div>
+        </section>
+
+        <!-- VIEW 2: ALUR MAGANG / PKL -->
+        <section class="view" id="internship">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[11px] font-bold uppercase tracking-wider">03 &middot; Training Administration</span>
+              <h1 class="font-display text-2xl sm:text-3xl font-bold text-on-surface mt-1.5">Alur Magang / PKL</h1>
+              <p class="text-sm text-on-surface-variant mt-1">Tahapan penerimaan peserta magang dari permohonan institusi sampai penyelesaian program.</p>
+            </div>
+            <button type="button" onclick="show('documents')" class="self-start sm:self-auto h-9 px-3.5 rounded-xl border border-outline-variant bg-surface-container-lowest hover:bg-surface-container-low text-xs font-semibold text-on-surface inline-flex items-center gap-1.5 cursor-pointer transition-colors shrink-0">
+              <span class="material-symbols-outlined text-[17px] text-primary">folder_open</span>
+              <span>Checklist Dokumen</span>
+            </button>
+          </div>
+
+          <!-- Process Flow Grid -->
+          <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col gap-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h2 class="font-display text-lg font-bold text-on-surface">Alur Proses (10 Tahapan)</h2>
+                <p class="text-xs text-on-surface-variant">Urutan proses secara ringkas. Klik salah satu tahap untuk menandai langkah aktif.</p>
+              </div>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary-fixed/60 text-on-primary-fixed-variant text-[11px] font-bold uppercase tracking-wider">Process Flow</span>
+            </div>
+
+            <div class="steps-grid grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+              <div class="step-card is-current border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">01</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Permohonan</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Sekolah/universitas mengirim surat permohonan dan data awal peserta.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">02</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Review Internal</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">HR/IR dan departemen meninjau kebutuhan serta kapasitas penempatan.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">03</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Persetujuan</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Permohonan diproses sesuai kewenangan dan ketentuan perusahaan.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">04</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Koordinasi Institusi</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Konfirmasi jumlah peserta, jurusan, periode, dan dokumen pendukung.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">05</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Verifikasi Data</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Pemeriksaan identitas, surat pengantar, dan kelengkapan administrasi.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">06</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Induksi &amp; Persiapan</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Registrasi, Safety Induction, APD, dan ketentuan akses area kerja.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">07</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Penempatan</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Departemen menentukan mentor, rencana kegiatan, dan batasan pekerjaan.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">08</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Pelaksanaan</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Peserta mengikuti kegiatan, absensi, arahan mentor, dan logbook.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">09</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Evaluasi</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Pembimbing menilai kedisiplinan, pembelajaran, dan laporan akhir.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">10</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Penutupan</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Laporan &amp; penilaian diserahkan; L&amp;D menerbitkan surat keterangan/sertifikat partisipasi.</p>
+              </div>
+            </div>
+
+            <p class="text-xs text-on-surface-variant pt-1">Tahapan persetujuan dan penanggung jawab final perlu diselaraskan dengan prosedur HR/IR dan ketentuan site.</p>
+          </div>
+
+          <!-- Important Policy Banner -->
+          <div class="p-4 sm:p-5 rounded-2xl bg-amber-50/90 border border-amber-300/80 flex items-start gap-3 text-xs sm:text-sm text-amber-950">
+            <span class="material-symbols-outlined text-[22px] text-[#9D7828] shrink-0 mt-0.5">policy</span>
+            <p class="leading-relaxed">
+              <strong class="font-bold">Ketentuan penting:</strong> Periode PKL maksimal 3 bulan dan dapat diperpanjang 1 kali sesuai persetujuan. Peserta wajib menyelesaikan orientasi/induksi, menandatangani perjanjian, dan menerima APD serta ID sebelum melakukan aktivitas di area kerja. Logbook ditandatangani pembimbing dan diserahkan paling lambat tanggal 16 setiap bulan.
+            </p>
+          </div>
+
+          <!-- Two-Column Details -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 shadow-2xs flex flex-col gap-3.5">
+              <h2 class="font-display text-base font-bold text-on-surface">Dokumen yang Disiapkan</h2>
+              <div class="flex flex-col gap-2.5">
+                <div class="p-3 rounded-xl bg-surface-container-low/60 border border-outline-variant/40 flex items-start gap-3">
+                  <span class="material-symbols-outlined text-[19px] text-emerald-700 shrink-0 mt-0.5">check_circle</span>
+                  <div>
+                    <b class="text-xs sm:text-sm text-on-surface block">Surat permohonan &amp; pengantar</b>
+                    <span class="text-xs text-on-surface-variant">Dari sekolah atau universitas.</span>
+                  </div>
+                </div>
+                <div class="p-3 rounded-xl bg-surface-container-low/60 border border-outline-variant/40 flex items-start gap-3">
+                  <span class="material-symbols-outlined text-[19px] text-emerald-700 shrink-0 mt-0.5">check_circle</span>
+                  <div>
+                    <b class="text-xs sm:text-sm text-on-surface block">Dokumen pengajuan</b>
+                    <span class="text-xs text-on-surface-variant">Surat/proposal resmi dari institusi, KTP, kartu pelajar/mahasiswa, dan pas foto 4&times;6.</span>
+                  </div>
+                </div>
+                <div class="p-3 rounded-xl bg-surface-container-low/60 border border-outline-variant/40 flex items-start gap-3">
+                  <span class="material-symbols-outlined text-[19px] text-emerald-700 shrink-0 mt-0.5">check_circle</span>
+                  <div>
+                    <b class="text-xs sm:text-sm text-on-surface block">Persyaratan peserta</b>
+                    <span class="text-xs text-on-surface-variant">Usia minimal 17 tahun, persetujuan orang tua/wali, BPJS Kesehatan aktif, dan BPJS TK BPU.</span>
+                  </div>
+                </div>
+                <div class="p-3 rounded-xl bg-surface-container-low/60 border border-outline-variant/40 flex items-start gap-3">
+                  <span class="material-symbols-outlined text-[19px] text-emerald-700 shrink-0 mt-0.5">check_circle</span>
+                  <div>
+                    <b class="text-xs sm:text-sm text-on-surface block">Dokumen pelaksanaan</b>
+                    <span class="text-xs text-on-surface-variant">Perjanjian PKL, rencana kegiatan, absensi, logbook, dan pernyataan kerahasiaan.</span>
+                  </div>
+                </div>
+                <div class="p-3 rounded-xl bg-surface-container-low/60 border border-outline-variant/40 flex items-start gap-3">
+                  <span class="material-symbols-outlined text-[19px] text-emerald-700 shrink-0 mt-0.5">check_circle</span>
+                  <div>
+                    <b class="text-xs sm:text-sm text-on-surface block">Dokumen penyelesaian</b>
+                    <span class="text-xs text-on-surface-variant">Laporan akhir yang disetujui pembimbing dan formulir penilaian peserta.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 shadow-2xs flex flex-col gap-3.5">
+              <h2 class="font-display text-base font-bold text-on-surface">Pihak yang Terlibat</h2>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div class="p-3.5 rounded-xl bg-surface-container-low/70 border border-outline-variant/40">
+                  <b class="text-xs sm:text-sm text-primary block">Sekolah / Universitas</b>
+                  <span class="text-xs text-on-surface-variant mt-0.5 block">Pengajuan dan dokumen peserta.</span>
+                </div>
+                <div class="p-3.5 rounded-xl bg-surface-container-low/70 border border-outline-variant/40">
+                  <b class="text-xs sm:text-sm text-primary block">HR / IR</b>
+                  <span class="text-xs text-on-surface-variant mt-0.5 block">Koordinasi penerimaan dan administrasi.</span>
+                </div>
+                <div class="p-3.5 rounded-xl bg-surface-container-low/70 border border-outline-variant/40">
+                  <b class="text-xs sm:text-sm text-primary block">L&amp;D</b>
+                  <span class="text-xs text-on-surface-variant mt-0.5 block">Koordinasi informasi dan pembelajaran.</span>
+                </div>
+                <div class="p-3.5 rounded-xl bg-surface-container-low/70 border border-outline-variant/40">
+                  <b class="text-xs sm:text-sm text-emerald-800 block">HSE</b>
+                  <span class="text-xs text-on-surface-variant mt-0.5 block">Induksi dan persyaratan keselamatan.</span>
+                </div>
+                <div class="p-3.5 rounded-xl bg-surface-container-low/70 border border-outline-variant/40">
+                  <b class="text-xs sm:text-sm text-primary block">Departemen</b>
+                  <span class="text-xs text-on-surface-variant mt-0.5 block">Penempatan dan evaluasi peserta.</span>
+                </div>
+                <div class="p-3.5 rounded-xl bg-surface-container-low/70 border border-outline-variant/40">
+                  <b class="text-xs sm:text-sm text-[#9D7828] block">Mentor</b>
+                  <span class="text-xs text-on-surface-variant mt-0.5 block">Bimbingan dan pemantauan harian.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 3: PENDAFTARAN TRAINING -->
+        <section class="view" id="registration">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold uppercase tracking-wider">03 &middot; Training Administration</span>
+              <h1 class="font-display text-2xl sm:text-3xl font-bold text-on-surface mt-1.5">Pendaftaran Training</h1>
+              <p class="text-sm text-on-surface-variant mt-1">Panduan bagi PIC departemen untuk mendaftarkan peserta pada program dan jadwal training yang tersedia.</p>
+            </div>
+            <div class="flex flex-wrap gap-2 shrink-0">
+              <a href="index.html#jadwal" class="h-9 px-3.5 rounded-xl border border-outline-variant bg-surface-container-lowest hover:bg-surface-container-low text-xs font-semibold text-on-surface inline-flex items-center gap-1.5 transition-colors">
+                <span class="material-symbols-outlined text-[17px] text-primary">calendar_month</span>
+                <span>Cek Kalender</span>
+              </a>
+              <a href="index.html#pendaftaran" class="h-9 px-3.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary text-xs font-semibold inline-flex items-center gap-1.5 transition-colors shadow-2xs">
+                <span class="material-symbols-outlined text-[17px]">how_to_reg</span>
+                <span>Buka Form Pendaftaran</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Registration Flow -->
+          <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col gap-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h2 class="font-display text-lg font-bold text-on-surface">Alur Pendaftaran (8 Tahapan)</h2>
+                <p class="text-xs text-on-surface-variant">Dari pengecekan jadwal hingga pencatatan hasil training.</p>
+              </div>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold uppercase tracking-wider">Registration Flow</span>
+            </div>
+
+            <div class="steps-grid grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+              <div class="step-card is-current border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">01</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Cek Jadwal</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">PIC memeriksa kalender dan jadwal training yang tersedia.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">02</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Siapkan Data</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Siapkan ID, nama, perusahaan, jabatan, dan departemen peserta.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">03</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Isi Form</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Pilih program/jadwal dan isi formulir pendaftaran dengan benar.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">04</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Kirim</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Periksa kelengkapan dan kirim pendaftaran melalui kanal resmi.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">05</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Verifikasi L&amp;D</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">L&amp;D memeriksa data, kuota, persyaratan, dan kesesuaian jadwal.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">06</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Konfirmasi</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">PIC menerima informasi status dan detail pelaksanaan.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">07</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Ikuti Training</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Peserta hadir sesuai waktu, lokasi, dan persyaratan training.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">08</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Rekam Hasil</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Kehadiran, assessment, dan hasil training dicatat oleh L&amp;D.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 shadow-2xs flex flex-col gap-3.5">
+              <h2 class="font-display text-base font-bold text-on-surface">Informasi pada Kalender Training</h2>
+              <div class="flex flex-col gap-2.5">
+                <div class="p-3 rounded-xl bg-surface-container-low/60 border border-outline-variant/40 flex items-start gap-3">
+                  <span class="material-symbols-outlined text-[19px] text-primary shrink-0 mt-0.5">calendar_month</span>
+                  <div>
+                    <b class="text-xs sm:text-sm text-on-surface block">Kalender &amp; daftar agenda</b>
+                    <span class="text-xs text-on-surface-variant">Lihat jadwal, tanggal, jam, durasi, lokasi, dan detail program.</span>
+                  </div>
+                </div>
+                <div class="p-3 rounded-xl bg-surface-container-low/60 border border-outline-variant/40 flex items-start gap-3">
+                  <span class="material-symbols-outlined text-[19px] text-primary shrink-0 mt-0.5">filter_alt</span>
+                  <div>
+                    <b class="text-xs sm:text-sm text-on-surface block">Pencarian &amp; filter</b>
+                    <span class="text-xs text-on-surface-variant">Cari nama program/kode batch/instruktur; filter jadwal resmi, request, kuota, dan status pelaksanaan.</span>
+                  </div>
+                </div>
+                <div class="p-3 rounded-xl bg-surface-container-low/60 border border-outline-variant/40 flex items-start gap-3">
+                  <span class="material-symbols-outlined text-[19px] text-primary shrink-0 mt-0.5">groups</span>
+                  <div>
+                    <b class="text-xs sm:text-sm text-on-surface block">Kuota &amp; peserta</b>
+                    <span class="text-xs text-on-surface-variant">Periksa ketersediaan kuota dan detail peserta sebelum mendaftar.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 shadow-2xs flex flex-col gap-3.5">
+              <h2 class="font-display text-base font-bold text-on-surface">Data Peserta yang Dibutuhkan</h2>
+              <div class="flex flex-col gap-2.5">
+                <div class="p-3 rounded-xl bg-surface-container-low/60 border border-outline-variant/40 flex items-start gap-3">
+                  <span class="material-symbols-outlined text-[19px] text-emerald-700 shrink-0 mt-0.5">badge</span>
+                  <div>
+                    <b class="text-xs sm:text-sm text-on-surface block">Identitas pekerja</b>
+                    <span class="text-xs text-on-surface-variant">Employee ID, nama lengkap, dan perusahaan.</span>
+                  </div>
+                </div>
+                <div class="p-3 rounded-xl bg-surface-container-low/60 border border-outline-variant/40 flex items-start gap-3">
+                  <span class="material-symbols-outlined text-[19px] text-emerald-700 shrink-0 mt-0.5">work</span>
+                  <div>
+                    <b class="text-xs sm:text-sm text-on-surface block">Informasi jabatan</b>
+                    <span class="text-xs text-on-surface-variant">Jabatan dan departemen sesuai data perusahaan.</span>
+                  </div>
+                </div>
+                <div class="p-3 rounded-xl bg-surface-container-low/60 border border-outline-variant/40 flex items-start gap-3">
+                  <span class="material-symbols-outlined text-[19px] text-emerald-700 shrink-0 mt-0.5">fact_check</span>
+                  <div>
+                    <b class="text-xs sm:text-sm text-on-surface block">Validasi akhir</b>
+                    <span class="text-xs text-on-surface-variant">L&amp;D memverifikasi data dan kuota; pendaftaran belum berarti peserta otomatis terkonfirmasi.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-2xl bg-primary-fixed/40 border border-primary/25 flex items-start gap-3 text-xs sm:text-sm text-on-surface">
+            <span class="material-symbols-outlined text-[21px] text-primary shrink-0 mt-0.5">lightbulb</span>
+            <p class="leading-relaxed"><strong>Tips:</strong> Pastikan ID pekerja, nama, perusahaan, jabatan, dan departemen sesuai data resmi agar tidak terjadi duplikasi atau kesalahan pencatatan.</p>
+          </div>
+        </section>
+
+        <!-- VIEW 4: PERMINTAAN TRAINING -->
+        <section class="view" id="request">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-bold uppercase tracking-wider">03 &middot; Training Administration</span>
+              <h1 class="font-display text-2xl sm:text-3xl font-bold text-on-surface mt-1.5">Permintaan Training</h1>
+              <p class="text-sm text-on-surface-variant mt-1">Alur pengajuan kebutuhan pelatihan khusus atau pelatihan yang belum tersedia pada jadwal reguler.</p>
+            </div>
+            <a href="index.html#jadwal" class="self-start sm:self-auto h-9 px-3.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary text-xs font-semibold inline-flex items-center gap-1.5 transition-colors shadow-2xs shrink-0">
+              <span class="material-symbols-outlined text-[17px]">calendar_month</span>
+              <span>Buka Kalender &amp; Request</span>
+            </a>
+          </div>
+
+          <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col gap-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h2 class="font-display text-lg font-bold text-on-surface">Proses Pengajuan (8 Tahapan)</h2>
+                <p class="text-xs text-on-surface-variant">Koordinasi kebutuhan dari departemen hingga realisasi.</p>
+              </div>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-bold uppercase tracking-wider">Request Flow</span>
+            </div>
+
+            <div class="steps-grid grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+              <div class="step-card is-current border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">01</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Identifikasi</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Departemen mengidentifikasi gap kompetensi atau kebutuhan operasional.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">02</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Ajukan</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Sampaikan tujuan, jumlah peserta, urgensi, lokasi, dan waktu usulan.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">03</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Review L&amp;D</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Review materi, trainer, durasi, metode, jadwal, dan sumber daya.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">04</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Koordinasi</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Koordinasi dengan HSE, HR/IR, trainer, dan HOD terkait.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">05</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Persetujuan</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Proses persetujuan mengikuti matriks kewenangan perusahaan.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">06</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Penjadwalan</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Finalisasi trainer, peserta, tempat, waktu, dan fasilitas.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">07</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Realisasi</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Training dilaksanakan dan dokumen pelaksanaan dikumpulkan.</p>
+              </div>
+              <div class="step-card border border-outline-variant/60 rounded-xl p-4 flex flex-col gap-2 bg-surface-container-lowest" tabindex="0">
+                <span class="step-badge self-start px-2.5 py-0.5 rounded-full text-[11px] font-bold border border-outline-variant bg-surface-container-low text-primary">08</span>
+                <h3 class="font-display text-sm font-bold text-on-surface">Evaluasi</h3>
+                <p class="text-xs text-on-surface-variant leading-relaxed">Hasil pelaksanaan dicatat, dievaluasi, dan dilaporkan.</p>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl bg-amber-50/80 border border-amber-200/80 flex items-start gap-2.5 text-xs text-amber-950">
+              <span class="material-symbols-outlined text-[18px] text-[#9D7828] shrink-0 mt-0.5">info</span>
+              <p class="leading-relaxed">Pengajuan di luar jadwal dicatat sebagai <strong>Training Request</strong>. Admin L&amp;D meninjau dan, bila disetujui, memasukkannya ke jadwal resmi agar dapat dikelola dalam kalender.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 5: PERAN TRAINER / MENTOR -->
+        <section class="view" id="mentor">
+          <div>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[11px] font-bold uppercase tracking-wider">02 &middot; Trainer</span>
+            <h1 class="font-display text-2xl sm:text-3xl font-bold text-on-surface mt-1.5">Peran Trainer / Mentor</h1>
+            <p class="text-sm text-on-surface-variant mt-1">Ringkasan peran pembimbing dalam pelaksanaan training maupun pendampingan peserta magang.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <article class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 shadow-2xs flex flex-col gap-3">
+              <div class="w-11 h-11 rounded-xl bg-primary-fixed text-primary flex items-center justify-center">
+                <span class="material-symbols-outlined text-[22px]">event_available</span>
+              </div>
+              <div>
+                <h2 class="font-display text-base font-bold text-on-surface">Persiapan</h2>
+                <p class="text-xs sm:text-[13px] text-on-surface-variant leading-relaxed mt-1">Memahami tujuan pembelajaran, materi, jadwal, kebutuhan peserta, dan kesiapan lokasi.</p>
+              </div>
+            </article>
+
+            <article class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 shadow-2xs flex flex-col gap-3">
+              <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/70 flex items-center justify-center">
+                <span class="material-symbols-outlined text-[22px]">groups</span>
+              </div>
+              <div>
+                <h2 class="font-display text-base font-bold text-on-surface">Pendampingan</h2>
+                <p class="text-xs sm:text-[13px] text-on-surface-variant leading-relaxed mt-1">Memberikan arahan, demonstrasi, pengawasan, dan umpan balik selama kegiatan.</p>
+              </div>
+            </article>
+
+            <article class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 shadow-2xs flex flex-col gap-3">
+              <div class="w-11 h-11 rounded-xl bg-amber-50 text-[#9D7828] border border-amber-200/80 flex items-center justify-center">
+                <span class="material-symbols-outlined text-[22px]">fact_check</span>
+              </div>
+              <div>
+                <h2 class="font-display text-base font-bold text-on-surface">Pencatatan</h2>
+                <p class="text-xs sm:text-[13px] text-on-surface-variant leading-relaxed mt-1">Mendukung absensi, hasil assessment, logbook, dan laporan pelaksanaan.</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- VIEW 6: PROGRAM & JADWAL TRAINING -->
+        <section class="view" id="program">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold uppercase tracking-wider">04 &middot; Training Program</span>
+              <h1 class="font-display text-2xl sm:text-3xl font-bold text-on-surface mt-1.5">Program &amp; Jadwal Training</h1>
+              <p class="text-sm text-on-surface-variant mt-1">Gunakan kalender training dan program yang ditetapkan L&amp;D sebagai acuan pendaftaran dan koordinasi peserta.</p>
+            </div>
+            <a href="annual-training-master-plan.html" class="self-start sm:self-auto h-9 px-3.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary text-xs font-semibold inline-flex items-center gap-1.5 transition-colors shadow-2xs shrink-0">
+              <span class="material-symbols-outlined text-[17px]">view_timeline</span>
+              <span>Buka Master Plan</span>
+            </a>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 shadow-2xs flex flex-col gap-3.5">
+              <h2 class="font-display text-base font-bold text-on-surface">Informasi Program</h2>
+              <div class="flex flex-col gap-2.5">
+                <a href="index.html#jadwal" class="p-3.5 rounded-xl bg-surface-container-low/70 hover:bg-primary-fixed/40 border border-outline-variant/40 flex items-center justify-between gap-3 transition-colors group">
+                  <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-[20px] text-primary shrink-0 mt-0.5">calendar_month</span>
+                    <div>
+                      <b class="text-xs sm:text-sm text-on-surface group-hover:text-primary block">Training Calendar</b>
+                      <span class="text-xs text-on-surface-variant">Jadwal pelaksanaan training internal dan ketersediaan kelas.</span>
+                    </div>
+                  </div>
+                  <span class="material-symbols-outlined text-[17px] text-outline group-hover:text-primary shrink-0">arrow_outward</span>
+                </a>
+                <a href="index.html#external" class="p-3.5 rounded-xl bg-surface-container-low/70 hover:bg-emerald-50 border border-outline-variant/40 flex items-center justify-between gap-3 transition-colors group">
+                  <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-[20px] text-emerald-700 shrink-0 mt-0.5">menu_book</span>
+                    <div>
+                      <b class="text-xs sm:text-sm text-on-surface group-hover:text-emerald-800 block">Training Program &amp; External Event</b>
+                      <span class="text-xs text-on-surface-variant">Daftar program, topik, durasi, sertifikasi eksternal, dan kategori pelatihan.</span>
+                    </div>
+                  </div>
+                  <span class="material-symbols-outlined text-[17px] text-outline group-hover:text-emerald-700 shrink-0">arrow_outward</span>
+                </a>
+                <a href="annual-training-master-plan.html" class="p-3.5 rounded-xl bg-surface-container-low/70 hover:bg-primary-fixed/40 border border-outline-variant/40 flex items-center justify-between gap-3 transition-colors group">
+                  <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-[20px] text-secondary shrink-0 mt-0.5">event_repeat</span>
+                    <div>
+                      <b class="text-xs sm:text-sm text-on-surface group-hover:text-primary block">ATMP (Annual Training Master Plan)</b>
+                      <span class="text-xs text-on-surface-variant">Rencana induk tahunan sebagai acuan perencanaan training departemen.</span>
+                    </div>
+                  </div>
+                  <span class="material-symbols-outlined text-[17px] text-outline group-hover:text-primary shrink-0">arrow_outward</span>
+                </a>
+              </div>
+            </div>
+
+            <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 shadow-2xs flex flex-col gap-3.5">
+              <h2 class="font-display text-base font-bold text-on-surface">Alur Pemanfaatan</h2>
+              <div class="flex flex-col gap-2.5">
+                <div class="p-3.5 rounded-xl bg-surface-container-low/60 border border-outline-variant/40 flex items-start gap-3">
+                  <span class="material-symbols-outlined text-[20px] text-primary shrink-0 mt-0.5">looks_one</span>
+                  <div>
+                    <b class="text-xs sm:text-sm text-on-surface block">Lihat kalender</b>
+                    <span class="text-xs text-on-surface-variant">Periksa jadwal dan program yang tersedia pada Kalender Internal / External.</span>
+                  </div>
+                </div>
+                <div class="p-3.5 rounded-xl bg-surface-container-low/60 border border-outline-variant/40 flex items-start gap-3">
+                  <span class="material-symbols-outlined text-[20px] text-primary shrink-0 mt-0.5">looks_two</span>
+                  <div>
+                    <b class="text-xs sm:text-sm text-on-surface block">Koordinasi peserta</b>
+                    <span class="text-xs text-on-surface-variant">Pastikan kebutuhan departemen, persyaratan, dan ketersediaan peserta.</span>
+                  </div>
+                </div>
+                <div class="p-3.5 rounded-xl bg-surface-container-low/60 border border-outline-variant/40 flex items-start gap-3">
+                  <span class="material-symbols-outlined text-[20px] text-emerald-700 shrink-0 mt-0.5">looks_3</span>
+                  <div>
+                    <b class="text-xs sm:text-sm text-on-surface block">Daftarkan peserta</b>
+                    <span class="text-xs text-on-surface-variant">Lanjutkan ke menu <button type="button" onclick="show('registration')" class="font-bold text-primary hover:underline cursor-pointer">Pendaftaran Training</button> atau buka <a href="index.html#pendaftaran" class="font-bold text-primary hover:underline">Form Portal</a>.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW 7: AKOMODASI / PROCESS TRAINING -->
+        <section class="view" id="accommodation">
+          <div>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[11px] font-bold uppercase tracking-wider">03 &middot; Training Administration</span>
+            <h1 class="font-display text-2xl sm:text-3xl font-bold text-on-surface mt-1.5">Akomodasi / Process Training</h1>
+            <p class="text-sm text-on-surface-variant mt-1">Informasi kebutuhan pendukung pelaksanaan training, terutama untuk kegiatan di luar lokasi atau yang membutuhkan koordinasi logistik.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <article class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 shadow-2xs flex flex-col gap-3">
+              <div class="w-11 h-11 rounded-xl bg-primary-fixed text-primary flex items-center justify-center">
+                <span class="material-symbols-outlined text-[22px]">flight_takeoff</span>
+              </div>
+              <div>
+                <h2 class="font-display text-base font-bold text-on-surface">Perjalanan Dinas</h2>
+                <p class="text-xs sm:text-[13px] text-on-surface-variant leading-relaxed mt-1">Koordinasi kebutuhan perjalanan dan dokumen pendukung sesuai prosedur perusahaan.</p>
+              </div>
+            </article>
+
+            <article class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 shadow-2xs flex flex-col gap-3">
+              <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/70 flex items-center justify-center">
+                <span class="material-symbols-outlined text-[22px]">hotel</span>
+              </div>
+              <div>
+                <h2 class="font-display text-base font-bold text-on-surface">Akomodasi</h2>
+                <p class="text-xs sm:text-[13px] text-on-surface-variant leading-relaxed mt-1">Koordinasi kebutuhan penginapan, transportasi, dan konsumsi peserta maupun trainer.</p>
+              </div>
+            </article>
+
+            <article class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 shadow-2xs flex flex-col gap-3">
+              <div class="w-11 h-11 rounded-xl bg-amber-50 text-[#9D7828] border border-amber-200/80 flex items-center justify-center">
+                <span class="material-symbols-outlined text-[22px]">meeting_room</span>
+              </div>
+              <div>
+                <h2 class="font-display text-base font-bold text-on-surface">Fasilitas Training</h2>
+                <p class="text-xs sm:text-[13px] text-on-surface-variant leading-relaxed mt-1">Persiapan ruangan, perlengkapan, dan fasilitas penunjang pelatihan.</p>
+              </div>
+            </article>
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-2xl bg-surface-container-low border border-outline-variant/60 flex items-start gap-3 text-xs sm:text-sm text-on-surface-variant">
+            <span class="material-symbols-outlined text-[20px] text-primary shrink-0 mt-0.5">info</span>
+            <p class="leading-relaxed">Gunakan format Travel Request, permintaan akomodasi, dan mekanisme persetujuan resmi yang berlaku. Hubungi tim L&amp;D pada halaman <button type="button" onclick="show('faq')" class="font-bold text-primary hover:underline cursor-pointer">FAQ &amp; Kontak L&amp;D</button> untuk koordinasi fasilitas ruangan dan jadwal.</p>
+          </div>
+        </section>
+
+        <!-- VIEW 8: DOKUMEN & ADMINISTRASI -->
+        <section class="view" id="documents">
+          <div>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant text-[11px] font-bold uppercase tracking-wider">05 &middot; Document Management</span>
+            <h1 class="font-display text-2xl sm:text-3xl font-bold text-on-surface mt-1.5">Dokumen &amp; Administrasi</h1>
+            <p class="text-sm text-on-surface-variant mt-1">Ringkasan dokumen pendukung yang perlu disiapkan dan dikelola dalam aktivitas L&amp;D.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <article class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 shadow-2xs flex flex-col gap-3">
+              <div class="flex items-center justify-between gap-2">
+                <div class="w-10 h-10 rounded-xl bg-primary-fixed text-primary flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[21px]">school</span>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full bg-primary-fixed/60 text-on-primary-fixed-variant text-[11px] font-bold tracking-wider uppercase">Magang</span>
+              </div>
+              <div>
+                <h2 class="font-display text-base font-bold text-on-surface">Dokumen Magang</h2>
+                <p class="text-xs sm:text-[13px] text-on-surface-variant leading-relaxed mt-1">Surat permohonan, surat pengantar, data peserta, persetujuan, penempatan, absensi, logbook, dan evaluasi.</p>
+              </div>
+            </article>
+
+            <article class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 shadow-2xs flex flex-col gap-3">
+              <div class="flex items-center justify-between gap-2">
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200/70 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[21px]">app_registration</span>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/70 text-[11px] font-bold tracking-wider uppercase">Registration</span>
+              </div>
+              <div>
+                <h2 class="font-display text-base font-bold text-on-surface">Dokumen Pendaftaran</h2>
+                <p class="text-xs sm:text-[13px] text-on-surface-variant leading-relaxed mt-1">Form pendaftaran, daftar peserta, data pekerja, dan konfirmasi jadwal.</p>
+              </div>
+            </article>
+
+            <article class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 shadow-2xs flex flex-col gap-3">
+              <div class="flex items-center justify-between gap-2">
+                <div class="w-10 h-10 rounded-xl bg-amber-50 text-[#9D7828] border border-amber-200/80 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[21px]">fact_check</span>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-900 border border-amber-200/80 text-[11px] font-bold tracking-wider uppercase">Realisasi</span>
+              </div>
+              <div>
+                <h2 class="font-display text-base font-bold text-on-surface">Dokumen Training</h2>
+                <p class="text-xs sm:text-[13px] text-on-surface-variant leading-relaxed mt-1">Jadwal/agenda, data peserta, daftar hadir, materi, assessment, evaluasi, laporan trainer, dan rekaman training.</p>
+              </div>
+            </article>
+          </div>
+
+          <div class="p-4 sm:p-5 rounded-2xl bg-emerald-50/75 border border-emerald-200/80 flex items-start gap-3 text-xs sm:text-sm text-emerald-950">
+            <span class="material-symbols-outlined text-[21px] text-emerald-700 shrink-0 mt-0.5">verified_user</span>
+            <p class="leading-relaxed">Gunakan template dan nomor dokumen resmi yang berlaku. Simpan rekaman final sesuai klasifikasi serta ketentuan pengendalian dokumen perusahaan.</p>
+          </div>
+        </section>
+
+        <!-- VIEW 9: FAQ & KONTAK L&D -->
+        <section class="view" id="faq">
+          <div>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-[11px] font-bold uppercase tracking-wider">06 &middot; Help &amp; Support</span>
+            <h1 class="font-display text-2xl sm:text-3xl font-bold text-on-surface mt-1.5">FAQ &amp; Kontak L&amp;D</h1>
+            <p class="text-sm text-on-surface-variant mt-1">Jawaban singkat untuk pertanyaan umum terkait layanan Learning &amp; Development Pani Gold Project.</p>
+          </div>
+
+          <!-- Accordion FAQ -->
+          <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col gap-3">
+            <h2 class="font-display text-base font-bold text-on-surface mb-1">Pertanyaan Umum (FAQ)</h2>
+
+            <details class="faq-item rounded-xl border border-outline-variant/60 bg-surface-container-lowest transition-colors" open>
+              <summary class="px-4 py-3.5 flex items-center justify-between gap-3 text-xs sm:text-sm font-bold text-on-surface select-none">
+                <span>Bagaimana jika jadwal training belum tersedia?</span>
+                <span class="faq-chevron material-symbols-outlined text-[20px] text-outline transition-transform shrink-0">expand_more</span>
+              </summary>
+              <div class="px-4 pb-4 text-xs sm:text-[13px] text-on-surface-variant leading-relaxed border-t border-outline-variant/30 pt-3">
+                PIC departemen dapat menyampaikan permintaan training kepada L&amp;D melalui fitur request pada <a href="index.html#jadwal" class="font-semibold text-primary hover:underline">Kalender Portal</a> dengan mencantumkan tujuan, jumlah peserta, target waktu, lokasi, dan alasan kebutuhan.
+              </div>
+            </details>
+
+            <details class="faq-item rounded-xl border border-outline-variant/60 bg-surface-container-lowest transition-colors">
+              <summary class="px-4 py-3.5 flex items-center justify-between gap-3 text-xs sm:text-sm font-bold text-on-surface select-none">
+                <span>Siapa yang mengisi pendaftaran training?</span>
+                <span class="faq-chevron material-symbols-outlined text-[20px] text-outline transition-transform shrink-0">expand_more</span>
+              </summary>
+              <div class="px-4 pb-4 text-xs sm:text-[13px] text-on-surface-variant leading-relaxed border-t border-outline-variant/30 pt-3">
+                Pendaftaran dikoordinasikan oleh PIC departemen melalui mekanisme/form resmi pada <a href="index.html#pendaftaran" class="font-semibold text-primary hover:underline">Portal Pendaftaran</a>. Data peserta perlu diverifikasi terlebih dahulu sebelum dikirim.
+              </div>
+            </details>
+
+            <details class="faq-item rounded-xl border border-outline-variant/60 bg-surface-container-lowest transition-colors">
+              <summary class="px-4 py-3.5 flex items-center justify-between gap-3 text-xs sm:text-sm font-bold text-on-surface select-none">
+                <span>Apakah peserta magang boleh langsung masuk area operasional?</span>
+                <span class="faq-chevron material-symbols-outlined text-[20px] text-outline transition-transform shrink-0">expand_more</span>
+              </summary>
+              <div class="px-4 pb-4 text-xs sm:text-[13px] text-on-surface-variant leading-relaxed border-t border-outline-variant/30 pt-3">
+                Tidak. Peserta wajib memenuhi persyaratan administrasi, Safety Induction, perlengkapan APD, serta otorisasi akses area yang berlaku sebelum penempatan kerja.
+              </div>
+            </details>
+
+            <details class="faq-item rounded-xl border border-outline-variant/60 bg-surface-container-lowest transition-colors">
+              <summary class="px-4 py-3.5 flex items-center justify-between gap-3 text-xs sm:text-sm font-bold text-on-surface select-none">
+                <span>Bagaimana jika ada perubahan peserta?</span>
+                <span class="faq-chevron material-symbols-outlined text-[20px] text-outline transition-transform shrink-0">expand_more</span>
+              </summary>
+              <div class="px-4 pb-4 text-xs sm:text-[13px] text-on-surface-variant leading-relaxed border-t border-outline-variant/30 pt-3">
+                PIC departemen perlu segera menginformasikan perubahan peserta kepada tim L&amp;D agar daftar peserta, konfirmasi kuota, dan dokumen pelaksanaan dapat diperbarui sebelum sesi dimulai.
+              </div>
+            </details>
+          </div>
+
+          <!-- Official L&D Contact Cards -->
+          <div class="bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col gap-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h2 class="font-display text-base font-bold text-on-surface">Kontak Resmi L&amp;D Pani Gold Project</h2>
+                <p class="text-xs text-on-surface-variant">Hubungi tim Learning &amp; Development untuk konsultasi jadwal, kuota, dan administrasi.</p>
+              </div>
+              <a href="index.html#pendaftaran" class="h-9 px-3.5 rounded-xl bg-primary hover:bg-primary-container text-on-primary text-xs font-semibold inline-flex items-center gap-1.5 transition-colors">
+                <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+                <span>Buka Portal Pendaftaran</span>
+              </a>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="p-3.5 rounded-xl bg-surface-container-low/80 border border-outline-variant/40 flex items-start gap-3">
+                <span class="material-symbols-outlined text-[20px] text-primary shrink-0 mt-0.5">phone_in_talk</span>
+                <div class="min-w-0">
+                  <span class="text-[11px] font-medium text-on-surface-variant block">Telepon / WhatsApp</span>
+                  <strong class="text-xs sm:text-sm text-on-surface block mt-0.5">+62 811-4320-1945</strong>
+                  <span class="text-[11px] text-on-surface-variant block mt-0.5">Ext. 4022 / 4023 (Pani Gold Site)</span>
+                </div>
+              </div>
+
+              <a href="mailto:pani.training@merdekacoppergold.com" class="p-3.5 rounded-xl bg-surface-container-low/80 hover:bg-primary-fixed/40 border border-outline-variant/40 flex items-start gap-3 transition-colors group">
+                <span class="material-symbols-outlined text-[20px] text-secondary shrink-0 mt-0.5">mail</span>
+                <div class="min-w-0">
+                  <span class="text-[11px] font-medium text-on-surface-variant block">Email Resmi L&amp;D</span>
+                  <strong class="text-xs sm:text-sm text-on-surface group-hover:text-primary block mt-0.5 break-words">pani.training@merdekacoppergold.com</strong>
+                </div>
+              </a>
+
+              <div class="p-3.5 rounded-xl bg-surface-container-low/80 border border-outline-variant/40 flex items-start gap-3">
+                <span class="material-symbols-outlined text-[20px] text-tertiary shrink-0 mt-0.5">location_on</span>
+                <div class="min-w-0">
+                  <span class="text-[11px] font-medium text-on-surface-variant block">Lokasi Kantor</span>
+                  <strong class="text-xs sm:text-sm text-on-surface block mt-0.5">Pioneer / Training Office &bull; Pani Site</strong>
+                </div>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-surface-container-low/80 border border-outline-variant/40 flex items-start gap-3">
+                <span class="material-symbols-outlined text-[20px] text-emerald-700 shrink-0 mt-0.5">schedule</span>
+                <div class="min-w-0">
+                  <span class="text-[11px] font-medium text-on-surface-variant block">Jam Layanan Operasional</span>
+                  <strong class="text-xs sm:text-sm text-on-surface block mt-0.5">Senin &ndash; Jumat &bull; 08:00 &ndash; 17:00 WITA</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Bottom Prev / Next Guide Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-outline-variant/50">
+          <button type="button" id="prevViewBtn" class="h-9 px-3.5 rounded-xl bg-surface-container-lowest border border-outline-variant/60 hover:bg-surface-container-low text-xs font-semibold text-on-surface inline-flex items-center gap-1.5 cursor-pointer transition-colors">
+            <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+            <span id="prevViewLabel">Sebelumnya</span>
+          </button>
+          <button type="button" id="nextViewBtn" class="h-9 px-3.5 rounded-xl bg-surface-container-lowest border border-outline-variant/60 hover:bg-surface-container-low text-xs font-semibold text-primary inline-flex items-center gap-1.5 cursor-pointer transition-colors">
+            <span id="nextViewLabel">Selanjutnya</span>
+            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER (Aligned with Portal Pendaftaran & Annual Master Plan) -->
+  <footer class="mt-auto bg-surface-container-low/80 border-t border-outline-variant/50 text-on-surface">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-on-surface-variant">
+      <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-center sm:text-left">
+        <span>&copy; <span id="footer-year">2026</span> <strong>PT Merdeka Copper Gold Tbk</strong></span>
+        <span class="hidden sm:inline">&bull;</span>
+        <span>Learning &amp; Development &ndash; Pani Gold Project</span>
+      </div>
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <a href="index.html" class="font-semibold text-primary hover:underline">Portal Pendaftaran</a>
+        <a href="index.html#jadwal" class="font-semibold text-primary hover:underline">Kalender Training</a>
+        <a href="annual-training-master-plan.html" class="font-semibold text-primary hover:underline">Annual Master Plan</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODAL VERIFIKASI PASSWORD ADMIN UNTUK AKSES MASTER PLAN (ATMP) -->
+  <div id="masterplan-auth-modal" class="fixed inset-0 z-[72] flex items-center justify-center p-4 bg-on-surface/60 backdrop-blur-xs hidden" onclick="if(event.target===this) closeMasterPlanAuthModal()">
+    <div role="dialog" aria-modal="true" aria-labelledby="masterplan-auth-title" class="bg-surface-container-lowest rounded-2xl shadow-lg border border-outline-variant/60 w-full max-w-md overflow-hidden">
+      <div class="px-6 pt-5 pb-4 bg-[#261900] text-white flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-primary/90 text-white flex items-center justify-center shadow-sm">
+            <span class="material-symbols-outlined text-[22px]">lock</span>
+          </div>
+          <div>
+            <h3 id="masterplan-auth-title" class="font-display text-base font-bold leading-tight">Akses Annual Master Plan</h3>
+            <p class="text-xs text-white/75">Verifikasi Password Admin &bull; Sheet <code class="font-mono text-primary-fixed">akses_admin</code></p>
+          </div>
+        </div>
+        <button type="button" onclick="closeMasterPlanAuthModal()" class="w-8 h-8 rounded-lg flex items-center justify-center text-white/75 hover:text-white hover:bg-white/10 transition-colors cursor-pointer" aria-label="Tutup">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <form id="masterplan-auth-form" onsubmit="submitMasterPlanAuth(event)" class="p-6 flex flex-col gap-4">
+        <div id="masterplan-auth-error" class="hidden p-3 rounded-xl bg-error-container text-on-error-container text-xs font-semibold flex items-center gap-2 border border-error/20">
+          <span class="material-symbols-outlined text-[18px] text-error shrink-0">gpp_bad</span>
+          <span id="masterplan-auth-error-text">Password admin tidak sesuai.</span>
+        </div>
+
+        <div class="p-3 rounded-xl bg-surface-container-low border border-outline-variant/40 text-xs text-on-surface-variant leading-relaxed flex items-start gap-2">
+          <span class="material-symbols-outlined text-[17px] text-[#9D7828] shrink-0 mt-0.5">shield_lock</span>
+          <span>Halaman <strong class="text-on-surface">Annual Training Master Plan (ATMP)</strong> bersifat terbatas. Masukkan <strong class="text-on-surface">Password Admin</strong> untuk melanjutkan.</span>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label for="masterplan-auth-password" class="text-xs font-semibold text-on-surface">Password Admin</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">passkey</span>
+            <input type="password" id="masterplan-auth-password" required autocomplete="current-password" placeholder="Masukkan password admin..." class="w-full h-11 pl-10 pr-10 rounded-xl bg-surface-container-low border border-outline-variant/60 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all">
+            <button type="button" onclick="toggleWfPassVisibility()" class="absolute right-2.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-lg flex items-center justify-center text-outline hover:text-on-surface cursor-pointer" aria-label="Tampilkan atau sembunyikan password">
+              <span id="masterplan-auth-pass-icon" class="material-symbols-outlined text-[18px]">visibility</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-2">
+          <button type="button" onclick="closeMasterPlanAuthModal()" class="h-10 px-4 rounded-xl text-on-surface-variant hover:bg-surface-container text-xs font-semibold transition-all cursor-pointer">Batal</button>
+          <button type="submit" id="masterplan-auth-submit-btn" class="h-10 px-5 rounded-xl bg-primary hover:bg-primary-container text-on-primary text-xs font-semibold inline-flex items-center gap-2 shadow-sm transition-all cursor-pointer">
+            <span class="material-symbols-outlined text-[18px]">lock_open</span>
+            <span id="masterplan-auth-submit-text">Buka Master Plan</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxb_YaLMPz-vK06QOJBhmD1zlZhOgaQimytAf03Mn8hRjsf4hhN_8Tc0W7nt7LNLnKh/exec";
+    const MGR_LOGO_FALLBACK = "https://lh3.googleusercontent.com/aida-public/AB6AXuAbUcqW5ZE_xo0PbCRcHYjV9AaTV0o2y3TdZWiUvnJzhLCvTkGg0uRdr4E52J6qgVNOLvTwo3pYTPUo9GyUB_z0tD5n1fSHaL2-ggSFzwdtcRQ6UMSpdo9SXj8uQO5K_H2o6Pz4jI0ns8AnAEpSWJDYqTsaKqLz_bmx4HWXRnoWnlRXk_o8-nbZOJizFuZrfS-xPtFlfi1q4cy7H-8Y37AvigPjoTSxNzvR6K4whVfm_S6vznlIh_WX";
+
+    const titles = {
+      home: 'Beranda Informasi',
+      mentor: 'Peran Trainer / Mentor',
+      internship: 'Alur Magang / PKL',
+      registration: 'Pendaftaran Training',
+      request: 'Permintaan Training',
+      accommodation: 'Akomodasi / Process',
+      program: 'Program & Jadwal Training',
+      documents: 'Dokumen & Administrasi',
+      faq: 'FAQ & Kontak L&D'
+    };
+
+    const viewOrder = Object.keys(titles);
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileDrawer = document.getElementById('mobile-nav-drawer');
+    const mobileDrawerClose = document.getElementById('mobileDrawerClose');
+
+    // Sync active styles uniformly across desktop sidebar items and mobile drawer items
+    const SIDEBAR_ACTIVE_CLS = 'nav-item w-full text-left px-3 py-2 rounded-xl text-[13px] font-bold bg-primary-fixed/75 text-primary border border-primary/20 shadow-2xs flex items-center gap-2.5 transition-all cursor-pointer';
+    const SIDEBAR_IDLE_CLS = 'nav-item w-full text-left px-3 py-2 rounded-xl text-[13px] font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary flex items-center gap-2.5 transition-all cursor-pointer';
+    const PILL_ACTIVE_CLS = 'nav-pill shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-on-primary shadow-2xs transition-all cursor-pointer';
+    const PILL_IDLE_CLS = 'nav-pill shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-primary hover:bg-surface-container-lowest/70 transition-all cursor-pointer';
+
+    function setMobileDrawerOpen(open) {
+      if (!mobileDrawer || !mobileMenu) return;
+      mobileDrawer.classList.toggle('hidden', !open);
+      mobileMenu.setAttribute('aria-expanded', String(open));
+      mobileMenu.setAttribute('aria-label', open ? 'Tutup menu navigasi' : 'Buka menu navigasi');
+      const iconEl = mobileMenu.querySelector('.material-symbols-outlined');
+      if (iconEl) iconEl.textContent = open ? 'close' : 'menu';
+    }
+
+    function updatePrevNextControls(activeId) {
+      const idx = viewOrder.indexOf(activeId);
+      const prevBtn = document.getElementById('prevViewBtn');
+      const nextBtn = document.getElementById('nextViewBtn');
+      const prevLabel = document.getElementById('prevViewLabel');
+      const nextLabel = document.getElementById('nextViewLabel');
+      if (!prevBtn || !nextBtn) return;
+
+      const prevId = idx > 0 ? viewOrder[idx - 1] : null;
+      const nextId = idx >= 0 && idx < viewOrder.length - 1 ? viewOrder[idx + 1] : null;
+
+      prevBtn.disabled = !prevId;
+      prevBtn.classList.toggle('opacity-40', !prevId);
+      prevBtn.classList.toggle('pointer-events-none', !prevId);
+      if (prevId) {
+        prevLabel.textContent = titles[prevId];
+        prevBtn.onclick = () => show(prevId);
+      } else {
+        prevLabel.textContent = 'Awal Panduan';
+      }
+
+      nextBtn.disabled = !nextId;
+      nextBtn.classList.toggle('opacity-40', !nextId);
+      nextBtn.classList.toggle('pointer-events-none', !nextId);
+      if (nextId) {
+        nextLabel.textContent = titles[nextId];
+        nextBtn.onclick = () => show(nextId);
+      } else {
+        nextLabel.textContent = 'Akhir Panduan';
+      }
+    }
+
+    function show(id, options = {}) {
+      const { updateHash = true, scroll = true } = options;
+      const target = document.getElementById(id);
+      if (!target || !titles[id]) return;
+
+      document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === id));
+
+      document.querySelectorAll('.nav-item').forEach(btn => {
+        const active = btn.dataset.view === id;
+        btn.className = active ? SIDEBAR_ACTIVE_CLS : SIDEBAR_IDLE_CLS;
+        if (active) btn.setAttribute('aria-current', 'page');
+        else btn.removeAttribute('aria-current');
+      });
+
+      document.querySelectorAll('.nav-pill').forEach(pill => {
+        const active = pill.dataset.view === id;
+        pill.className = active ? PILL_ACTIVE_CLS : PILL_IDLE_CLS;
+        if (active) {
+          pill.setAttribute('aria-current', 'page');
+          pill.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', inline: 'center', block: 'nearest' });
+        } else {
+          pill.removeAttribute('aria-current');
+        }
+      });
+
+      const crumbEl = document.getElementById('crumb');
+      if (crumbEl) crumbEl.textContent = titles[id];
+
+      updatePrevNextControls(id);
+      setMobileDrawerOpen(false);
+
+      if (updateHash) {
+        try {
+          const nextHash = id === 'home' ? '#home' : '#' + id;
+          if (window.location.hash !== nextHash) {
+            history.replaceState(null, '', nextHash);
+          }
+        } catch (e) {}
+      }
+
+      if (scroll) {
+        window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
+      }
+    }
+
+    // Bind navigation triggers
+    document.querySelectorAll('.nav-item, .nav-pill').forEach(el => {
+      el.addEventListener('click', () => show(el.dataset.view));
+    });
+
+    // Mobile drawer events
+    if (mobileMenu && mobileDrawer) {
+      mobileMenu.addEventListener('click', () => {
+        const isOpen = mobileDrawer.classList.contains('hidden');
+        setMobileDrawerOpen(isOpen);
+      });
+      mobileDrawer.addEventListener('click', event => {
+        if (event.target === mobileDrawer) setMobileDrawerOpen(false);
+      });
+    }
+    if (mobileDrawerClose) {
+      mobileDrawerClose.addEventListener('click', () => setMobileDrawerOpen(false));
+    }
+
+    // Interactive step highlight within each process flow
+    document.querySelectorAll('.steps-grid').forEach(grid => {
+      const activateStep = card => {
+        grid.querySelectorAll('.step-card').forEach(c => c.classList.remove('is-current'));
+        card.classList.add('is-current');
+      };
+      grid.addEventListener('click', event => {
+        const card = event.target.closest('.step-card');
+        if (card) activateStep(card);
+      });
+      grid.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          const card = event.target.closest('.step-card');
+          if (card) {
+            event.preventDefault();
+            activateStep(card);
+          }
+        }
+      });
+    });
+
+    // Single-open FAQ accordion
+    document.querySelectorAll('details.faq-item').forEach(detail => {
+      detail.addEventListener('toggle', () => {
+        if (detail.open) {
+          document.querySelectorAll('details.faq-item').forEach(other => {
+            if (other !== detail) other.open = false;
+          });
+        }
+      });
+    });
+
+    // Shared quick search binding (reused across desktop & mobile inputs)
+    function bindSearch(inputEl, resultsEl, wrapEl) {
+      if (!inputEl || !resultsEl || !wrapEl) return;
+
+      const closeResults = () => {
+        resultsEl.classList.add('hidden');
+        resultsEl.innerHTML = '';
+      };
+
+      const runSearch = query => {
+        const q = query.trim().toLocaleLowerCase('id');
+        resultsEl.innerHTML = '';
+        if (!q) {
+          closeResults();
+          return;
+        }
+        const matches = Object.entries(titles).filter(([id, title]) => {
+          const view = document.getElementById(id);
+          return view && (title + ' ' + view.innerText).toLocaleLowerCase('id').includes(q);
+        }).slice(0, 6);
+
+        if (!matches.length) {
+          const empty = document.createElement('div');
+          empty.className = 'px-3 py-2.5 text-xs text-on-surface-variant';
+          empty.textContent = 'Tidak ditemukan. Coba kata kunci lain.';
+          resultsEl.appendChild(empty);
+        } else {
+          matches.forEach(([id, title]) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'search-result w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-on-surface hover:bg-primary-fixed/50 hover:text-primary flex items-center gap-2 transition-colors cursor-pointer';
+            btn.setAttribute('role', 'option');
+
+            const icon = document.createElement('span');
+            icon.className = 'material-symbols-outlined text-[16px] text-primary';
+            icon.textContent = 'arrow_forward';
+
+            const label = document.createElement('span');
+            label.textContent = title;
+
+            btn.append(icon, label);
+            btn.addEventListener('click', () => {
+              show(id);
+              inputEl.value = '';
+              closeResults();
+            });
+            resultsEl.appendChild(btn);
+          });
+        }
+        resultsEl.classList.remove('hidden');
+      };
+
+      inputEl.addEventListener('input', () => runSearch(inputEl.value));
+      inputEl.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+          closeResults();
+          inputEl.blur();
+        } else if (event.key === 'Enter') {
+          const first = resultsEl.querySelector('.search-result');
+          if (first) first.click();
+        } else if (event.key === 'ArrowDown') {
+          const first = resultsEl.querySelector('.search-result');
+          if (first) {
+            event.preventDefault();
+            first.focus();
+          }
+        }
+      });
+
+      document.addEventListener('click', event => {
+        if (!wrapEl.contains(event.target)) closeResults();
+      });
+    }
+
+    bindSearch(
+      document.getElementById('menuSearch'),
+      document.getElementById('searchResults'),
+      document.getElementById('searchWrap')
+    );
+    bindSearch(
+      document.getElementById('mobileMenuSearch'),
+      document.getElementById('mobileSearchResults'),
+      document.getElementById('mobileSearchWrap')
+    );
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && mobileDrawer && !mobileDrawer.classList.contains('hidden')) {
+        setMobileDrawerOpen(false);
+      }
+    });
+
+    // Logo fallback & Footer Year & Initial Hash Routing
+    const brandLogo = document.getElementById('header-brand-logo');
+    if (brandLogo) {
+      brandLogo.addEventListener('error', () => {
+        if (brandLogo.src !== MGR_LOGO_FALLBACK) {
+          brandLogo.src = MGR_LOGO_FALLBACK;
+        }
+      });
+    }
+
+    const footerYearEl = document.getElementById('footer-year');
+    if (footerYearEl) footerYearEl.textContent = String(new Date().getFullYear());
+
+    function syncFromHash(scroll) {
+      const hashId = (window.location.hash || '').replace('#', '').trim();
+      const targetId = titles[hashId] ? hashId : 'home';
+      show(targetId, { updateHash: false, scroll });
+      // Override native browser fragment scroll so breadcrumb & header are never hidden under fixed topbar
+      if (hashId) {
+        requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'auto' }));
+      }
+    }
+
+    window.addEventListener('hashchange', () => syncFromHash(true));
+    syncFromHash(false);
+
+    // Password gate modal untuk seluruh tautan menuju Annual Training Master Plan
+    let pendingMasterPlanUrl = 'annual-training-master-plan.html';
+
+    function toggleWfPassVisibility() {
+      const inp = document.getElementById('masterplan-auth-password');
+      const icon = document.getElementById('masterplan-auth-pass-icon');
+      if (!inp) return;
+      const showPass = inp.type === 'password';
+      inp.type = showPass ? 'text' : 'password';
+      if (icon) icon.textContent = showPass ? 'visibility_off' : 'visibility';
+    }
+
+    function showMasterPlanAuthError(msg) {
+      const box = document.getElementById('masterplan-auth-error');
+      const txt = document.getElementById('masterplan-auth-error-text');
+      if (box) box.classList.remove('hidden');
+      if (txt) txt.textContent = msg;
+    }
+
+    function hideMasterPlanAuthError() {
+      const box = document.getElementById('masterplan-auth-error');
+      if (box) box.classList.add('hidden');
+    }
+
+    function openMasterPlanAuthModal(targetUrl) {
+      pendingMasterPlanUrl = targetUrl || 'annual-training-master-plan.html';
+      hideMasterPlanAuthError();
+      const pwEl = document.getElementById('masterplan-auth-password');
+      const icon = document.getElementById('masterplan-auth-pass-icon');
+      if (pwEl) {
+        pwEl.value = '';
+        pwEl.type = 'password';
+      }
+      if (icon) icon.textContent = 'visibility';
+      const modal = document.getElementById('masterplan-auth-modal');
+      if (modal) modal.classList.remove('hidden');
+      setMobileDrawerOpen(false);
+      if (pwEl) setTimeout(() => pwEl.focus(), 60);
+    }
+
+    function closeMasterPlanAuthModal() {
+      const modal = document.getElementById('masterplan-auth-modal');
+      if (modal) modal.classList.add('hidden');
+      const pwEl = document.getElementById('masterplan-auth-password');
+      if (pwEl) pwEl.value = '';
+    }
+
+    function submitMasterPlanAuth(event) {
+      if (event) event.preventDefault();
+      const pwEl = document.getElementById('masterplan-auth-password');
+      const btn = document.getElementById('masterplan-auth-submit-btn');
+      const txt = document.getElementById('masterplan-auth-submit-text');
+      const password = pwEl ? pwEl.value : '';
+
+      if (!password.trim()) {
+        showMasterPlanAuthError('Password admin wajib diisi.');
+        if (pwEl) pwEl.focus();
+        return;
+      }
+
+      if (btn) btn.disabled = true;
+      if (txt) txt.textContent = 'Memverifikasi...';
+      hideMasterPlanAuthError();
+
+      fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          action: 'admin_verify_password',
+          username: '',
+          password: password.trim()
+        })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (btn) btn.disabled = false;
+        if (txt) txt.textContent = 'Buka Master Plan';
+        if (res && res.status === 'success') {
+          const adminInfo = res.admin || {};
+          try {
+            window.name = JSON.stringify({ lndAtmpGrant: true, at: Date.now(), admin: adminInfo });
+          } catch (e) {}
+          try {
+            sessionStorage.setItem('lnd_atmp_access', JSON.stringify({ verified: true, at: Date.now(), admin: adminInfo }));
+          } catch (e) {}
+          closeMasterPlanAuthModal();
+          window.location.href = pendingMasterPlanUrl || 'annual-training-master-plan.html';
+        } else {
+          showMasterPlanAuthError((res && res.message) || 'Password admin tidak sesuai.');
+          if (pwEl) pwEl.select();
+        }
+      })
+      .catch(() => {
+        if (btn) btn.disabled = false;
+        if (txt) txt.textContent = 'Buka Master Plan';
+        showMasterPlanAuthError('Koneksi ke server gagal. Periksa koneksi internet.');
+      });
+    }
+
+    document.addEventListener('click', event => {
+      const link = event.target && event.target.closest ? event.target.closest('a[href*="annual-training-master-plan.html"]') : null;
+      if (!link) return;
+      if (event.ctrlKey || event.metaKey || event.shiftKey || event.button === 1) return;
+      event.preventDefault();
+      openMasterPlanAuthModal(link.getAttribute('href') || 'annual-training-master-plan.html');
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        const modal = document.getElementById('masterplan-auth-modal');
+        if (modal && !modal.classList.contains('hidden')) closeMasterPlanAuthModal();
+      }
+    });
+  </script>
+</body>
+</html>
