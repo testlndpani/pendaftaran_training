@@ -358,6 +358,11 @@
                   <span class="material-symbols-outlined text-[18px] text-amber-700">library_add</span>
                   <span>+ Batch / Multiple Add Jadwal</span>
                 </button>
+                <button type="button" onclick="closeAdminDropdown(); openWaitingListModal();" class="w-full px-3.5 py-2 text-left text-xs font-semibold text-amber-900 hover:bg-amber-50 flex items-center gap-2.5 transition-colors">
+                  <span class="material-symbols-outlined text-[18px] text-amber-700">hourglass_top</span>
+                  <span>Waiting List &amp; Request Jadwal</span>
+                  <span id="header-admin-wl-badge" class="ml-auto px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-600 text-white">0</span>
+                </button>
               </div>
               <div class="border-t border-outline-variant/40 pt-1 mt-1">
                 <button type="button" onclick="closeAdminDropdown(); handleAdminLogout();" class="w-full px-3.5 py-2 text-left text-xs font-semibold text-error hover:bg-red-50 flex items-center gap-2.5 transition-colors">
@@ -392,6 +397,9 @@
             <button type="button" onclick="openAdminScheduleModal('batch', null, 'internal')" class="h-7 px-2.5 rounded-lg bg-white/15 hover:bg-white/25 text-white text-xs font-semibold inline-flex items-center gap-1 whitespace-nowrap transition-all cursor-pointer">
               <span class="material-symbols-outlined text-[15px]">library_add</span> Batch Add
             </button>
+            <button type="button" onclick="openWaitingListModal()" class="h-7 px-2.5 rounded-lg bg-amber-500/30 hover:bg-amber-500/50 text-amber-200 text-xs font-semibold inline-flex items-center gap-1 whitespace-nowrap transition-all cursor-pointer">
+              <span class="material-symbols-outlined text-[15px]">hourglass_top</span> Waiting List (<span id="ribbon-waiting-list-count">0</span>)
+            </button>
             <button type="button" onclick="handleAdminLogout()" class="h-7 px-2.5 rounded-lg bg-red-500/20 hover:bg-red-500/40 text-red-100 text-xs font-semibold inline-flex items-center gap-1 whitespace-nowrap transition-all cursor-pointer">
               <span class="material-symbols-outlined text-[15px]">logout</span> Keluar
             </button>
@@ -411,6 +419,7 @@
                 <button type="button" onclick="switchPageTab('external')" class="w-full sm:w-auto h-11 px-5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-label-lg text-label-lg font-semibold inline-flex items-center justify-center gap-2 transition-colors shadow-xs"><span class="material-symbols-outlined text-[20px]">event_available</span>External &amp; Event Calendar</button>
                 <button type="button" onclick="switchPageTab('kompetensi')" class="w-full sm:w-auto h-11 px-5 rounded-lg border border-outline-variant bg-surface-container-lowest hover:bg-surface-container-low text-on-surface font-label-lg text-label-lg font-semibold inline-flex items-center justify-center gap-2 transition-colors"><span class="material-symbols-outlined text-[20px]">workspace_premium</span>Catat Kompetensi</button>
                 <a href="annual-training-master-plan.html" class="w-full sm:w-auto h-11 px-5 rounded-lg border border-outline-variant bg-surface-container-lowest hover:bg-surface-container-low text-on-surface font-label-lg text-label-lg font-semibold inline-flex items-center justify-center gap-2 transition-colors"><span class="material-symbols-outlined text-[20px] text-primary">view_timeline</span>Annual Master Plan</a>
+                <button type="button" onclick="openWaitingListModal()" class="w-full sm:w-auto h-11 px-5 rounded-lg border border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-900 font-label-lg text-label-lg font-semibold inline-flex items-center justify-center gap-2 transition-colors cursor-pointer" title="Lihat Waiting List &amp; Permintaan Jadwal Training"><span class="material-symbols-outlined text-[20px] text-amber-700">hourglass_top</span>Waiting List <span id="home-waiting-list-badge" class="px-2 py-0.5 text-xs font-bold rounded-full bg-amber-600 text-white">0</span></button>
                 <a href="work-flow.html" class="w-full sm:w-auto h-11 px-5 rounded-lg border border-outline-variant bg-surface-container-lowest hover:bg-surface-container-low text-on-surface font-label-lg text-label-lg font-semibold inline-flex items-center justify-center gap-2 transition-colors"><span class="material-symbols-outlined text-[20px] text-[#9D7828]">route</span>Work Flow &amp; Panduan</a>
               </div>
             </div>
@@ -865,10 +874,10 @@
 
                   <!-- NOTICE BANNER REQUEST DI LUAR JADWAL -->
                   <div id="custom-schedule-notice" class="md:col-span-2 hidden p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-950 flex items-start gap-2.5 text-xs leading-relaxed">
-                    <span class="material-symbols-outlined text-amber-600 text-[18px] shrink-0 mt-0.5">info</span>
+                    <span class="material-symbols-outlined text-amber-600 text-[18px] shrink-0 mt-0.5">hourglass_top</span>
                     <div>
-                      <span class="font-bold">Permintaan Pelatihan di Luar Jadwal:</span>
-                      <span class="text-on-surface-variant block mt-0.5">Tentukan tanggal pelaksanaan dengan date picker. Lokasi default diatur di <strong>Gold Room</strong> dan waktu mulai default pukul <strong>08:00 WIB</strong> (nantinya akan ditentukan/dikonfirmasi kembali oleh Admin Tim L&amp;D).</span>
+                      <span class="font-bold">Permintaan Pelatihan di Luar Jadwal (Waiting List):</span>
+                      <span class="text-on-surface-variant block mt-0.5">Pengajuan ini akan masuk ke menu <strong>Waiting List</strong> dan belum langsung dimasukkan ke kalender. Tanggal dan waktu yang Anda pilih merupakan usulan pemohon, yang nantinya akan diverifikasi dan diberikan tanggal resmi oleh Admin Tim L&amp;D.</span>
                     </div>
                   </div>
 
@@ -1035,6 +1044,11 @@
         <span class="material-symbols-outlined text-[18px]">view_timeline</span>
         <span>Annual Master Plan</span>
       </a>
+      <button type="button" onclick="openWaitingListModal()" id="btn-waiting-list" class="inline-flex items-center justify-center gap-2 h-9 sm:h-10 px-3.5 sm:px-4 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-900 border border-amber-500/40 font-label-md text-label-md font-semibold shadow-xs whitespace-nowrap transition-all cursor-pointer" title="Lihat Waiting List &amp; Permintaan Jadwal Training">
+        <span class="material-symbols-outlined text-[18px] text-amber-700">hourglass_top</span>
+        <span>Waiting List</span>
+        <span id="waiting-list-count-badge" class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-amber-600 text-white leading-none">0</span>
+      </button>
     </div>
     <div data-admin-only="true" data-admin-display="flex" class="hidden flex-wrap items-center gap-2 sm:gap-2.5 sm:ml-auto">
       <button type="button" onclick="openAdminScheduleModal('batch', null, 'internal')" class="inline-flex items-center justify-center gap-2 h-9 sm:h-10 px-3.5 sm:px-4 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300/80 font-label-md text-label-md shadow-xs whitespace-nowrap transition-all font-semibold cursor-pointer">
@@ -2656,6 +2670,259 @@
       <span class="leading-tight font-medium" id="soft-loader-notice-text">Mohon jangan menutup atau memuat ulang halaman.</span>
     </div>
 
+  </div>
+</div>
+
+<!-- =========================================================================== -->
+<!-- 4B. POP UP MODAL: WAITING LIST & PERMINTAAN JADWAL PELATIHAN                -->
+<!-- =========================================================================== -->
+<div id="waiting-list-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-on-surface/50 hidden backdrop-blur-xs">
+  <div role="dialog" aria-modal="true" aria-labelledby="waiting-list-modal-title" class="bg-surface-container-lowest rounded-2xl shadow-2xl border border-outline-variant/60 w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    
+    <!-- HEADER -->
+    <div class="px-5 sm:px-7 py-4 sm:py-5 border-b border-outline-variant/50 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent flex items-start justify-between gap-4 shrink-0">
+      <div class="flex items-center gap-3.5 min-w-0">
+        <div class="w-11 h-11 rounded-xl bg-amber-500/20 text-amber-800 flex items-center justify-center shrink-0 border border-amber-500/30">
+          <span class="material-symbols-outlined text-[24px]">hourglass_top</span>
+        </div>
+        <div class="min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <h2 id="waiting-list-modal-title" class="font-headline-sm text-title-lg sm:text-headline-sm text-on-surface font-bold leading-tight">Waiting List Permintaan Pelatihan</h2>
+            <span id="waiting-list-modal-header-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-600 text-white">0 Menunggu</span>
+          </div>
+          <p class="font-body-sm text-body-sm text-on-surface-variant truncate mt-0.5">Daftar permintaan jadwal di luar kalender reguler yang diajukan pemohon, menunggu penetapan tanggal resmi oleh Admin L&amp;D.</p>
+        </div>
+      </div>
+      <button type="button" onclick="closeWaitingListModal()" class="w-9 h-9 rounded-xl flex items-center justify-center hover:bg-surface-container-low text-outline hover:text-on-surface transition-colors cursor-pointer shrink-0" title="Tutup Modal">
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+    </div>
+
+    <!-- TOOLBAR & FILTERS -->
+    <div class="px-5 sm:px-7 py-3 border-b border-outline-variant/40 bg-surface-container-low/40 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shrink-0">
+      <!-- Search Input -->
+      <div class="relative flex-1">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
+        <input type="text" id="waiting-list-search" oninput="filterWaitingList()" placeholder="Cari modul, nama PIC, peserta, departemen..." class="w-full h-9 pl-9 pr-8 rounded-lg bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:ring-2 focus:ring-primary shadow-xs">
+        <button type="button" id="waiting-list-search-clear" onclick="clearWaitingListSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface p-0.5">
+          <span class="material-symbols-outlined text-[16px]">close</span>
+        </button>
+      </div>
+
+      <!-- Filter Buttons -->
+      <div class="flex items-center gap-1.5 self-start sm:self-auto shrink-0">
+        <button type="button" onclick="setWaitingListFilter('pending')" id="wl-filter-pending" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-600 text-white shadow-xs transition-colors cursor-pointer flex items-center gap-1">
+          <span>Menunggu Tanggal</span>
+          <span id="wl-count-pending" class="px-1.5 py-0.2 rounded-full bg-white/20 text-[10px]">0</span>
+        </button>
+        <button type="button" onclick="setWaitingListFilter('all')" id="wl-filter-all" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-low border border-outline-variant/50 transition-colors cursor-pointer flex items-center gap-1">
+          <span>Semua</span>
+          <span id="wl-count-all" class="px-1.5 py-0.2 rounded-full bg-outline-variant/40 text-[10px]">0</span>
+        </button>
+        <button type="button" onclick="setWaitingListFilter('scheduled')" id="wl-filter-scheduled" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-low border border-outline-variant/50 transition-colors cursor-pointer flex items-center gap-1">
+          <span>Terjadwal</span>
+          <span id="wl-count-scheduled" class="px-1.5 py-0.2 rounded-full bg-outline-variant/40 text-[10px]">0</span>
+        </button>
+        <button type="button" onclick="refreshWaitingListData()" class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-surface-container-low text-primary transition-colors cursor-pointer" title="Muat Ulang Data">
+          <span class="material-symbols-outlined text-[18px]">sync</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- LIST CONTAINER -->
+    <div id="waiting-list-items-container" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-surface-container-low/20">
+      <!-- Populated via JS -->
+    </div>
+
+    <!-- FOOTER -->
+    <div class="px-5 sm:px-7 py-3.5 border-t border-outline-variant/50 bg-surface-container-lowest flex flex-wrap items-center justify-between gap-3 shrink-0">
+      <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+        <span class="material-symbols-outlined text-[16px] text-amber-600">info</span>
+        <span>Admin dapat memberikan tanggal untuk memindahkan permintaan dari Waiting List ke Kalender Resmi.</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button type="button" onclick="closeWaitingListModal(); switchPageTab('pendaftaran'); setTimeout(() => setCustomTrainingMode(true), 150);" class="h-9 px-3.5 rounded-xl border border-outline-variant text-on-surface hover:bg-surface-container-low font-label-md text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer">
+          <span class="material-symbols-outlined text-[16px]">add_circle</span>
+          <span>Ajukan Request Baru</span>
+        </button>
+        <button type="button" onclick="closeWaitingListModal()" class="h-9 px-4 rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer">
+          <span>Tutup</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- =========================================================================== -->
+<!-- 4C. MODAL ADMIN: BERIKAN TANGGAL & TETAPKAN JADWAL WAITING LIST             -->
+<!-- =========================================================================== -->
+<div id="admin-assign-date-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-on-surface/50 hidden backdrop-blur-xs">
+  <div role="dialog" aria-modal="true" aria-labelledby="assign-date-modal-title" class="bg-surface-container-lowest rounded-2xl shadow-2xl border border-outline-variant/60 w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    
+    <!-- HEADER -->
+    <div class="px-5 sm:px-7 py-4 sm:py-5 border-b border-outline-variant/50 bg-[#261900] text-white flex items-start justify-between gap-4 shrink-0">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center shrink-0 border border-amber-500/40">
+          <span class="material-symbols-outlined text-[22px]">calendar_add_on</span>
+        </div>
+        <div class="min-w-0">
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-amber-400 text-amber-950">Admin Action</span>
+            <span class="text-xs text-white/70">Waiting List &rarr; Kalender Resmi</span>
+          </div>
+          <h3 id="assign-date-modal-title" class="font-headline-sm text-title-md sm:text-headline-sm font-bold leading-tight mt-0.5">Berikan Tanggal &amp; Tetapkan Jadwal</h3>
+        </div>
+      </div>
+      <button type="button" onclick="closeAdminAssignDateModal()" class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/10 text-white/70 hover:text-white transition-colors cursor-pointer shrink-0" title="Tutup Modal">
+        <span class="material-symbols-outlined text-[18px]">close</span>
+      </button>
+    </div>
+
+    <!-- FORM BODY -->
+    <form id="admin-assign-date-form" onsubmit="submitAssignDateToWaitingList(event)" class="flex-1 overflow-y-auto p-5 sm:p-7 flex flex-col gap-5">
+      <input type="hidden" id="assign-date-req-id" value="">
+      <input type="hidden" id="assign-date-agenda" value="">
+
+      <!-- SUMMARY CARD REQUEST -->
+      <div class="p-4 rounded-xl bg-amber-50/70 border border-amber-200/80 flex flex-col gap-2.5">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <span class="text-[11px] font-semibold text-amber-800 uppercase tracking-wider">Permintaan Pelatihan:</span>
+            <h4 id="assign-date-display-agenda" class="text-base font-bold text-on-surface truncate">-</h4>
+          </div>
+          <span id="assign-date-display-peserta" class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-200/80 text-amber-900 shrink-0">0 Calon Peserta</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-amber-200/60 text-xs">
+          <div>
+            <span class="text-on-surface-variant">Pemohon / PIC:</span>
+            <span id="assign-date-display-pic" class="font-semibold text-on-surface ml-1">-</span>
+          </div>
+          <div>
+            <span class="text-on-surface-variant">Usulan Tanggal Pemohon:</span>
+            <span id="assign-date-display-proposed" class="font-semibold text-on-surface ml-1">-</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROW 1: TANGGAL MULAI & TANGGAL SELESAI -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-on-surface flex items-center gap-1.5" for="assign-date-start">
+            <span class="material-symbols-outlined text-[16px] text-primary">event</span>
+            Tanggal Mulai Pelatihan <span class="text-error">*</span>
+          </label>
+          <input type="date" id="assign-date-start" required onchange="handleAssignDateChange()" onclick="try{this.showPicker()}catch(e){}" class="w-full h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-xs cursor-pointer">
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold text-on-surface flex items-center gap-1.5" for="assign-date-end">
+              <span class="material-symbols-outlined text-[16px] text-primary">event_available</span>
+              Tanggal Selesai Pelatihan <span class="text-error">*</span>
+            </label>
+            <span id="assign-date-duration-badge" class="text-[11px] font-semibold text-primary">1 Hari (8 Jam)</span>
+          </div>
+          <input type="date" id="assign-date-end" required onchange="handleAssignDateChange()" onclick="try{this.showPicker()}catch(e){}" class="w-full h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-xs cursor-pointer">
+        </div>
+      </div>
+
+      <!-- ROW 2: JAM MULAI & RUANGAN -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-on-surface flex items-center gap-1.5" for="assign-date-hour">
+            <span class="material-symbols-outlined text-[16px] text-primary">schedule</span>
+            Waktu / Jam Mulai Pelatihan <span class="text-error">*</span>
+          </label>
+          <input type="text" id="assign-date-hour" list="assign-date-hours-list" value="08:00 WIB" required placeholder="Contoh: 08:00 WIB" class="w-full h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-xs">
+          <datalist id="assign-date-hours-list">
+            <option value="08:00 WIB">08:00 WIB (Pagi)</option>
+            <option value="08:30 WIB">08:30 WIB</option>
+            <option value="09:00 WIB">09:00 WIB</option>
+            <option value="10:00 WIB">10:00 WIB</option>
+            <option value="13:00 WIB">13:00 WIB (Siang)</option>
+            <option value="14:00 WIB">14:00 WIB</option>
+          </datalist>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-on-surface flex items-center gap-1.5" for="assign-date-room">
+            <span class="material-symbols-outlined text-[16px] text-primary">meeting_room</span>
+            Ruangan Pelatihan <span class="text-error">*</span>
+          </label>
+          <input type="text" id="assign-date-room" list="assign-date-rooms-list" value="Gold Room" required placeholder="Contoh: Gold Room / Ruang Diklat" class="w-full h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-xs">
+          <datalist id="assign-date-rooms-list">
+            <option value="Gold Room">Gold Room</option>
+            <option value="Ruang Diklat Lantai 2">Ruang Diklat Lantai 2</option>
+            <option value="Safety Induction Room">Safety Induction Room</option>
+            <option value="Training Center Room A">Training Center Room A</option>
+            <option value="Training Center Room B">Training Center Room B</option>
+            <option value="Workshop Diklat">Workshop Diklat</option>
+            <option value="Meeting Room Utama">Meeting Room Utama</option>
+          </datalist>
+        </div>
+      </div>
+
+      <!-- ROW 3: BATCH & KUOTA & STATUS -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-on-surface flex items-center gap-1.5" for="assign-date-batch">
+            <span class="material-symbols-outlined text-[16px] text-primary">layers</span>
+            Batch Pelatihan
+          </label>
+          <input type="text" id="assign-date-batch" value="Batch Khusus" placeholder="Batch 1 / Batch Khusus" class="w-full h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-xs">
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-on-surface flex items-center gap-1.5" for="assign-date-kuota">
+            <span class="material-symbols-outlined text-[16px] text-primary">group</span>
+            Kuota Peserta <span class="text-error">*</span>
+          </label>
+          <input type="number" id="assign-date-kuota" min="1" max="100" value="25" required class="w-full h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-xs">
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold text-on-surface flex items-center gap-1.5" for="assign-date-status">
+            <span class="material-symbols-outlined text-[16px] text-primary">toggle_on</span>
+            Status Pelatihan
+          </label>
+          <select id="assign-date-status" class="w-full h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-xs cursor-pointer">
+            <option value="Buka" selected>Buka (Pendaftaran Aktif)</option>
+            <option value="Penuh">Penuh (Kuota Tercukupi)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ROW 4: PIC INSTRUKTUR -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-bold text-on-surface flex items-center gap-1.5" for="assign-date-pic">
+          <span class="material-symbols-outlined text-[16px] text-primary">person</span>
+          PIC / Trainer L&amp;D
+        </label>
+        <input type="text" id="assign-date-pic" value="Tim L&amp;D Pani Gold Project" class="w-full h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-xs">
+      </div>
+
+      <!-- ROW 5: CATATAN / DESKRIPSI -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-xs font-bold text-on-surface flex items-center gap-1.5" for="assign-date-deskripsi">
+          <span class="material-symbols-outlined text-[16px] text-primary">description</span>
+          Catatan / Deskripsi Pelatihan
+        </label>
+        <textarea id="assign-date-deskripsi" rows="2" placeholder="Catatan tambahan untuk pelaksanaan pelatihan ini..." class="w-full p-3 rounded-xl bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-xs"></textarea>
+      </div>
+
+      <!-- SUBMIT FOOTER -->
+      <div class="pt-4 border-t border-outline-variant/50 flex flex-wrap items-center justify-between gap-3">
+        <button type="button" onclick="closeAdminAssignDateModal()" class="h-10 px-4 rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md font-semibold transition-colors cursor-pointer">
+          Batal
+        </button>
+        <button type="submit" id="assign-date-submit-btn" class="h-10 px-5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold inline-flex items-center gap-2 shadow-sm transition-all cursor-pointer">
+          <span class="material-symbols-outlined text-[18px]">event_available</span>
+          <span id="assign-date-submit-text">Simpan &amp; Masukkan ke Kalender</span>
+        </button>
+      </div>
+
+    </form>
   </div>
 </div>
 
@@ -4355,6 +4622,16 @@
         matched.has_linked_request = true;
         matched.linked_request_id = req.id_jadwal;
         matched.linked_request_count = (matched.linked_request_count || 0) + req.peserta.length;
+        if (!Array.isArray(matched.peserta)) matched.peserta = [];
+        req.peserta.forEach(p => {
+          if (!matched.peserta.some(mp => (mp.id_karyawan && mp.id_karyawan === p.id_karyawan) || (mp.nama_karyawan && mp.nama_karyawan.toLowerCase() === (p.nama_karyawan || '').toLowerCase()))) {
+            matched.peserta.push(p);
+          }
+        });
+        matched.total_terdaftar = matched.peserta.length;
+        if (Number(matched.kuota) > 0) {
+          matched.sisa_kuota = Math.max(0, Number(matched.kuota) - matched.total_terdaftar);
+        }
       }
 
       let parsedDates = null;
@@ -4586,10 +4863,11 @@
                 peserta: pesertaList
               };
             });
-            const filteredParsed = parsedSchedules.filter(item => item.id_jadwal && item.agenda && !/tutup|selesai|closed|batal/i.test(item.status));
+            const filteredParsed = parsedSchedules.filter(item => item.id_jadwal && item.agenda && !item.is_request && !/^REQ-/i.test(item.id_jadwal || '') && !/tutup|selesai|closed|batal/i.test(item.status));
             if (rData && rData.table && Array.isArray(rData.table.rows)) {
               const reqs = extractAndSyncTrainingRequests(filteredParsed, rData.table.rows);
-              reqs.forEach(rq => filteredParsed.push(rq));
+              window.LIVE_WAITING_LIST = reqs || [];
+              if (typeof updateWaitingListUI === 'function') updateWaitingListUI();
             }
 
             if (filteredParsed.length > 0) {
@@ -4638,18 +4916,20 @@
           }
         });
 
-        // Jika data dari API belum memuat request (misal sebelum GAS di-deploy ulang), ambil dari Data Pendaftaran via GViz
-        if (!mergedInternal.some(it => it.is_request)) {
-          try {
-            const pData = await fetchGvizSheetJson("1Y5IQUSN84p2Os1e9wxraDIfZF6UfOql4Y5EdXbv850A", "Data Pendaftaran");
-            if (pData && pData.table && Array.isArray(pData.table.rows)) {
-              const reqs = extractAndSyncTrainingRequests(mergedInternal, pData.table.rows);
-              reqs.forEach(rq => mergedInternal.push(rq));
-            }
-          } catch (eReqGviz) {
-            console.warn("Gviz training requests sync fallback error:", eReqGviz);
+        // Ambil Data Pendaftaran via GViz untuk sinkronisasi peserta & Waiting List
+        try {
+          const pData = await fetchGvizSheetJson("1Y5IQUSN84p2Os1e9wxraDIfZF6UfOql4Y5EdXbv850A", "Data Pendaftaran");
+          if (pData && pData.table && Array.isArray(pData.table.rows)) {
+            const reqs = extractAndSyncTrainingRequests(mergedInternal, pData.table.rows);
+            window.LIVE_WAITING_LIST = reqs || [];
+            if (typeof updateWaitingListUI === 'function') updateWaitingListUI();
           }
+        } catch (eReqGviz) {
+          console.warn("Gviz training requests sync fallback error:", eReqGviz);
         }
+
+        // PENTING: Jangan masukkan request/waiting list ke kalender sebelum dijadwalkan oleh Admin!
+        mergedInternal = mergedInternal.filter(item => !item.is_request && !/^REQ-/i.test(item.id_jadwal || ''));
 
         mergedInternal.forEach(item => {
           const parsedH = parseStartHour(item.start_hour || item.startHour || item.waktu);
@@ -6239,9 +6519,9 @@
         hideSoftLoader();
         closeModal();
         const fileMsg = result.file_url ? ' beserta dokumen memo di Google Drive' : '';
-        const successTitle = isCustom ? 'Permintaan Terkirim!' : 'Pendaftaran Berhasil!';
+        const successTitle = isCustom ? 'Masuk ke Waiting List!' : 'Pendaftaran Berhasil!';
         const successMsg = isCustom
-          ? `Permintaan pelatihan "${course}" di luar jadwal untuk ${result.total_peserta || pesertaArray.length} peserta${fileMsg} telah diajukan (ID: ${result.id_booking}). Tim L&D akan segera memvalidasi pengajuan Anda.`
+          ? `Permintaan pelatihan "${course}" untuk ${result.total_peserta || pesertaArray.length} peserta${fileMsg} telah masuk ke Waiting List (ID: ${result.id_booking}). Permintaan tidak langsung masuk kalender; Admin L&D akan meninjau dan menetapkan tanggal jadwal resmi.`
           : `Data ${result.total_peserta || pesertaArray.length} peserta${fileMsg} telah tersimpan (ID: ${result.id_booking}).`;
         showToast('success', successTitle, successMsg);
         
@@ -7339,7 +7619,11 @@
   }
 
   function openAdminAddFromRequest(reqId) {
-    const req = (LIVE_SCHEDULES || []).find(s => s.id_jadwal === reqId);
+    if (typeof openAssignDateModal === 'function') {
+      openAssignDateModal(reqId);
+      return;
+    }
+    const req = (LIVE_WAITING_LIST || []).find(s => s.id_jadwal === reqId) || (LIVE_SCHEDULES || []).find(s => s.id_jadwal === reqId);
     if (!req) return;
     if (typeof openAdminScheduleModal === 'function') {
       openAdminScheduleModal('add', null, 'internal', req.start && !req.is_tentative ? req.start : '');
@@ -7361,10 +7645,685 @@
   }
   window.openAdminAddFromRequest = openAdminAddFromRequest;
 
+  // ===========================================================================
+  // 9B. LOGIKA WAITING LIST & PENETAPAN TANGGAL JADWAL OLEH ADMIN
+  // ===========================================================================
+  window.LIVE_WAITING_LIST = [];
+  window.currentWaitingListFilter = 'pending';
+
+  function openWaitingListModal() {
+    const modal = document.getElementById('waiting-list-modal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    renderWaitingListItems();
+  }
+  window.openWaitingListModal = openWaitingListModal;
+
+  function closeWaitingListModal() {
+    const modal = document.getElementById('waiting-list-modal');
+    if (modal) modal.classList.add('hidden');
+  }
+  window.closeWaitingListModal = closeWaitingListModal;
+
+  function setWaitingListFilter(filter) {
+    window.currentWaitingListFilter = filter || 'all';
+    ['pending', 'all', 'scheduled'].forEach(f => {
+      const btn = document.getElementById('wl-filter-' + f);
+      if (!btn) return;
+      if (f === window.currentWaitingListFilter) {
+        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-600 text-white shadow-xs transition-colors cursor-pointer flex items-center gap-1';
+      } else {
+        btn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-low border border-outline-variant/50 transition-colors cursor-pointer flex items-center gap-1';
+      }
+    });
+    renderWaitingListItems();
+  }
+  window.setWaitingListFilter = setWaitingListFilter;
+
+  function filterWaitingList() {
+    renderWaitingListItems();
+    const searchVal = (document.getElementById('waiting-list-search')?.value || '').trim();
+    const clearBtn = document.getElementById('waiting-list-search-clear');
+    if (clearBtn) clearBtn.classList.toggle('hidden', !searchVal);
+  }
+  window.filterWaitingList = filterWaitingList;
+
+  function clearWaitingListSearch() {
+    const input = document.getElementById('waiting-list-search');
+    if (input) input.value = '';
+    filterWaitingList();
+  }
+  window.clearWaitingListSearch = clearWaitingListSearch;
+
+  function refreshWaitingListData() {
+    showToast('info', 'Memuat Ulang', 'Memperbarui data Waiting List dari server...');
+    if (typeof fetchAllDatabaseData === 'function') {
+      fetchAllDatabaseData().then(() => {
+        renderWaitingListItems();
+      });
+    }
+  }
+  window.refreshWaitingListData = refreshWaitingListData;
+
+  function updateWaitingListUI() {
+    const list = window.LIVE_WAITING_LIST || [];
+    const pendingList = list.filter(it => !it.is_synced);
+    const scheduledList = list.filter(it => !!it.is_synced);
+
+    const pendingCount = pendingList.length;
+    const totalCount = list.length;
+    const scheduledCount = scheduledList.length;
+
+    // Badges di toolbar & navigasi
+    const badgeTop = document.getElementById('waiting-list-count-badge');
+    if (badgeTop) {
+      badgeTop.textContent = pendingCount;
+      badgeTop.className = pendingCount > 0
+        ? 'px-2 py-0.5 text-[11px] font-bold rounded-full bg-amber-600 text-white leading-none animate-pulse'
+        : 'px-2 py-0.5 text-[11px] font-bold rounded-full bg-surface-container-high text-on-surface-variant leading-none';
+    }
+
+    const homeBadge = document.getElementById('home-waiting-list-badge');
+    if (homeBadge) {
+      homeBadge.textContent = pendingCount;
+      homeBadge.classList.toggle('hidden', pendingCount === 0);
+    }
+
+    const adminDropdownBadge = document.getElementById('header-admin-wl-badge');
+    if (adminDropdownBadge) {
+      adminDropdownBadge.textContent = pendingCount;
+    }
+
+    const ribbonBadge = document.getElementById('ribbon-waiting-list-count');
+    if (ribbonBadge) {
+      ribbonBadge.textContent = pendingCount;
+    }
+
+    const headerBadge = document.getElementById('waiting-list-modal-header-badge');
+    if (headerBadge) {
+      headerBadge.textContent = `${pendingCount} Menunggu`;
+      headerBadge.className = pendingCount > 0
+        ? 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-600 text-white animate-pulse'
+        : 'px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-600 text-white';
+    }
+
+    const countPendingEl = document.getElementById('wl-count-pending');
+    if (countPendingEl) countPendingEl.textContent = pendingCount;
+    const countAllEl = document.getElementById('wl-count-all');
+    if (countAllEl) countAllEl.textContent = totalCount;
+    const countScheduledEl = document.getElementById('wl-count-scheduled');
+    if (countScheduledEl) countScheduledEl.textContent = scheduledCount;
+
+    // Render cards jika modal sedang terbuka
+    const modal = document.getElementById('waiting-list-modal');
+    if (modal && !modal.classList.contains('hidden')) {
+      renderWaitingListItems();
+    }
+  }
+  window.updateWaitingListUI = updateWaitingListUI;
+
+  function renderWaitingListItems() {
+    const container = document.getElementById('waiting-list-items-container');
+    if (!container) return;
+
+    const list = window.LIVE_WAITING_LIST || [];
+    const query = (document.getElementById('waiting-list-search')?.value || '').toLowerCase().trim();
+    const filter = window.currentWaitingListFilter || 'pending';
+
+    let filtered = list.filter(item => {
+      if (filter === 'pending' && item.is_synced) return false;
+      if (filter === 'scheduled' && !item.is_synced) return false;
+
+      if (query) {
+        const title = (item.agenda || '').toLowerCase();
+        const pic = (item.pic || '').toLowerCase();
+        const idJad = (item.id_jadwal || '').toLowerCase();
+        const hasParticipant = Array.isArray(item.peserta) && item.peserta.some(p => {
+          return (p.nama_karyawan || '').toLowerCase().includes(query) ||
+                 (p.id_karyawan || '').toLowerCase().includes(query) ||
+                 (p.departement || '').toLowerCase().includes(query) ||
+                 (p.perusahaan || '').toLowerCase().includes(query);
+        });
+        if (!title.includes(query) && !pic.includes(query) && !idJad.includes(query) && !hasParticipant) {
+          return false;
+        }
+      }
+      return true;
+    });
+
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div class="py-12 px-4 flex flex-col items-center justify-center text-center gap-3 bg-surface-container-lowest rounded-2xl border border-outline-variant/40">
+          <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-200">
+            <span class="material-symbols-outlined text-[32px]">${filter === 'scheduled' ? 'event_available' : 'hourglass_empty'}</span>
+          </div>
+          <div class="max-w-md">
+            <h4 class="font-title-md text-title-md font-bold text-on-surface">
+              ${query ? 'Pencarian Tidak Ditemukan' : (filter === 'scheduled' ? 'Belum Ada Permintaan yang Terjadwal' : 'Tidak Ada Waiting List Pending')}
+            </h4>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+              ${query ? `Tidak ada data waiting list yang cocok dengan kata kunci "${query}".` : (filter === 'scheduled' ? 'Permintaan yang telah diberikan tanggal resmi oleh Admin akan tampil di sini.' : 'Semua pengajuan permintaan pelatihan telah dijadwalkan, atau belum ada permintaan baru.')}
+            </p>
+          </div>
+          ${!query ? `
+            <button type="button" onclick="closeWaitingListModal(); switchPageTab('pendaftaran'); setTimeout(() => setCustomTrainingMode(true), 150);" class="mt-2 h-9 px-4 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-xs font-semibold inline-flex items-center gap-1.5 transition-all shadow-xs cursor-pointer">
+              <span class="material-symbols-outlined text-[17px]">add_circle</span>
+              <span>Buat Permintaan Jadwal Baru</span>
+            </button>
+          ` : `
+            <button type="button" onclick="clearWaitingListSearch()" class="mt-2 h-8 px-3 rounded-lg border border-outline-variant text-primary font-semibold text-xs hover:bg-surface-container-low transition-colors">
+              Reset Pencarian
+            </button>
+          `}
+        </div>
+      `;
+      return;
+    }
+
+    const isAdmin = typeof window.isAdminAuthenticated === 'function' && window.isAdminAuthenticated();
+
+    container.innerHTML = filtered.map((req, idx) => {
+      const isScheduled = !!req.is_synced;
+      const pesertaCount = Array.isArray(req.peserta) ? req.peserta.length : 0;
+      const proposedDates = (req.startRaw || req.start)
+        ? `${req.startRaw || req.start}${req.endRaw && req.endRaw !== req.startRaw ? ' s/d ' + req.endRaw : ''}`
+        : 'Tentatif (Menunggu Admin)';
+      const safeId = escapeHtml(req.id_jadwal || ('REQ-' + idx));
+      const safeAgenda = escapeHtml(req.agenda || 'Pelatihan Permintaan Khusus');
+      const safePic = escapeHtml(req.pic || 'PIC Pemohon');
+      const safeRoom = escapeHtml(req.room || 'Gold Room (Tentatif)');
+      const safeTimestamp = escapeHtml(req.timestamp || '-');
+      const syncedId = escapeHtml(req.synced_schedule_id || '');
+
+      return `
+        <div class="bg-surface-container-lowest rounded-2xl border ${isScheduled ? 'border-emerald-300/80' : 'border-amber-300/80 shadow-xs'} p-4 sm:p-5 flex flex-col gap-3.5 transition-all hover:shadow-md">
+          
+          <!-- CARD HEADER -->
+          <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+            <div class="flex items-start gap-3 min-w-0">
+              <div class="w-10 h-10 rounded-xl ${isScheduled ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'} flex items-center justify-center shrink-0 mt-0.5">
+                <span class="material-symbols-outlined text-[22px]">${isScheduled ? 'task_alt' : 'hourglass_top'}</span>
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 flex-wrap mb-1">
+                  <span class="font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-surface-container text-on-surface-variant border border-outline-variant/60">${safeId}</span>
+                  ${isScheduled ? `
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 inline-flex items-center gap-1">
+                      <span class="material-symbols-outlined text-[14px] text-emerald-700">check_circle</span>
+                      Terjadwal (${syncedId})
+                    </span>
+                  ` : `
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-900 border border-amber-300 inline-flex items-center gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                      Menunggu Tanggal Admin
+                    </span>
+                  `}
+                </div>
+                <h3 class="font-title-md text-title-md font-bold text-on-surface leading-snug">${safeAgenda}</h3>
+              </div>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="flex items-center gap-2 self-start sm:self-auto shrink-0 flex-wrap">
+              ${isScheduled ? `
+                <button type="button" onclick="editScheduledTrainingFromWaitingList('${syncedId || safeId}')" class="h-9 px-3.5 rounded-xl border border-outline-variant bg-surface-container-lowest hover:bg-surface-container text-on-surface font-label-md text-xs font-semibold inline-flex items-center gap-1.5 shadow-xs transition-all cursor-pointer" title="Ubah tanggal, ruangan, kuota, jam, atau status jadwal ini">
+                  <span class="material-symbols-outlined text-[17px] text-primary">edit_calendar</span>
+                  <span>Ubah Jadwal</span>
+                </button>
+                <button type="button" onclick="viewScheduledTrainingInCalendar('${syncedId || safeId}')" class="h-9 px-3.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-label-md text-xs font-semibold inline-flex items-center gap-1.5 shadow-xs transition-all cursor-pointer" title="Buka jadwal resmi di Kalender">
+                  <span class="material-symbols-outlined text-[17px]">calendar_month</span>
+                  <span>Lihat di Kalender</span>
+                </button>
+              ` : `
+                <button type="button" onclick="openAssignDateModal('${safeId}')" class="h-9 px-4 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-xs font-semibold inline-flex items-center gap-1.5 shadow-xs transition-all cursor-pointer" title="Berikan tanggal resmi untuk pelatihan ini">
+                  <span class="material-symbols-outlined text-[17px]">calendar_add_on</span>
+                  <span>${isAdmin ? 'Berikan Tanggal / Jadwalkan' : 'Jadwalkan (Admin)'}</span>
+                </button>
+              `}
+            </div>
+          </div>
+
+          <!-- CARD DETAILS GRID -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 p-3 rounded-xl bg-surface-container-low/60 border border-outline-variant/40 text-xs">
+            <div>
+              <span class="text-on-surface-variant block text-[11px]">PIC Pemohon / Pengaju:</span>
+              <span class="font-semibold text-on-surface inline-flex items-center gap-1 mt-0.5">
+                <span class="material-symbols-outlined text-[14px] text-primary">person</span>
+                ${safePic}
+              </span>
+            </div>
+            <div>
+              <span class="text-on-surface-variant block text-[11px]">Usulan Tanggal Pelaksanaan:</span>
+              <span class="font-semibold text-on-surface inline-flex items-center gap-1 mt-0.5">
+                <span class="material-symbols-outlined text-[14px] text-amber-700">date_range</span>
+                ${proposedDates}
+              </span>
+            </div>
+            <div>
+              <span class="text-on-surface-variant block text-[11px]">Calon Peserta Terdaftar:</span>
+              <span class="font-semibold text-on-surface inline-flex items-center gap-1 mt-0.5">
+                <span class="material-symbols-outlined text-[14px] text-primary">groups</span>
+                ${pesertaCount} Orang Peserta
+              </span>
+            </div>
+            <div>
+              <span class="text-on-surface-variant block text-[11px]">Usulan Lokasi Ruangan:</span>
+              <span class="font-semibold text-on-surface inline-flex items-center gap-1 mt-0.5 truncate">
+                <span class="material-symbols-outlined text-[14px] text-primary">meeting_room</span>
+                ${safeRoom}
+              </span>
+            </div>
+          </div>
+
+          <!-- EXTRA ROW: DOKUMEN & TIMESTAMP & PARTICIPANT TOGGLE -->
+          <div class="flex flex-wrap items-center justify-between gap-2.5 pt-1 text-xs">
+            <div class="flex items-center gap-3 text-on-surface-variant flex-wrap">
+              <span class="inline-flex items-center gap-1">
+                <span class="material-symbols-outlined text-[15px] text-outline">history</span>
+                Diajukan: ${safeTimestamp}
+              </span>
+              ${req.link_dokumen ? `
+                <a href="${escapeHtml(req.link_dokumen)}" target="_blank" rel="noopener noreferrer" class="font-semibold text-primary hover:underline inline-flex items-center gap-1 bg-primary/10 px-2 py-0.5 rounded-lg border border-primary/20">
+                  <span class="material-symbols-outlined text-[14px]">attachment</span>
+                  <span>Lampiran Dokumen</span>
+                </a>
+              ` : ''}
+            </div>
+
+            <button type="button" onclick="toggleWaitingListParticipants('${safeId}')" class="h-8 px-3 rounded-lg border border-outline-variant/60 bg-surface-container-lowest hover:bg-surface-container-low text-on-surface font-semibold text-xs inline-flex items-center gap-1.5 transition-colors cursor-pointer">
+              <span class="material-symbols-outlined text-[16px] text-primary">groups</span>
+              <span>Lihat Peserta (${pesertaCount})</span>
+              <span id="wl-icon-toggle-${safeId}" class="material-symbols-outlined text-[16px] transition-transform duration-200">expand_more</span>
+            </button>
+          </div>
+
+          <!-- COLLAPSIBLE PARTICIPANT LIST -->
+          <div id="wl-participants-${safeId}" class="hidden pt-3 border-t border-outline-variant/40 animate-in fade-in duration-150">
+            <div class="overflow-x-auto rounded-xl border border-outline-variant/50">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-surface-container-low text-on-surface-variant border-b border-outline-variant/40">
+                  <tr>
+                    <th class="py-2 px-3 font-semibold w-10">No</th>
+                    <th class="py-2 px-3 font-semibold">NIK / ID</th>
+                    <th class="py-2 px-3 font-semibold">Nama Peserta</th>
+                    <th class="py-2 px-3 font-semibold">Departemen</th>
+                    <th class="py-2 px-3 font-semibold">Jabatan</th>
+                    <th class="py-2 px-3 font-semibold">Perusahaan</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-outline-variant/30 bg-surface-container-lowest">
+                  ${pesertaCount > 0 ? req.peserta.map((p, pIdx) => `
+                    <tr class="hover:bg-surface-container-low/50">
+                      <td class="py-2 px-3 text-on-surface-variant">${pIdx + 1}</td>
+                      <td class="py-2 px-3 font-mono font-medium text-on-surface">${escapeHtml(p.id_karyawan || '-')}</td>
+                      <td class="py-2 px-3 font-bold text-on-surface">${escapeHtml(p.nama_karyawan || '-')}</td>
+                      <td class="py-2 px-3 text-on-surface-variant">${escapeHtml(p.departement || '-')}</td>
+                      <td class="py-2 px-3 text-on-surface-variant">${escapeHtml(p.jabatan || '-')}</td>
+                      <td class="py-2 px-3 text-on-surface-variant">${escapeHtml(p.perusahaan || '-')}</td>
+                    </tr>
+                  `).join('') : `
+                    <tr>
+                      <td colspan="6" class="py-3 px-3 text-center text-on-surface-variant italic">Belum ada rincian peserta.</td>
+                    </tr>
+                  `}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      `;
+    }).join('');
+  }
+  window.renderWaitingListItems = renderWaitingListItems;
+
+  function toggleWaitingListParticipants(reqId) {
+    const tableDiv = document.getElementById(`wl-participants-${reqId}`);
+    const icon = document.getElementById(`wl-icon-toggle-${reqId}`);
+    if (!tableDiv) return;
+    const isHidden = tableDiv.classList.contains('hidden');
+    tableDiv.classList.toggle('hidden', !isHidden);
+    if (icon) {
+      icon.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
+  }
+  window.toggleWaitingListParticipants = toggleWaitingListParticipants;
+
+  function openAssignDateModal(reqId) {
+    const isAdmin = typeof window.isAdminAuthenticated === 'function' && window.isAdminAuthenticated();
+    if (!isAdmin) {
+      window._onAdminLoginSuccess = function() {
+        openAssignDateModal(reqId);
+      };
+      if (typeof window.openAdminLoginModal === 'function') {
+        window.openAdminLoginModal();
+      }
+      showToast('info', 'Autentikasi Admin', 'Silakan login Admin Tim L&D untuk memberikan tanggal dan menjadwalkan pelatihan ini.');
+      return;
+    }
+
+    const list = window.LIVE_WAITING_LIST || [];
+    const req = list.find(r => r.id_jadwal === reqId);
+    if (!req) {
+      showToast('warning', 'Tidak Ditemukan', 'Permintaan pelatihan tidak ditemukan.');
+      return;
+    }
+
+    document.getElementById('assign-date-req-id').value = req.id_jadwal;
+    document.getElementById('assign-date-agenda').value = req.agenda || '';
+    document.getElementById('assign-date-display-agenda').textContent = req.agenda || 'Pelatihan';
+    document.getElementById('assign-date-display-pic').textContent = req.pic || '-';
+    
+    const pCount = Array.isArray(req.peserta) ? req.peserta.length : 0;
+    document.getElementById('assign-date-display-peserta').textContent = `${pCount} Calon Peserta`;
+
+    const proposedDates = (req.startRaw || req.start)
+      ? `${req.startRaw || req.start}${req.endRaw && req.endRaw !== req.startRaw ? ' s/d ' + req.endRaw : ''}`
+      : 'Tentatif';
+    document.getElementById('assign-date-display-proposed').textContent = proposedDates;
+
+    // Prefill date pickers
+    const today = new Date().toISOString().split('T')[0];
+    let startVal = (req.start && !req.is_tentative) ? req.start : today;
+    let endVal = (req.end && !req.is_tentative) ? req.end : startVal;
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(startVal)) startVal = today;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(endVal)) endVal = startVal;
+
+    const startInput = document.getElementById('assign-date-start');
+    const endInput = document.getElementById('assign-date-end');
+    if (startInput) startInput.value = startVal;
+    if (endInput) endInput.value = endVal;
+
+    const roomInput = document.getElementById('assign-date-room');
+    if (roomInput) {
+      roomInput.value = (req.room && !/tentatif/i.test(req.room)) ? req.room : 'Gold Room';
+    }
+
+    const hourInput = document.getElementById('assign-date-hour');
+    if (hourInput) {
+      hourInput.value = req.start_hour ? `${req.start_hour} WIB` : '08:00 WIB';
+    }
+
+    const kuotaInput = document.getElementById('assign-date-kuota');
+    if (kuotaInput) {
+      kuotaInput.value = Math.max(25, pCount + 5);
+    }
+
+    const batchInput = document.getElementById('assign-date-batch');
+    if (batchInput) {
+      batchInput.value = 'Batch Khusus';
+    }
+
+    const descInput = document.getElementById('assign-date-deskripsi');
+    if (descInput) {
+      descInput.value = `Diakomodasi dari Waiting List (${req.id_jadwal}) yang diajukan oleh PIC ${req.pic} (${pCount} peserta).`;
+    }
+
+    calculateAssignDateDuration();
+
+    const modal = document.getElementById('admin-assign-date-modal');
+    if (modal) modal.classList.remove('hidden');
+  }
+  window.openAssignDateModal = openAssignDateModal;
+
+  function closeAdminAssignDateModal() {
+    const modal = document.getElementById('admin-assign-date-modal');
+    if (modal) modal.classList.add('hidden');
+  }
+  window.closeAdminAssignDateModal = closeAdminAssignDateModal;
+
+  function handleAssignDateChange() {
+    const sdEl = document.getElementById('assign-date-start');
+    const edEl = document.getElementById('assign-date-end');
+    const sd = sdEl ? sdEl.value : '';
+    let ed = edEl ? edEl.value : '';
+
+    if (sd && !ed && edEl) {
+      edEl.value = sd;
+      ed = sd;
+    }
+    if (sd && ed && ed < sd) {
+      if (edEl) edEl.value = sd;
+      ed = sd;
+    }
+    calculateAssignDateDuration();
+  }
+  window.handleAssignDateChange = handleAssignDateChange;
+
+  function calculateAssignDateDuration() {
+    const sd = document.getElementById('assign-date-start')?.value || '';
+    const ed = document.getElementById('assign-date-end')?.value || sd;
+    const badge = document.getElementById('assign-date-duration-badge');
+    if (!badge) return;
+
+    if (!sd) {
+      badge.textContent = '1 Hari (8 Jam)';
+      return;
+    }
+
+    let diff = 1;
+    try {
+      const d1 = new Date(sd + 'T00:00:00');
+      const d2 = new Date((ed || sd) + 'T00:00:00');
+      diff = Math.max(1, Math.round((d2 - d1) / 86400000) + 1);
+    } catch (e) { diff = 1; }
+
+    badge.textContent = `${diff} Hari (${diff * 8} Jam)`;
+  }
+  window.calculateAssignDateDuration = calculateAssignDateDuration;
+
+  async function submitAssignDateToWaitingList(e) {
+    if (e) e.preventDefault();
+    const isAdmin = typeof window.isAdminAuthenticated === 'function' && window.isAdminAuthenticated();
+    if (!isAdmin) {
+      if (typeof window.openAdminLoginModal === 'function') window.openAdminLoginModal();
+      return;
+    }
+
+    const reqId = document.getElementById('assign-date-req-id')?.value || '';
+    const agenda = document.getElementById('assign-date-agenda')?.value || '';
+    const startDate = document.getElementById('assign-date-start')?.value || '';
+    const endDate = document.getElementById('assign-date-end')?.value || startDate;
+    const startHourRaw = document.getElementById('assign-date-hour')?.value || '08:00';
+    const room = document.getElementById('assign-date-room')?.value || 'Gold Room';
+    const batch = document.getElementById('assign-date-batch')?.value || 'Batch Khusus';
+    const kuota = parseInt(document.getElementById('assign-date-kuota')?.value, 10) || 25;
+    const status = document.getElementById('assign-date-status')?.value || 'Buka';
+    const pic = document.getElementById('assign-date-pic')?.value || 'Tim L&D Pani Gold Project';
+    const deskripsi = document.getElementById('assign-date-deskripsi')?.value || '';
+
+    if (!startDate) {
+      showToast('warning', 'Validasi Tanggal', 'Tanggal Mulai pelatihan wajib diisi.');
+      return;
+    }
+
+    let diffDays = 1;
+    try {
+      const d1 = new Date(startDate + 'T00:00:00');
+      const d2 = new Date(endDate + 'T00:00:00');
+      diffDays = Math.max(1, Math.round((d2 - d1) / 86400000) + 1);
+    } catch (err) { diffDays = 1; }
+    const durHours = diffDays * 8;
+
+    const btn = document.getElementById('assign-date-submit-btn');
+    const textSpan = document.getElementById('assign-date-submit-text');
+    if (btn) btn.disabled = true;
+    if (textSpan) textSpan.textContent = 'Menerbitkan Jadwal...';
+
+    // Generate ID jadwal resmi baru
+    const datePart = startDate.replace(/-/g, '');
+    const randPart = Math.floor(100 + Math.random() * 900);
+    const newIdJadwal = `TRN-${datePart}-${randPart}`;
+
+    const schedPayload = {
+      category: 'internal',
+      id_jadwal: newIdJadwal,
+      original_id: '',
+      original_agenda: agenda,
+      agenda: agenda,
+      batch: batch,
+      start: startDate,
+      end: endDate,
+      start_hour: startHourRaw,
+      duration_day: String(diffDays),
+      duration_hour: String(durHours),
+      kuota: kuota,
+      sisa_kuota: kuota,
+      room: room,
+      pic: pic,
+      status: status,
+      deskripsi: deskripsi,
+      sync_request_id: reqId
+    };
+
+    const adminUsername = (window._adminState && window._adminState.username) || 'admin';
+    const payload = {
+      action: 'admin_add_schedule',
+      admin_username: adminUsername,
+      sync_request_id: reqId,
+      schedule: schedPayload
+    };
+
+    try {
+      const resp = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      const res = await resp.json();
+
+      if (res && res.status === 'success') {
+        const savedSched = res.schedule || schedPayload;
+        const normItem = (typeof _buildNormalizedItemFromForm === 'function')
+          ? _buildNormalizedItemFromForm(savedSched, schedPayload, null)
+          : savedSched;
+
+        // Tautkan peserta dari waiting list ke schedule resmi baru
+        const wlItem = (window.LIVE_WAITING_LIST || []).find(x => x.id_jadwal === reqId);
+        if (wlItem) {
+          wlItem.is_synced = true;
+          wlItem.synced_schedule_id = normItem.id_jadwal;
+          wlItem.status_lnd = `Tersinkron dengan Jadwal Resmi (${normItem.id_jadwal})`;
+          wlItem.status = wlItem.status_lnd;
+          if (Array.isArray(wlItem.peserta) && wlItem.peserta.length > 0) {
+            normItem.peserta = wlItem.peserta;
+            normItem.total_terdaftar = wlItem.peserta.length;
+            normItem.sisa_kuota = Math.max(0, normItem.kuota - normItem.total_terdaftar);
+          }
+        }
+
+        // Simpan override & apply patch
+        if (typeof _recordOverride === 'function') {
+          _recordOverride({
+            type: 'upsert',
+            scope: 'internal',
+            keys: [normItem.id_jadwal, normItem.uid].filter(Boolean),
+            item: normItem
+          });
+        }
+        if (typeof _applyLivePatchToArrays === 'function') {
+          _applyLivePatchToArrays('internal', 'upsert', normItem, [normItem.id_jadwal]);
+        } else if (Array.isArray(window.LIVE_SCHEDULES)) {
+          window.LIVE_SCHEDULES.push(normItem);
+          if (typeof sortSchedulesChronologically === 'function') {
+            window.LIVE_SCHEDULES = sortSchedulesChronologically(window.LIVE_SCHEDULES);
+          }
+          if (typeof renderDynamicListView === 'function') renderDynamicListView(window.LIVE_SCHEDULES);
+          if (typeof renderCalendar === 'function') renderCalendar();
+        }
+
+        closeAdminAssignDateModal();
+        updateWaitingListUI();
+        renderWaitingListItems();
+
+        showToast('success', 'Jadwal Resmi Diterbitkan!', `Pelatihan "${agenda}" berhasil ditetapkan tanggalnya (${startDate}) dan kini tampil di Kalender.`);
+
+        // Background sync
+        if (typeof fetchAllDatabaseData === 'function') {
+          fetchAllDatabaseData();
+        }
+      } else {
+        showToast('error', 'Gagal Menjadwalkan', res ? res.message : 'Terjadi kesalahan sistem.');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('error', 'Koneksi Gagal', 'Gagal menghubungi server Google Sheets.');
+    } finally {
+      if (btn) btn.disabled = false;
+      if (textSpan) textSpan.textContent = 'Simpan & Masukkan ke Kalender';
+    }
+  }
+  window.submitAssignDateToWaitingList = submitAssignDateToWaitingList;
+
+  function viewScheduledTrainingInCalendar(idJadwal) {
+    closeWaitingListModal();
+    if (typeof switchPageTab === 'function') {
+      switchPageTab('jadwal');
+    }
+    setTimeout(() => {
+      const wlItem = (window.LIVE_WAITING_LIST || []).find(r =>
+        (r.id_jadwal && r.id_jadwal.toLowerCase() === String(idJadwal).toLowerCase()) ||
+        (r.synced_schedule_id && r.synced_schedule_id.toLowerCase() === String(idJadwal).toLowerCase())
+      );
+      const targetId = (wlItem && wlItem.synced_schedule_id) || idJadwal;
+      const item = (LIVE_SCHEDULES || []).find(s => s.id_jadwal && s.id_jadwal.toLowerCase() === String(targetId).toLowerCase());
+      if (item && item.start) {
+        const p = typeof parseDateString === 'function' ? parseDateString(item.start) : null;
+        if (p && typeof currentYear !== 'undefined') {
+          currentYear = p.year;
+          currentMonth = p.month - 1;
+          if (typeof updateMonthPicker === 'function') updateMonthPicker();
+          if (typeof renderCalendar === 'function') renderCalendar();
+        }
+      }
+      if (typeof openTrainingDetailModal === 'function') {
+        openTrainingDetailModal(targetId);
+      }
+    }, 200);
+  }
+  window.viewScheduledTrainingInCalendar = viewScheduledTrainingInCalendar;
+
+  function editScheduledTrainingFromWaitingList(idJadwal) {
+    const isAdmin = typeof window.isAdminAuthenticated === 'function' && window.isAdminAuthenticated();
+    if (!isAdmin) {
+      window._onAdminLoginSuccess = function() {
+        editScheduledTrainingFromWaitingList(idJadwal);
+      };
+      if (typeof window.openAdminLoginModal === 'function') {
+        window.openAdminLoginModal();
+      }
+      showToast('info', 'Autentikasi Admin', 'Silakan login Admin Tim L&D untuk merubah jadwal pelatihan ini.');
+      return;
+    }
+
+    closeWaitingListModal();
+
+    const wlItem = (window.LIVE_WAITING_LIST || []).find(r =>
+      (r.id_jadwal && r.id_jadwal.toLowerCase() === String(idJadwal).toLowerCase()) ||
+      (r.synced_schedule_id && r.synced_schedule_id.toLowerCase() === String(idJadwal).toLowerCase())
+    );
+    const targetId = (wlItem && wlItem.synced_schedule_id) || idJadwal;
+    const item = (typeof _findScheduleItem === 'function')
+      ? _findScheduleItem(targetId, 'internal')
+      : (window.LIVE_SCHEDULES || []).find(s => s.id_jadwal && s.id_jadwal.toLowerCase() === String(targetId).toLowerCase());
+
+    const scope = (item && (item.source_type || item.category)) || 'internal';
+    const key = (item && (item.id_jadwal || item.uid)) || targetId;
+
+    if (typeof openAdminScheduleModal === 'function') {
+      openAdminScheduleModal('edit', key, scope);
+    } else {
+      showToast('warning', 'Fitur Belum Siap', 'Modal edit jadwal belum dapat dibuka.');
+    }
+  }
+  window.editScheduledTrainingFromWaitingList = editScheduledTrainingFromWaitingList;
+
   function closeTrainingDetailModal() {
     const modal = document.getElementById('training-detail-modal');
     if (modal) modal.classList.add('hidden');
   }
+  window.closeTrainingDetailModal = closeTrainingDetailModal;
 
   // ===========================================================================
   // 10. MODAL HEADER & UTILITIES
@@ -7373,19 +8332,25 @@
     const m = document.getElementById('help-center-modal');
     if (m) m.classList.remove('hidden');
   }
+  window.openHelpCenterModal = openHelpCenterModal;
+
   function closeHelpCenterModal() {
     const m = document.getElementById('help-center-modal');
     if (m) m.classList.add('hidden');
   }
+  window.closeHelpCenterModal = closeHelpCenterModal;
 
   function openUserProfileModal() {
     const m = document.getElementById('user-profile-modal');
     if (m) m.classList.remove('hidden');
   }
+  window.openUserProfileModal = openUserProfileModal;
+
   function closeUserProfileModal() {
     const m = document.getElementById('user-profile-modal');
     if (m) m.classList.add('hidden');
   }
+  window.closeUserProfileModal = closeUserProfileModal;
 
   function showToast(type, title, message) {
     const container = document.getElementById('toast-container');
@@ -7420,12 +8385,11 @@
       setTimeout(() => toast.remove(), 300);
     }, 4500);
   }
+  window.showToast = showToast;
 
   function parseDateString(str) {
     if (!str) return null;
     const s = String(str).trim();
-    let gviz = s.match(/^Date\(\s*(\d{4})\s*,\s*(\d{1,2})\s*,\s*(\d{1,2})/i);
-    if (gviz) return { day: +gviz[3], month: (+gviz[2]) + 1, year: +gviz[1] };
     let mm = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
     if (mm) return { day: +mm[3], month: +mm[2], year: +mm[1] };
     mm = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
@@ -7449,6 +8413,7 @@
     }
     return null;
   }
+  window.parseDateString = parseDateString;
 
   function getInitials(name) {
     if (!name) return 'LD';
@@ -7457,6 +8422,7 @@
     if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
     return clean.substring(0, 2).toUpperCase();
   }
+  window.getInitials = getInitials;
 
   function escapeHtml(text) {
     if (!text) return '';
@@ -7467,738 +8433,681 @@
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#039;');
   }
-
-  // ===========================================================================
-  // 10B. EXTERNAL & EVENT CALENDAR (DOMINAN WARNA HIJAU)
-  //      Membaca sheet: External_Training_Schedule, AGENDA_DILUAR_TRAINING,
-  //      dan External_Training_Manpower secara real-time via JSONP (bebas CORS)
-  // ===========================================================================
-  window.EXTERNAL_ITEMS = [];
-  window.EXTERNAL_MANPOWER = [];
-  let extCalendarYear = 2026;
-  let extCalendarMonth = 10; // Default November 2026 (0-indexed)
-  let extActiveView = 'ext-view-month';
-  const MONTH_NAMES_ID = MONTH_NAMES;
-
-  function extractDateStringFromText(txt) {
-    if (!txt) return '';
-    const s = String(txt);
-    const monthsMap = {
-      'januari': 'Jan', 'jan': 'Jan', 'februari': 'Feb', 'feb': 'Feb',
-      'maret': 'Mar', 'mar': 'Mar', 'april': 'Apr', 'apr': 'Apr',
-      'mei': 'May', 'may': 'May', 'juni': 'Jun', 'jun': 'Jun',
-      'juli': 'Jul', 'jul': 'Jul', 'agustus': 'Aug', 'agu': 'Aug', 'agt': 'Aug', 'aug': 'Aug',
-      'september': 'Sep', 'sep': 'Sep', 'oktober': 'Oct', 'okt': 'Oct', 'oct': 'Oct',
-      'november': 'Nov', 'nov': 'Nov', 'desember': 'Dec', 'des': 'Dec', 'dec': 'Dec'
-    };
-    const m = s.match(/(\d{1,2})\s+(Januari|Februari|Maret|April|Mei|Juni|Juli|Agustus|September|Oktober|November|Desember|Jan|Feb|Mar|Apr|May|Jun|Jul|Agu|Agt|Aug|Sep|Okt|Oct|Nov|Des|Dec)[a-z]*\s+(\d{4})/i);
-    if (m) {
-      const day = String(parseInt(m[1], 10)).padStart(2, '0');
-      const mon = monthsMap[m[2].toLowerCase()] || m[2].substring(0, 3);
-      return `${day} ${mon} ${m[3]}`;
-    }
-    return '';
-  }
-
-  function inferCompanyFromEmployeeId(empId, existingCompany) {
-    if (existingCompany && String(existingCompany).trim()) return String(existingCompany).trim();
-    const id = String(empId || '').toUpperCase().trim();
-    if (id.startsWith('PGP')) return 'Pani Gold Project (PGP)';
-    if (id.startsWith('PBT')) return 'PT Pani Bersama Tambang (PBT)';
-    if (id.startsWith('MMI')) return 'PT Merdeka Mining Indonesia (MMI)';
-    if (id.startsWith('PIN')) return 'PT Pani Industri Nusantara (PIN)';
-    if (id.startsWith('GSM')) return 'PT Gorontalo Sejahtera Mining (GSM)';
-    if (id.startsWith('PETS')) return 'PT Puncak Emas Tani Sejahtera (PETS)';
-    if (id.startsWith('MMS')) return 'PT Merdeka Mining Servis (MMS)';
-    return 'Pani Gold Project';
-  }
-
-  let __gvizJsonpCounter = 0;
-  function fetchGvizSheetJson(sheetId, sheetName, extraQuery = '') {
-    return new Promise((resolve) => {
-      const cbName = '__gvizJsonpCb_' + Date.now() + '_' + (++__gvizJsonpCounter);
-      const script = document.createElement('script');
-      let settled = false;
-
-      const cleanup = () => {
-        try { delete window[cbName]; } catch (e) { window[cbName] = undefined; }
-        if (script.parentNode) script.parentNode.removeChild(script);
-      };
-
-      const timer = setTimeout(() => {
-        if (settled) return;
-        settled = true;
-        cleanup();
-        resolve(null);
-      }, 15000);
-
-      window[cbName] = function (resp) {
-        if (settled) return;
-        settled = true;
-        clearTimeout(timer);
-        cleanup();
-        resolve(resp && resp.status === 'ok' ? resp : (resp || null));
-      };
-
-      script.onerror = function () {
-        if (settled) return;
-        settled = true;
-        clearTimeout(timer);
-        cleanup();
-        resolve(null);
-      };
-
-      const sheetParam = /^gid=\d+$/i.test(String(sheetName || ''))
-        ? sheetName
-        : `headers=1&sheet=${encodeURIComponent(sheetName)}`;
-      const extra = extraQuery ? `&${extraQuery}` : '';
-      script.src = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=responseHandler:${cbName}&${sheetParam}${extra}`;
-      script.async = true;
-      (document.head || document.documentElement).appendChild(script);
-    });
-  }
-  window.fetchGvizSheetJson = fetchGvizSheetJson;
-
-  function gvizFindColIdx(cols, names) {
-    const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-    const targets = names.map(norm);
-    return (cols || []).findIndex(c => {
-      const lbl = norm(c.label || c.id);
-      return targets.some(t => lbl === t || (lbl && lbl.includes(t)));
-    });
-  }
-
-  function gvizCellVal(cArr, idx) {
-    if (idx === -1 || !cArr || idx >= cArr.length || !cArr[idx]) return '';
-    const cell = cArr[idx];
-    return cell.v !== undefined && cell.v !== null ? cell.v : (cell.f !== undefined && cell.f !== null ? cell.f : '');
-  }
-
-  function gvizCellFmt(cArr, idx) {
-    if (idx === -1 || !cArr || idx >= cArr.length || !cArr[idx]) return '';
-    const cell = cArr[idx];
-    return cell.f !== undefined && cell.f !== null ? cell.f : (cell.v !== undefined && cell.v !== null ? cell.v : '');
-  }
-
-  function gvizCellDate(cArr, idx) {
-    if (idx === -1 || !cArr || idx >= cArr.length || !cArr[idx]) return '';
-    const cell = cArr[idx];
-    const vStr = cell.v != null ? String(cell.v).trim() : '';
-    const m = vStr.match(/^Date\(\s*(\d{4})\s*,\s*(\d{1,2})\s*,\s*(\d{1,2})/i);
-    if (m) {
-      const yr = +m[1];
-      const mo = +m[2];
-      const dy = String(+m[3]).padStart(2, '0');
-      const shortMons = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      return `${dy} ${shortMons[mo] || 'Jan'} ${yr}`;
-    }
-    return String(cell.f != null ? cell.f : (cell.v != null ? cell.v : '')).trim();
-  }
-
-  async function fetchExternalCalendarData() {
-    if (window.__extFetchPromise) return window.__extFetchPromise;
-    window.__extFetchPromise = (async () => {
-      const SHEET_ID = '1Y5IQUSN84p2Os1e9wxraDIfZF6UfOql4Y5EdXbv850A';
-      const syncLabel = document.getElementById('ext-sync-time-label');
-      if (syncLabel) {
-        syncLabel.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Menyinkronkan data jadwal eksternal...`;
-      }
-
-      try {
-        const [extSchedGviz, agendaLuarGviz, manpowerGviz] = await Promise.all([
-          fetchGvizSheetJson(SHEET_ID, 'External_Training_Schedule').catch(() => null),
-          fetchGvizSheetJson(SHEET_ID, 'AGENDA_DILUAR_TRAINING').catch(() => null),
-          fetchGvizSheetJson(SHEET_ID, 'External_Training_Manpower').catch(() => null)
-        ]);
-
-        // 1. Parse External_Training_Manpower
-        const manpowerById = {};
-        const manpowerByAgendaFallback = {};
-        const allManpower = [];
-        if (manpowerGviz && manpowerGviz.table && manpowerGviz.table.rows) {
-          const cols = manpowerGviz.table.cols || [];
-          const idxBooking = gvizFindColIdx(cols, ['ID_Booking']);
-          const idxNik = gvizFindColIdx(cols, ['Id_Karyawan', 'NIK']);
-          const idxNama = gvizFindColIdx(cols, ['Nama_Karyawan', 'Nama']);
-          const idxHp = gvizFindColIdx(cols, ['No_HP', 'HP']);
-          const idxJab = gvizFindColIdx(cols, ['Jabatan']);
-          const idxDept = gvizFindColIdx(cols, ['Departement', 'Departemen']);
-          const idxComp = gvizFindColIdx(cols, ['Perusahaan']);
-          const idxJadwal = gvizFindColIdx(cols, ['ID_Jadwal']);
-          const idxPelatihan = gvizFindColIdx(cols, ['Nama_Pelatihan', 'Agenda']);
-          const idxPic = gvizFindColIdx(cols, ['PIC_Pendaftaran', 'PIC']);
-          const idxStatus = gvizFindColIdx(cols, ['Status']);
-
-          manpowerGviz.table.rows.forEach((r, rIdx) => {
-            const c = r.c || [];
-            const colBooking = String(gvizCellVal(c, idxBooking) || '').trim();
-            const colNik = String(gvizCellVal(c, idxNik) || '').trim();
-            const nama = String(gvizCellVal(c, idxNama) || '').trim();
-            if (!nama && !colBooking && !colNik) return;
-
-            // Deteksi otomatis apabila ID Karyawan (misal PGP260062) diletakkan di kolom ID_Booking
-            const empId = colNik || (!/^REG-/i.test(colBooking) ? colBooking : '');
-            const bookingId = /^REG-/i.test(colBooking) ? colBooking : `EXT-MP-${rIdx + 1}`;
-            const jabatan = String(gvizCellVal(c, idxJab) || '').trim();
-            const dept = String(gvizCellVal(c, idxDept) || '').trim() || jabatan;
-            const comp = inferCompanyFromEmployeeId(empId, gvizCellVal(c, idxComp));
-            const idJ = String(gvizCellVal(c, idxJadwal) || '').trim();
-            const namaP = String(gvizCellVal(c, idxPelatihan) || '').trim();
-            const statusVal = String(gvizCellVal(c, idxStatus) || '').trim() || 'Terdaftar';
-
-            const pObj = {
-              id_booking: bookingId,
-              id_karyawan: empId || '-',
-              nama_karyawan: nama || 'Peserta External',
-              no_hp: String(gvizCellVal(c, idxHp) || '').trim(),
-              jabatan: jabatan,
-              departement: dept || '-',
-              perusahaan: comp,
-              id_jadwal: idJ,
-              nama_pelatihan: namaP,
-              pic_pendaftaran: String(gvizCellVal(c, idxPic) || '').trim(),
-              pic: String(gvizCellVal(c, idxPic) || '').trim(),
-              validasi: statusVal
-            };
-            allManpower.push(pObj);
-            // STRICT MAPPING: Pisahkan pencatatan berdasarkan ID jadwal dan fallback judul
-            if (idJ) {
-              if (!manpowerById[idJ]) manpowerById[idJ] = [];
-              manpowerById[idJ].push(pObj);
-            } else if (namaP) {
-              if (!manpowerByAgendaFallback[namaP]) manpowerByAgendaFallback[namaP] = [];
-              manpowerByAgendaFallback[namaP].push(pObj);
-            }
-          });
-        }
-
-        // 2. Parse External_Training_Schedule
-        const externalTrainings = [];
-        if (extSchedGviz && extSchedGviz.table && extSchedGviz.table.rows) {
-          const cols = extSchedGviz.table.cols || [];
-          const idxId = gvizFindColIdx(cols, ['ID_Jadwal']);
-          const idxStart = gvizFindColIdx(cols, ['START', 'Tanggal_Mulai']);
-          const idxEnd = gvizFindColIdx(cols, ['END', 'Tanggal_Selesai']);
-          const idxDurDay = gvizFindColIdx(cols, ['Duration_Day']);
-          const idxDurHr = gvizFindColIdx(cols, ['Duration_Hour']);
-          const idxStartHr = gvizFindColIdx(cols, ['Start Hour', 'Start_Hour']);
-          const idxAgenda = gvizFindColIdx(cols, ['AGENDA']);
-          const idxPic = gvizFindColIdx(cols, ['PIC']);
-          const idxRoom = gvizFindColIdx(cols, ['ROOM', 'Ruangan']);
-          const idxBatch = gvizFindColIdx(cols, ['BATCH']);
-          const idxKuota = gvizFindColIdx(cols, ['Kuota']);
-          const idxSisa = gvizFindColIdx(cols, ['Sisa Kuota', 'Sisa_Kuota']);
-          const idxStatus = gvizFindColIdx(cols, ['STATUS']);
-          const idxDesc = gvizFindColIdx(cols, ['Deskripsi_Pelatihan', 'Deskripsi']);
-
-          extSchedGviz.table.rows.forEach((r, idx) => {
-            const c = r.c || [];
-            const idJ = String(gvizCellVal(c, idxId) || '').trim();
-            const agenda = String(gvizCellVal(c, idxAgenda) || '').trim();
-            if (!idJ && !agenda) return;
-
-            let startStr = gvizCellDate(c, idxStart);
-            let endStr = gvizCellDate(c, idxEnd);
-            const desc = String(gvizCellVal(c, idxDesc) || '').trim();
-            if (!startStr) {
-              const extracted = extractDateStringFromText(agenda) || extractDateStringFromText(desc);
-              if (extracted) {
-                startStr = extracted;
-                endStr = endStr || extracted;
-              }
-            }
-
-            const durDay = gvizCellFmt(c, idxDurDay);
-            const durHr = gvizCellFmt(c, idxDurHr);
-            let durStr = durDay ? `${durDay} Hari` : '';
-            if (durHr) durStr += (durStr ? ` (${durHr} Jam)` : `${durHr} Jam`);
-
-            const rawHour = gvizCellFmt(c, idxStartHr) || gvizCellVal(c, idxStartHr);
-            const parsedH = parseStartHour(rawHour);
-
-            // STRICT PESERTA MAPPING: Hanya ambil peserta yang terdaftar di id_jadwal ini
-            let pesertaList = idJ ? (manpowerById[idJ] || []) : [];
-            if (pesertaList.length === 0 && !idJ && agenda) {
-              pesertaList = manpowerByAgendaFallback[agenda] || [];
-            }
-
-            const kuotaNum = Number(gvizCellVal(c, idxKuota)) || (pesertaList.length > 0 ? Math.max(15, pesertaList.length) : 15);
-            const sisaNum = pesertaList.length > 0
-              ? Math.max(0, kuotaNum - pesertaList.length)
-              : (gvizCellVal(c, idxSisa) !== '' ? Number(gvizCellVal(c, idxSisa)) : kuotaNum);
-
-            externalTrainings.push({
-              uid: `EXT-${idx + 1}-${idJ || agenda}`,
-              id_jadwal: idJ || `EXT-PLAN-${idx + 1}`,
-              source_type: 'external_training',
-              source_label: 'External Training',
-              start: startStr,
-              end: endStr || startStr,
-              duration: durStr || (startStr ? '' : 'Menunggu Jadwal'),
-              start_hour: parsedH.formatted,
-              start_minutes: parsedH.minutes,
-              agenda: agenda,
-              pic: String(gvizCellVal(c, idxPic) || '').trim() || 'Tim L&D / Vendor Sertifikasi',
-              room: String(gvizCellVal(c, idxRoom) || '').trim() || 'Menunggu Konfirmasi Lokasi',
-              batch: String(gvizCellVal(c, idxBatch) || '').trim() || (startStr ? 'Batch 1' : 'Rencana Program'),
-              kuota: kuotaNum,
-              sisa_kuota: sisaNum,
-              total_terdaftar: pesertaList.length,
-              status: String(gvizCellVal(c, idxStatus) || '').trim() || (startStr ? 'Buka' : 'Rencana Jadwal'),
-              deskripsi: desc,
-              peserta: pesertaList
-            });
-          });
-        }
-
-        // 3. Parse AGENDA_DILUAR_TRAINING
-        const agendaEvents = [];
-        if (agendaLuarGviz && agendaLuarGviz.table && agendaLuarGviz.table.rows) {
-          const cols = agendaLuarGviz.table.cols || [];
-          const idxId = gvizFindColIdx(cols, ['ID_Jadwal']);
-          const idxStart = gvizFindColIdx(cols, ['START', 'Tanggal_Mulai']);
-          const idxEnd = gvizFindColIdx(cols, ['END', 'Tanggal_Selesai']);
-          const idxAgenda = gvizFindColIdx(cols, ['AGENDA']);
-          const idxPic = gvizFindColIdx(cols, ['PIC']);
-          const idxLoc = gvizFindColIdx(cols, ['LOCATION', 'ROOM', 'Lokasi']);
-          const idxStatus = gvizFindColIdx(cols, ['STATUS']);
-          const idxDesc = gvizFindColIdx(cols, ['Deskripsi_Pelatihan', 'Deskripsi']);
-          const idxStartHr = gvizFindColIdx(cols, ['Start Hour', 'Start_Hour', 'Jam_Mulai']);
-          const idxBatch = gvizFindColIdx(cols, ['BATCH', 'Batch']);
-          const idxKuota = gvizFindColIdx(cols, ['Kuota', 'KUOTA']);
-          const idxSisa = gvizFindColIdx(cols, ['Sisa Kuota', 'Sisa_Kuota']);
-          const idxDurDay = gvizFindColIdx(cols, ['Duration_Day', 'Durasi_Hari']);
-          const idxDurHr = gvizFindColIdx(cols, ['Duration_Hour', 'Durasi_Jam']);
-
-          agendaLuarGviz.table.rows.forEach((r, idx) => {
-            const c = r.c || [];
-            const idJ = String(gvizCellVal(c, idxId) || '').trim();
-            const agenda = String(gvizCellVal(c, idxAgenda) || '').trim();
-            if (!idJ && !agenda) return;
-
-            let startStr = gvizCellDate(c, idxStart);
-            let endStr = gvizCellDate(c, idxEnd);
-            const desc = String(gvizCellVal(c, idxDesc) || '').trim();
-            let autoExtractedDate = false;
-            if (!startStr) {
-              const extracted = extractDateStringFromText(agenda) || extractDateStringFromText(desc);
-              if (extracted) {
-                startStr = extracted;
-                endStr = endStr || extracted;
-                autoExtractedDate = true;
-              }
-            }
-
-            const rawHr = idxStartHr !== -1 ? (gvizCellFmt(c, idxStartHr) || gvizCellVal(c, idxStartHr)) : '';
-            const parsedH = rawHr ? parseStartHour(rawHr) : { formatted: '08:00', minutes: 480 };
-            const durDay = idxDurDay !== -1 ? gvizCellVal(c, idxDurDay) : '';
-            const durHr = idxDurHr !== -1 ? gvizCellVal(c, idxDurHr) : '';
-            let durStr = durDay ? `${durDay} Hari` : '';
-            if (durHr) durStr += (durStr ? ` (${durHr} Jam)` : `${durHr} Jam`);
-            const kuotaVal = idxKuota !== -1 ? Number(gvizCellVal(c, idxKuota)) || 0 : 0;
-            const sisaVal = idxSisa !== -1 && gvizCellVal(c, idxSisa) !== '' ? Number(gvizCellVal(c, idxSisa)) : kuotaVal;
-
-            agendaEvents.push({
-              uid: `EVT-${idx + 1}-${idJ || idx}`,
-              id_jadwal: idJ || `AGENDA-${idx + 1}`,
-              source_type: 'agenda_event',
-              source_label: 'Agenda di Luar Training',
-              start: startStr,
-              end: endStr || startStr,
-              duration: durStr,
-              start_hour: parsedH.formatted || '08:00',
-              start_minutes: parsedH.minutes || 480,
-              agenda: agenda,
-              pic: String(gvizCellVal(c, idxPic) || '').trim() || 'External Relations / L&D',
-              room: String(gvizCellVal(c, idxLoc) || '').trim() || 'Lokasi Eksternal / Site',
-              batch: (idxBatch !== -1 && String(gvizCellVal(c, idxBatch) || '').trim()) || (autoExtractedDate ? 'Agenda Event (Tanggal dari Undangan)' : 'Agenda Event'),
-              kuota: kuotaVal,
-              sisa_kuota: sisaVal,
-              total_terdaftar: 0,
-              status: String(gvizCellVal(c, idxStatus) || '').trim() || 'Terjadwal',
-              deskripsi: desc,
-              peserta: []
-            });
-          });
-        }
-
-        window.EXTERNAL_MANPOWER = allManpower;
-        const rawExternalCombined = externalTrainings.concat(agendaEvents);
-        window.EXTERNAL_ITEMS = typeof window.applyAdminOverridesToExternalList === 'function'
-          ? window.applyAdminOverridesToExternalList(rawExternalCombined)
-          : rawExternalCombined;
-
-        const finalExtTrainings = window.EXTERNAL_ITEMS.filter(x => x.source_type === 'external_training');
-        const finalAgendaEvents = window.EXTERNAL_ITEMS.filter(x => x.source_type === 'agenda_event');
-
-        // Update KPI Cards
-        const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-        setTxt('ext-kpi-total', window.EXTERNAL_ITEMS.length);
-        setTxt('ext-kpi-training', finalExtTrainings.length);
-        setTxt('ext-kpi-events', finalAgendaEvents.length);
-        setTxt('ext-kpi-manpower', allManpower.length);
-
-        if (syncLabel) {
-          const nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-          syncLabel.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-600"></span> Tersinkronisasi (${finalExtTrainings.length} External Training, ${finalAgendaEvents.length} Event, ${allManpower.length} Manpower &bull; ${nowStr} WITA)`;
-        }
-
-        // Pilih bulan default otomatis sesuai tanggal jadwal aktif pertama (misal November 2026)
-        if (!window.__extPeriodInit && window.EXTERNAL_ITEMS.length > 0) {
-          window.__extPeriodInit = true;
-          const dated = window.EXTERNAL_ITEMS.map(it => parseDateString(it.start)).filter(Boolean);
-          if (dated.length > 0) {
-            extCalendarYear = dated[0].year;
-            extCalendarMonth = dated[0].month - 1;
-          }
-        }
-
-        renderExtAllViews();
-      } catch (err) {
-        console.warn('Gagal memuat External Calendar:', err);
-        if (syncLabel) {
-          syncLabel.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500"></span> Gagal menyinkronkan sheet eksternal. Klik untuk coba lagi.`;
-        }
-      } finally {
-        window.__extFetchPromise = null;
-      }
-    })();
-    return window.__extFetchPromise;
-  }
-
-  function getFilteredExtItems() {
-    const q = (document.getElementById('ext-search-input')?.value || '').toLowerCase().trim();
-    const cat = document.getElementById('ext-category-filter')?.value || 'all';
-    const st = document.getElementById('ext-status-filter')?.value || 'all';
-
-    return (window.EXTERNAL_ITEMS || []).filter(item => {
-      if (cat !== 'all' && item.source_type !== cat) return false;
-      const hasDate = Boolean(parseDateString(item.start));
-      const past = hasDate && isSchedulePast(item);
-      if (st === 'scheduled' && !hasDate) return false;
-      if (st === 'unscheduled' && hasDate) return false;
-      if (st === 'past' && !past) return false;
-
-      if (q) {
-        const pNames = (item.peserta || []).map(p => `${p.nama_karyawan} ${p.id_karyawan} ${p.jabatan}`).join(' ').toLowerCase();
-        const hay = `${item.agenda} ${item.id_jadwal} ${item.room} ${item.pic} ${item.batch} ${item.deskripsi} ${pNames}`.toLowerCase();
-        if (!hay.includes(q)) return false;
-      }
-      return true;
-    });
-  }
-
-  function filterExtSchedules() {
-    renderExtAllViews();
-  }
-
-  function resetExtFilters() {
-    const sInput = document.getElementById('ext-search-input');
-    const cSel = document.getElementById('ext-category-filter');
-    const stSel = document.getElementById('ext-status-filter');
-    if (sInput) sInput.value = '';
-    if (cSel) cSel.value = 'all';
-    if (stSel) stSel.value = 'all';
-    renderExtAllViews();
-  }
-
-  function switchExtCalendarView(targetId) {
-    extActiveView = targetId;
-    document.querySelectorAll('.ext-view-panel').forEach(p => {
-      const on = p.id === targetId;
-      p.classList.toggle('hidden', !on);
-      p.classList.toggle('flex', on);
-    });
-    document.querySelectorAll('.ext-view-tab-btn').forEach(btn => {
-      const on = btn.getAttribute('data-ext-target') === targetId;
-      btn.className = on
-        ? 'ext-view-tab-btn flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg bg-emerald-700 text-white font-label-md text-label-md font-semibold shadow-sm transition-all cursor-pointer shrink-0'
-        : 'ext-view-tab-btn flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest font-label-md text-label-md font-medium transition-all cursor-pointer shrink-0';
-    });
-    renderExtAllViews();
-  }
-
-  function handleExtMonthPickerChange(val) {
-    if (!val) return;
-    const parts = val.split('-');
-    if (parts.length === 2) {
-      updateExtCalendarPeriod(parseInt(parts[0], 10), parseInt(parts[1], 10));
-    }
-  }
-
-  function navigateExtPrev() {
-    let m = extCalendarMonth - 1;
-    let y = extCalendarYear;
-    if (m < 0) { m = 11; y--; }
-    if (y < 2025) { y = 2025; m = 0; }
-    updateExtCalendarPeriod(y, m);
-  }
-
-  function navigateExtNext() {
-    let m = extCalendarMonth + 1;
-    let y = extCalendarYear;
-    if (m > 11) { m = 0; y++; }
-    if (y > 2027) { y = 2027; m = 11; }
-    updateExtCalendarPeriod(y, m);
-  }
-
-  function navigateExtToday() {
-    const dated = (window.EXTERNAL_ITEMS || []).map(it => parseDateString(it.start)).filter(Boolean);
-    if (dated.length > 0) {
-      updateExtCalendarPeriod(dated[0].year, dated[0].month - 1);
-    } else {
-      const now = new Date();
-      updateExtCalendarPeriod(now.getFullYear(), now.getMonth());
-    }
-  }
-
-  function setExtYearView(year) {
-    updateExtCalendarPeriod(Number(year) || 2026, extCalendarMonth);
-  }
-
-  function updateExtCalendarPeriod(year, monthIndex) {
-    extCalendarYear = year;
-    extCalendarMonth = monthIndex;
-
-    const picker = document.getElementById('ext-month-picker');
-    if (picker) picker.value = `${year}-${monthIndex}`;
-
-    const qBadge = document.getElementById('ext-quarter-badge');
-    if (qBadge) {
-      const q = Math.floor(monthIndex / 3) + 1;
-      qBadge.textContent = `Q${q} FY${year}`;
-    }
-
-    const mTitle = document.getElementById('ext-month-view-title');
-    if (mTitle) mTitle.textContent = `${MONTH_NAMES[monthIndex]} ${year}`;
-
-    [2025, 2026, 2027].forEach(yr => {
-      const btn = document.getElementById('ext-btn-yr-' + yr);
-      if (btn) {
-        btn.className = (yr === year)
-          ? 'px-3 py-1 rounded-lg text-xs font-bold bg-emerald-700 text-white shadow-xs transition-all'
-          : 'px-3 py-1 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all';
-      }
-    });
-
-    renderExtAllViews();
-  }
-
-  function renderExtAllViews() {
-    const filtered = getFilteredExtItems();
-    renderExtMonthView(filtered, extCalendarYear, extCalendarMonth);
-    renderExtWeekView(filtered, extCalendarYear, extCalendarMonth);
-    renderExtYearMatrix(filtered, extCalendarYear, extCalendarMonth);
-    renderExtDynamicListView(filtered);
-  }
-  window.renderExtAllViews = renderExtAllViews;
-
-  function renderExtMonthView(items, year, monthIndex) {
-    const grid = document.getElementById('ext-month-calendar-grid');
-    if (!grid) return;
-
-    const firstDayDate = new Date(year, monthIndex, 1);
-    let startOffset = firstDayDate.getDay() - 1;
-    if (startOffset < 0) startOffset = 6; // Senin = 0 ... Minggu = 6
-
-    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
-    const prevMonthDays = new Date(year, monthIndex, 0).getDate();
-    const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
-
-    const now = new Date();
-    const isCurrentMonth = now.getFullYear() === year && now.getMonth() === monthIndex;
-    const todayDate = now.getDate();
-
-    let html = '';
-    for (let i = 0; i < totalCells; i++) {
-      const dayNum = i - startOffset + 1;
-      const colIdx = i % 7;
-      const isWeekend = colIdx === 5 || colIdx === 6;
-
-      if (dayNum < 1) {
-        const pDay = prevMonthDays + dayNum;
-        html += `<div class="min-h-[110px] p-2.5 bg-surface-container-low/30 text-outline-variant flex flex-col gap-1 select-none"><span class="font-title-sm text-title-sm font-medium">${pDay}</span></div>`;
-      } else if (dayNum > daysInMonth) {
-        const nDay = dayNum - daysInMonth;
-        html += `<div class="min-h-[110px] p-2.5 bg-surface-container-low/30 text-outline-variant flex flex-col gap-1 select-none"><span class="font-title-sm text-title-sm font-medium">${nDay}</span></div>`;
-      } else {
-        const isToday = isCurrentMonth && dayNum === todayDate;
-        const isoDateStr = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
-        const isAdminOn = typeof window.isAdminAuthenticated === 'function' && window.isAdminAuthenticated();
-        const extQuickAddBtn = isAdminOn
-          ? `<button type="button" onclick="event.stopPropagation(); openAdminScheduleModal('add', null, 'external_training', '${isoDateStr}')" class="w-5 h-5 rounded-md bg-emerald-600/15 hover:bg-emerald-700 text-emerald-800 hover:text-white inline-flex items-center justify-center transition-all cursor-pointer shrink-0" title="Tambah jadwal External pada ${isoDateStr}"><span class="material-symbols-outlined text-[13px]">add</span></button>`
-          : '';
-        const cellClass = isToday
-          ? 'min-h-[110px] p-2.5 flex flex-col justify-between bg-emerald-500/[0.06] ring-2 ring-emerald-600 ring-inset rounded-lg'
-          : `min-h-[110px] p-2.5 flex flex-col justify-between ${isWeekend ? 'bg-surface-container-low/20' : 'hover:bg-surface-container-low/40'} transition-colors`;
-        const dayHeader = isToday
-          ? `<div class="flex items-center justify-between gap-1"><span class="font-title-sm text-title-sm text-emerald-700 font-extrabold">${dayNum}</span><div class="flex items-center gap-1"><span class="text-[10px] bg-emerald-700 text-white px-1.5 py-0.2 rounded font-semibold">Hari Ini</span>${extQuickAddBtn}</div></div>`
-          : `<div class="flex items-center justify-between gap-1"><span class="font-title-sm text-title-sm ${isWeekend ? 'text-outline font-semibold' : 'text-on-surface font-bold'}">${dayNum}</span>${extQuickAddBtn}</div>`;
-
-        html += `
-          <div data-ext-day="${dayNum}" class="${cellClass}">
-            ${dayHeader}
-            <div class="ext-day-events mt-1 flex flex-col gap-1 w-full flex-1"></div>
-          </div>
-        `;
-      }
-    }
-    grid.innerHTML = html;
-
-    // Inject badges for scheduled items in this month (matching Internal Training style with green theme)
-    let monthEventCount = 0;
-    const monthStart = new Date(year, monthIndex, 1);
-    const monthEnd = new Date(year, monthIndex, daysInMonth, 23, 59, 59);
-
-    items.forEach(item => {
-      const sParsed = parseDateString(item.start);
-      const eParsed = parseDateString(item.end) || sParsed;
-      if (!sParsed) return;
-
-      const sDate = new Date(sParsed.year, sParsed.month - 1, sParsed.day);
-      const eDate = new Date(eParsed.year, eParsed.month - 1, eParsed.day, 23, 59, 59);
-      if (eDate < monthStart || sDate > monthEnd) return;
-
-      monthEventCount++;
-      const isTraining = item.source_type === 'external_training';
-      const itemScope = item.source_type || 'external_training';
-      const adminKey = item.id_jadwal || item.uid;
-      const safeUid = escapeHtml(item.uid).replace(/'/g, "\\'");
-      const colorCls = isTraining ? 'bg-emerald-700 text-white' : 'bg-teal-600 text-white';
-      const isAdminOn = typeof window.isAdminAuthenticated === 'function' && window.isAdminAuthenticated();
-      const adminMiniBtns = isAdminOn
-        ? `<span class="inline-flex items-center gap-0.5 ml-auto pl-1 shrink-0"><button type="button" onclick="event.stopPropagation(); openAdminScheduleModal('edit', ${jsArg(adminKey)}, ${jsArg(itemScope)})" class="w-4 h-4 rounded bg-black/25 hover:bg-black/50 text-white inline-flex items-center justify-center" title="Edit Jadwal"><span class="material-symbols-outlined text-[11px]">edit</span></button><button type="button" onclick="event.stopPropagation(); openAdminDeleteModal(${jsArg(adminKey)}, ${jsArg(itemScope)}, ${jsArg(item.agenda)})" class="w-4 h-4 rounded bg-red-600/85 hover:bg-red-700 text-white inline-flex items-center justify-center" title="Hapus Jadwal"><span class="material-symbols-outlined text-[11px]">close</span></button></span>`
-        : '';
-
-      for (let d = 1; d <= daysInMonth; d++) {
-        const cur = new Date(year, monthIndex, d, 12, 0, 0);
-        if (cur >= sDate && cur <= eDate) {
-          const cellEvents = grid.querySelector(`[data-ext-day="${d}"] .ext-day-events`);
-          if (!cellEvents) continue;
-
-          const isStart = d === sParsed.day && (monthIndex + 1) === sParsed.month;
-          const badge = document.createElement('div');
-          badge.className = `mt-0.5 sm:mt-1 p-1 sm:p-1.5 rounded-md sm:rounded-lg ${colorCls} text-[10px] sm:text-[11px] leading-tight shadow-xs cursor-pointer hover:opacity-90 hover:scale-[1.01] transition-all`;
-          badge.title = `${item.agenda} - Klik untuk melihat rincian`;
-          badge.setAttribute('onclick', `openTrainingDetailModal('${safeUid}')`);
-
-          const subInfo = isTraining
-            ? `${escapeHtml(item.batch || 'Batch')} &bull; ${(item.peserta || []).length}/${item.kuota || 15} Peserta`
-            : `${escapeHtml(item.room || 'Agenda Luar Training')}`;
-
-          badge.innerHTML = isStart
-            ? `<div class="font-bold truncate flex items-center"><span class="truncate">${escapeHtml(item.agenda)}</span>${adminMiniBtns}</div><div class="text-[9.5px] sm:text-[10px] opacity-90 truncate">${subInfo}</div>`
-            : `<div class="font-semibold truncate opacity-90 flex items-center"><span class="truncate">&#8627; ${escapeHtml(item.agenda)}</span>${adminMiniBtns}</div>`;
-          cellEvents.appendChild(badge);
-        }
-      }
-    });
-
-    const unscheduled = items.filter(it => !parseDateString(it.start));
-    const countLabel = document.getElementById('ext-calendar-session-count');
-    if (countLabel) {
-      countLabel.innerHTML = `&bull; ${monthEventCount} Sesi Terjadwal (${MONTH_NAMES[monthIndex]} ${year})` +
-        (unscheduled.length > 0 ? ` &bull; ${unscheduled.length} Rencana Program` : '');
-    }
-
-    const unsBox = document.getElementById('ext-unscheduled-box');
-    if (unsBox) {
-      if (unscheduled.length > 0) {
-        const isAdminOnUns = typeof window.isAdminAuthenticated === 'function' && window.isAdminAuthenticated();
-        unsBox.classList.remove('hidden');
-        unsBox.innerHTML = `
-          <div class="flex flex-col gap-2.5">
-            <div class="text-label-md font-semibold text-on-surface flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-              <span>Rencana Program External Training (Menunggu Tanggal Pelaksanaan)</span>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-              ${unscheduled.map(u => {
-                const safeUid = escapeHtml(u.uid).replace(/'/g, "\\'");
-                const uScope = u.source_type || 'external_training';
-                const uKey = u.id_jadwal || u.uid;
-                const uAdminBtns = isAdminOnUns
-                  ? `<div class="flex items-center gap-1 shrink-0"><button type="button" onclick="event.stopPropagation(); openAdminScheduleModal('edit', ${jsArg(uKey)}, ${jsArg(uScope)})" class="w-7 h-7 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300/80 inline-flex items-center justify-center cursor-pointer" title="Edit Jadwal TBA"><span class="material-symbols-outlined text-[15px]">edit</span></button><button type="button" onclick="event.stopPropagation(); openAdminDeleteModal(${jsArg(uKey)}, ${jsArg(uScope)}, ${jsArg(u.agenda)})" class="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 inline-flex items-center justify-center cursor-pointer" title="Hapus Jadwal TBA"><span class="material-symbols-outlined text-[15px]">delete</span></button></div>`
-                  : '';
-                return `
-                  <div onclick="openTrainingDetailModal('${safeUid}')" class="p-3 rounded-xl bg-surface-container-lowest hover:bg-emerald-50/50 border border-outline-variant/50 flex items-center justify-between gap-2 cursor-pointer transition-all">
-                    <div class="min-w-0 flex-1">
-                      <div class="font-semibold text-on-surface text-body-sm truncate">${escapeHtml(u.agenda)}</div>
-                      <div class="text-[11px] text-on-surface-variant">Tanggal Menyusul (TBA)</div>
-                    </div>
-                    ${uAdminBtns}
-                    <span class="material-symbols-outlined text-emerald-700 text-[18px] shrink-0">chevron_right</span>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          </div>
-        `;
-      } else {
-        unsBox.classList.add('hidden');
-        unsBox.innerHTML = '';
-      }
-    }
-  }
-
-  function renderExtWeekView(items, year, monthIndex) {
-    const body = document.getElementById('ext-week-view-body');
-    const titleEl = document.getElementById('ext-week-view-title');
-    const badgeEl = document.getElementById('ext-week-count-badge');
-    if (!body) return;
-
-    if (titleEl) titleEl.textContent = `Jadwal Mingguan: ${MONTH_NAMES[monthIndex]} ${year}`;
-
-    const monthStart = new Date(year, monthIndex, 1);
-    const monthEnd = new Date(year, monthIndex + 1, 0);
-    const datedItems = items.map(it => {
-      const s = parseDateString(it.start);
-      const e = parseDateString(it.end) || s;
-      if (!s) return null;
-      return {
-        it,
-        r: [new Date(s.year, s.month - 1, s.day), new Date(e.year, e.month - 1, e.day)]
-      };
-    }).filter(x => x && x.r[0] <= monthEnd && x.r[1] >= monthStart);
-
-    if (badgeEl) badgeEl.textContent = `${datedItems.length} Agenda Terjadwal`;
-
-    if (!datedItems.length) {
-      body.innerHTML = `<div class="p-8 text-center text-on-surface-variant bg-surface-container-low/40 rounded-2xl">Tidak ada agenda terjadwal pada ${MONTH_NAMES[monthIndex]} ${year}.</div>`;
-      return;
-    }
-
-    const DAY = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
-    const short = d => `${d.getDate()} ${MONTH_NAMES[d.getMonth()].slice(0, 3)}`;
-    let html = '';
-    for (let ws = new Date(year, monthIndex, 1 - ((monthStart.getDay() + 6) % 7)); ws <= monthEnd; ws = new Date(ws.getFullYear(), ws.getMonth(), ws.getDate() + 7)) {
-      const we = new Date(ws.getFullYear(), ws.getMonth(), ws.getDate() + 6);
-      const inWeek = datedItems.filter(x => x.r[0] <= we && x.r[1] >= ws);
-      const heads = DAY.map((n, i) => {
-        const d = new Date(ws.getFullYear(), ws.getMonth(), ws.getDate() + i);
-        return `<div class="text-center text-[11px] ${i > 4 ? 'text-outline' : 'text-on-surface-variant'} ${d.getMonth() !== monthIndex ? 'opacity-40' : ''}"><span class="font-semibold">${n}</span> ${d.getDate()}</div>`;
-      }).join('');
-      const bars = inWeek.map(x => {
-        const a = Math.max(0, Math.round((x.r[0] - ws) / 864e5));
-        const b = Math.min(6, Math.round((x.r[1] - ws) / 864e5));
-        const isTr = x.it.source_type === 'external_training';
-        const barColor = isTr ? 'bg-emerald-700 text-white' : 'bg-teal-600 text-white';
-        const safeUid = escapeHtml(x.it.uid).replace(/'/g, "\\'");
-        const xScope = x.it.source_type || 'external_training';
+  window.escapeHtml = escapeHtml;
+
+   // ===========================================================================
+   // 10B. EXTERNAL & EVENT CALENDAR (DOMINAN WARNA HIJAU)
+   //      Membaca sheet: External_Training_Schedule, AGENDA_DILUAR_TRAINING,
+   //      dan External_Training_Manpower secara real-time tanpa perlu sign-in
+   // ===========================================================================
+   window.EXTERNAL_ITEMS = [];
+   window.EXTERNAL_MANPOWER = [];
+   let extCalendarYear = 2026;
+   let extCalendarMonth = 10; // Default November 2026 (0-indexed)
+   let extActiveView = 'ext-view-month';
+     const MONTH_NAMES_ID = MONTH_NAMES;
+    // MONTH_NAMES already declared
+
+
+ 
+   function extractDateStringFromText(txt) {
+     if (!txt) return '';
+     const s = String(txt);
+     const monthsMap = {
+       'januari': 'Jan', 'jan': 'Jan', 'februari': 'Feb', 'feb': 'Feb',
+       'maret': 'Mar', 'mar': 'Mar', 'april': 'Apr', 'apr': 'Apr',
+       'mei': 'May', 'may': 'May', 'juni': 'Jun', 'jun': 'Jun',
+       'juli': 'Jul', 'jul': 'Jul', 'agustus': 'Aug', 'agu': 'Aug', 'agt': 'Aug', 'aug': 'Aug',
+       'september': 'Sep', 'sep': 'Sep', 'oktober': 'Oct', 'okt': 'Oct', 'oct': 'Oct',
+       'november': 'Nov', 'nov': 'Nov', 'desember': 'Dec', 'des': 'Dec', 'dec': 'Dec'
+     };
+     const m = s.match(/(\d{1,2})\s+(Januari|Februari|Maret|April|Mei|Juni|Juli|Agustus|September|Oktober|November|Desember|Jan|Feb|Mar|Apr|May|Jun|Jul|Agu|Agt|Aug|Sep|Okt|Oct|Nov|Des|Dec)[a-z]*\s+(\d{4})/i);
+     if (m) {
+       const day = String(parseInt(m[1], 10)).padStart(2, '0');
+       const mon = monthsMap[m[2].toLowerCase()] || m[2].substring(0, 3);
+       return `${day} ${mon} ${m[3]}`;
+     }
+     return '';
+   }
+ 
+   function inferCompanyFromEmployeeId(empId, existingCompany) {
+     if (existingCompany && String(existingCompany).trim()) return String(existingCompany).trim();
+     const id = String(empId || '').toUpperCase().trim();
+     if (id.startsWith('PGP')) return 'Pani Gold Project (PGP)';
+     if (id.startsWith('PBT')) return 'PT Pani Bersama Tambang (PBT)';
+     if (id.startsWith('MMI')) return 'PT Merdeka Mining Indonesia (MMI)';
+     if (id.startsWith('GSM')) return 'PT Gorontalo Sejahtera Mining (GSM)';
+     if (id.startsWith('PETS')) return 'PT Puncak Emas Tani Sejahtera (PETS)';
+     if (id.startsWith('MMS')) return 'PT Merdeka Mining Servis (MMS)';
+     return 'Pani Gold Project';
+   }
+ 
+   window.__gvizCounter = window.__gvizCounter || 0;
+   function fetchGvizSheetJson(sheetId, sheetName, tq) {
+     return new Promise((resolve) => {
+       const cbName = "__gvizCb_" + Date.now() + "_" + (++window.__gvizCounter);
+       const script = document.createElement("script");
+       let settled = false;
+
+       const cleanup = () => {
+         try { delete window[cbName]; } catch (e) { window[cbName] = undefined; }
+         if (script.parentNode) script.parentNode.removeChild(script);
+       };
+
+       const timer = setTimeout(() => {
+         if (settled) return;
+         settled = true;
+         cleanup();
+         resolve(null);
+       }, 15000);
+
+       window[cbName] = function(resp) {
+         if (settled) return;
+         settled = true;
+         clearTimeout(timer);
+         cleanup();
+         resolve(resp && resp.status === "ok" ? resp : (resp || null));
+       };
+
+       script.onerror = function() {
+         if (settled) return;
+         settled = true;
+         clearTimeout(timer);
+         cleanup();
+         resolve(null);
+       };
+
+       const sheetParam = /^gid=\d+$/i.test(String(sheetName || ""))
+         ? `headers=1&${sheetName}`
+         : `headers=1&sheet=${encodeURIComponent(sheetName || '')}`;
+       const tqParam = tq ? `&tq=${encodeURIComponent(tq)}` : '';
+       script.src = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=responseHandler:${cbName}&${sheetParam}${tqParam}`;
+       script.async = true;
+       (document.head || document.documentElement).appendChild(script);
+     });
+   }
+   window.fetchGvizSheetJson = fetchGvizSheetJson;
+ 
+   function gvizFindColIdx(cols, names) {
+     const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+     const targets = names.map(norm);
+     return (cols || []).findIndex(c => {
+       const lbl = norm(c.label || c.id);
+       return targets.some(t => lbl === t || (lbl && lbl.includes(t)));
+     });
+   }
+ 
+   function gvizCellVal(cArr, idx) {
+     if (idx === -1 || !cArr || idx >= cArr.length || !cArr[idx]) return '';
+     const cell = cArr[idx];
+     return cell.v !== undefined && cell.v !== null ? cell.v : (cell.f !== undefined && cell.f !== null ? cell.f : '');
+   }
+ 
+   function gvizCellFmt(cArr, idx) {
+     if (idx === -1 || !cArr || idx >= cArr.length || !cArr[idx]) return '';
+     const cell = cArr[idx];
+     return cell.f !== undefined && cell.f !== null ? cell.f : (cell.v !== undefined && cell.v !== null ? cell.v : '');
+   }
+ 
+   async function fetchExternalCalendarData() {
+     const SHEET_ID = '1Y5IQUSN84p2Os1e9wxraDIfZF6UfOql4Y5EdXbv850A';
+     const syncLabel = document.getElementById('ext-sync-time-label');
+     if (syncLabel) {
+       syncLabel.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Menyinkronkan data jadwal eksternal...`;
+     }
+ 
+     try {
+       const [extSchedGviz, agendaLuarGviz, manpowerGviz] = await Promise.all([
+         fetchGvizSheetJson(SHEET_ID, 'External_Training_Schedule').catch(() => null),
+         fetchGvizSheetJson(SHEET_ID, 'AGENDA_DILUAR_TRAINING').catch(() => null),
+         fetchGvizSheetJson(SHEET_ID, 'External_Training_Manpower').catch(() => null)
+       ]);
+ 
+       // 1. Parse External_Training_Manpower
+       const manpowerByKey = {};
+       const allManpower = [];
+       if (manpowerGviz && manpowerGviz.table && manpowerGviz.table.rows) {
+         const cols = manpowerGviz.table.cols || [];
+         const idxBooking = gvizFindColIdx(cols, ['ID_Booking']);
+         const idxNik = gvizFindColIdx(cols, ['Id_Karyawan', 'NIK']);
+         const idxNama = gvizFindColIdx(cols, ['Nama_Karyawan', 'Nama']);
+         const idxHp = gvizFindColIdx(cols, ['No_HP', 'HP']);
+         const idxJab = gvizFindColIdx(cols, ['Jabatan']);
+         const idxDept = gvizFindColIdx(cols, ['Departement', 'Departemen']);
+         const idxComp = gvizFindColIdx(cols, ['Perusahaan']);
+         const idxJadwal = gvizFindColIdx(cols, ['ID_Jadwal']);
+         const idxPelatihan = gvizFindColIdx(cols, ['Nama_Pelatihan', 'Agenda']);
+         const idxPic = gvizFindColIdx(cols, ['PIC_Pendaftaran', 'PIC']);
+         const idxStatus = gvizFindColIdx(cols, ['Status']);
+ 
+         manpowerGviz.table.rows.forEach((r, rIdx) => {
+           const c = r.c || [];
+           const colBooking = String(gvizCellVal(c, idxBooking) || '').trim();
+           const colNik = String(gvizCellVal(c, idxNik) || '').trim();
+           const nama = String(gvizCellVal(c, idxNama) || '').trim();
+           if (!nama && !colBooking && !colNik) return;
+ 
+           // Deteksi otomatis apabila ID Karyawan (misal PGP260062) diletakkan di kolom ID_Booking
+           const empId = colNik || (!/^REG-/i.test(colBooking) ? colBooking : '');
+           const bookingId = /^REG-/i.test(colBooking) ? colBooking : `EXT-MP-${rIdx + 1}`;
+           const jabatan = String(gvizCellVal(c, idxJab) || '').trim();
+           const dept = String(gvizCellVal(c, idxDept) || '').trim() || jabatan;
+           const comp = inferCompanyFromEmployeeId(empId, gvizCellVal(c, idxComp));
+           const idJ = String(gvizCellVal(c, idxJadwal) || '').trim();
+           const namaP = String(gvizCellVal(c, idxPelatihan) || '').trim();
+           const statusVal = String(gvizCellVal(c, idxStatus) || '').trim() || 'Terdaftar';
+ 
+           const pObj = {
+             id_booking: bookingId,
+             id_karyawan: empId || '-',
+             nama_karyawan: nama || 'Peserta External',
+             no_hp: String(gvizCellVal(c, idxHp) || '').trim(),
+             jabatan: jabatan,
+             departement: dept || '-',
+             perusahaan: comp,
+             id_jadwal: idJ,
+             nama_pelatihan: namaP,
+             pic: String(gvizCellVal(c, idxPic) || '').trim(),
+             validasi: statusVal
+           };
+           allManpower.push(pObj);
+           if (idJ) {
+             if (!manpowerByKey[idJ]) manpowerByKey[idJ] = [];
+             manpowerByKey[idJ].push(pObj);
+           }
+           if (namaP) {
+             if (!manpowerByKey[namaP]) manpowerByKey[namaP] = [];
+             manpowerByKey[namaP].push(pObj);
+           }
+         });
+       }
+ 
+       // 2. Parse External_Training_Schedule
+       const externalTrainings = [];
+       if (extSchedGviz && extSchedGviz.table && extSchedGviz.table.rows) {
+         const cols = extSchedGviz.table.cols || [];
+         const idxId = gvizFindColIdx(cols, ['ID_Jadwal']);
+         const idxStart = gvizFindColIdx(cols, ['START', 'Tanggal_Mulai']);
+         const idxEnd = gvizFindColIdx(cols, ['END', 'Tanggal_Selesai']);
+         const idxDurDay = gvizFindColIdx(cols, ['Duration_Day']);
+         const idxDurHr = gvizFindColIdx(cols, ['Duration_Hour']);
+         const idxStartHr = gvizFindColIdx(cols, ['Start Hour', 'Start_Hour']);
+         const idxAgenda = gvizFindColIdx(cols, ['AGENDA']);
+         const idxPic = gvizFindColIdx(cols, ['PIC']);
+         const idxRoom = gvizFindColIdx(cols, ['ROOM', 'Ruangan']);
+         const idxBatch = gvizFindColIdx(cols, ['BATCH']);
+         const idxKuota = gvizFindColIdx(cols, ['Kuota']);
+         const idxSisa = gvizFindColIdx(cols, ['Sisa Kuota', 'Sisa_Kuota']);
+         const idxStatus = gvizFindColIdx(cols, ['STATUS']);
+         const idxDesc = gvizFindColIdx(cols, ['Deskripsi_Pelatihan', 'Deskripsi']);
+ 
+         extSchedGviz.table.rows.forEach((r, idx) => {
+           const c = r.c || [];
+           const idJ = String(gvizCellVal(c, idxId) || '').trim();
+           const agenda = String(gvizCellVal(c, idxAgenda) || '').trim();
+           if (!idJ && !agenda) return;
+ 
+           let startStr = String(gvizCellFmt(c, idxStart) || gvizCellVal(c, idxStart) || '').trim();
+           let endStr = String(gvizCellFmt(c, idxEnd) || gvizCellVal(c, idxEnd) || '').trim();
+           const desc = String(gvizCellVal(c, idxDesc) || '').trim();
+           if (!startStr) {
+             const extracted = extractDateStringFromText(agenda) || extractDateStringFromText(desc);
+             if (extracted) {
+               startStr = extracted;
+               endStr = endStr || extracted;
+             }
+           }
+ 
+           const durDay = gvizCellFmt(c, idxDurDay);
+           const durHr = gvizCellFmt(c, idxDurHr);
+           let durStr = durDay ? `${durDay} Hari` : '';
+           if (durHr) durStr += (durStr ? ` (${durHr} Jam)` : `${durHr} Jam`);
+ 
+           const rawHour = gvizCellFmt(c, idxStartHr) || gvizCellVal(c, idxStartHr);
+           const parsedH = parseStartHour(rawHour);
+ 
+           const listById = idJ ? (manpowerByKey[idJ] || []) : [];
+           const listByAgenda = agenda ? (manpowerByKey[agenda] || []) : [];
+           const seen = {};
+           const pesertaList = [];
+           listById.concat(listByAgenda).forEach(p => {
+             const k = (p.id_karyawan || '') + '_' + (p.nama_karyawan || '');
+             if (!seen[k]) { seen[k] = true; pesertaList.push(p); }
+           });
+ 
+           const kuotaNum = Number(gvizCellVal(c, idxKuota)) || (pesertaList.length > 0 ? Math.max(15, pesertaList.length) : 15);
+           const sisaNum = pesertaList.length > 0
+             ? Math.max(0, kuotaNum - pesertaList.length)
+             : (gvizCellVal(c, idxSisa) !== '' ? Number(gvizCellVal(c, idxSisa)) : kuotaNum);
+ 
+           externalTrainings.push({
+             uid: `EXT-${idx + 1}-${idJ || agenda}`,
+             id_jadwal: idJ || `EXT-PLAN-${idx + 1}`,
+             source_type: 'external_training',
+             source_label: 'External Training',
+             start: startStr,
+             end: endStr || startStr,
+             duration: durStr || (startStr ? '' : 'Menunggu Jadwal'),
+             start_hour: parsedH.formatted,
+             start_minutes: parsedH.minutes,
+             agenda: agenda,
+             pic: String(gvizCellVal(c, idxPic) || '').trim() || 'Tim L&D / Vendor Sertifikasi',
+             room: String(gvizCellVal(c, idxRoom) || '').trim() || 'Menunggu Konfirmasi Lokasi',
+             batch: String(gvizCellVal(c, idxBatch) || '').trim() || (startStr ? 'Batch 1' : 'Rencana Program'),
+             kuota: kuotaNum,
+             sisa_kuota: sisaNum,
+             total_terdaftar: pesertaList.length,
+             status: String(gvizCellVal(c, idxStatus) || '').trim() || (startStr ? 'Buka' : 'Rencana Jadwal'),
+             deskripsi: desc,
+             peserta: pesertaList
+           });
+         });
+       }
+ 
+       // 3. Parse AGENDA_DILUAR_TRAINING
+       const agendaEvents = [];
+       if (agendaLuarGviz && agendaLuarGviz.table && agendaLuarGviz.table.rows) {
+         const cols = agendaLuarGviz.table.cols || [];
+         const idxId = gvizFindColIdx(cols, ['ID_Jadwal']);
+         const idxStart = gvizFindColIdx(cols, ['START', 'Tanggal_Mulai']);
+         const idxEnd = gvizFindColIdx(cols, ['END', 'Tanggal_Selesai']);
+         const idxAgenda = gvizFindColIdx(cols, ['AGENDA']);
+         const idxPic = gvizFindColIdx(cols, ['PIC']);
+         const idxLoc = gvizFindColIdx(cols, ['LOCATION', 'ROOM', 'Lokasi']);
+         const idxStatus = gvizFindColIdx(cols, ['STATUS']);
+         const idxDesc = gvizFindColIdx(cols, ['Deskripsi_Pelatihan', 'Deskripsi']);
+ 
+         agendaLuarGviz.table.rows.forEach((r, idx) => {
+           const c = r.c || [];
+           const idJ = String(gvizCellVal(c, idxId) || '').trim();
+           const agenda = String(gvizCellVal(c, idxAgenda) || '').trim();
+           if (!idJ && !agenda) return;
+ 
+           let startStr = String(gvizCellFmt(c, idxStart) || gvizCellVal(c, idxStart) || '').trim();
+           let endStr = String(gvizCellFmt(c, idxEnd) || gvizCellVal(c, idxEnd) || '').trim();
+           const desc = String(gvizCellVal(c, idxDesc) || '').trim();
+           let autoExtractedDate = false;
+           if (!startStr) {
+             const extracted = extractDateStringFromText(agenda) || extractDateStringFromText(desc);
+             if (extracted) {
+               startStr = extracted;
+               endStr = endStr || extracted;
+               autoExtractedDate = true;
+             }
+           }
+ 
+           agendaEvents.push({
+             uid: `EVT-${idx + 1}-${idJ || idx}`,
+             id_jadwal: idJ || `AGENDA-${idx + 1}`,
+             source_type: 'agenda_event',
+             source_label: 'Agenda di Luar Training',
+             start: startStr,
+             end: endStr || startStr,
+             duration: '',
+             start_hour: '08:00',
+             start_minutes: 480,
+             agenda: agenda,
+             pic: String(gvizCellVal(c, idxPic) || '').trim() || 'External Relations / L&D',
+             room: String(gvizCellVal(c, idxLoc) || '').trim() || 'Lokasi Eksternal / Site',
+             batch: autoExtractedDate ? 'Agenda Event (Tanggal dari Undangan)' : 'Agenda Event',
+             kuota: 0,
+             sisa_kuota: 0,
+             total_terdaftar: 0,
+             status: String(gvizCellVal(c, idxStatus) || '').trim() || 'Terjadwal',
+             deskripsi: desc,
+             peserta: []
+           });
+         });
+       }
+ 
+       window.EXTERNAL_MANPOWER = allManpower;
+       window.EXTERNAL_ITEMS = externalTrainings.concat(agendaEvents);
+ 
+       // Update KPI Cards
+       const setTxt = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+       setTxt('ext-kpi-total', window.EXTERNAL_ITEMS.length);
+       setTxt('ext-kpi-training', externalTrainings.length);
+       setTxt('ext-kpi-events', agendaEvents.length);
+       setTxt('ext-kpi-manpower', allManpower.length);
+ 
+       if (syncLabel) {
+         const nowStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+         syncLabel.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-600"></span> Tersinkronisasi (${externalTrainings.length} External Training, ${agendaEvents.length} Event, ${allManpower.length} Manpower &bull; ${nowStr} WITA)`;
+       }
+ 
+       // Pilih bulan default otomatis sesuai tanggal jadwal aktif pertama (misal November 2026)
+       if (!window.__extPeriodInit && window.EXTERNAL_ITEMS.length > 0) {
+         window.__extPeriodInit = true;
+         const dated = window.EXTERNAL_ITEMS.map(it => parseDateString(it.start)).filter(Boolean);
+         if (dated.length > 0) {
+           extCalendarYear = dated[0].year;
+           extCalendarMonth = dated[0].month - 1;
+         }
+       }
+ 
+       renderExtAllViews();
+     } catch (err) {
+       console.warn('Gagal memuat External Calendar:', err);
+       if (syncLabel) {
+         syncLabel.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500"></span> Gagal menyinkronkan sheet eksternal. Klik untuk coba lagi.`;
+       }
+     }
+   }
+ 
+   function getFilteredExtItems() {
+     const q = (document.getElementById('ext-search-input')?.value || '').toLowerCase().trim();
+     const cat = document.getElementById('ext-category-filter')?.value || 'all';
+     const st = document.getElementById('ext-status-filter')?.value || 'all';
+ 
+     return (window.EXTERNAL_ITEMS || []).filter(item => {
+       if (cat !== 'all' && item.source_type !== cat) return false;
+       const hasDate = Boolean(parseDateString(item.start));
+       const past = hasDate && isSchedulePast(item);
+       if (st === 'scheduled' && !hasDate) return false;
+       if (st === 'unscheduled' && hasDate) return false;
+       if (st === 'past' && !past) return false;
+ 
+       if (q) {
+         const pNames = (item.peserta || []).map(p => `${p.nama_karyawan} ${p.id_karyawan} ${p.jabatan}`).join(' ').toLowerCase();
+         const hay = `${item.agenda} ${item.id_jadwal} ${item.room} ${item.pic} ${item.batch} ${item.deskripsi} ${pNames}`.toLowerCase();
+         if (!hay.includes(q)) return false;
+       }
+       return true;
+     });
+   }
+ 
+   function filterExtSchedules() {
+     renderExtAllViews();
+   }
+ 
+   function resetExtFilters() {
+     const sInput = document.getElementById('ext-search-input');
+     const cSel = document.getElementById('ext-category-filter');
+     const stSel = document.getElementById('ext-status-filter');
+     if (sInput) sInput.value = '';
+     if (cSel) cSel.value = 'all';
+     if (stSel) stSel.value = 'all';
+     renderExtAllViews();
+   }
+ 
+   function switchExtCalendarView(targetId) {
+     extActiveView = targetId;
+     document.querySelectorAll('.ext-view-panel').forEach(p => {
+       const on = p.id === targetId;
+       p.classList.toggle('hidden', !on);
+       p.classList.toggle('flex', on);
+     });
+     document.querySelectorAll('.ext-view-tab-btn').forEach(btn => {
+       const on = btn.getAttribute('data-ext-target') === targetId;
+       btn.className = on
+         ? 'ext-view-tab-btn flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg bg-emerald-700 text-white font-label-md text-label-md font-semibold shadow-sm transition-all cursor-pointer shrink-0'
+         : 'ext-view-tab-btn flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-lowest font-label-md text-label-md font-medium transition-all cursor-pointer shrink-0';
+     });
+     renderExtAllViews();
+   }
+ 
+   function handleExtMonthPickerChange(val) {
+     if (!val) return;
+     const parts = val.split('-');
+     if (parts.length === 2) {
+       updateExtCalendarPeriod(parseInt(parts[0], 10), parseInt(parts[1], 10));
+     }
+   }
+ 
+   function navigateExtPrev() {
+     let m = extCalendarMonth - 1;
+     let y = extCalendarYear;
+     if (m < 0) { m = 11; y--; }
+     if (y < 2025) { y = 2025; m = 0; }
+     updateExtCalendarPeriod(y, m);
+   }
+ 
+   function navigateExtNext() {
+     let m = extCalendarMonth + 1;
+     let y = extCalendarYear;
+     if (m > 11) { m = 0; y++; }
+     if (y > 2027) { y = 2027; m = 11; }
+     updateExtCalendarPeriod(y, m);
+   }
+ 
+   function navigateExtToday() {
+     const dated = (window.EXTERNAL_ITEMS || []).map(it => parseDateString(it.start)).filter(Boolean);
+     if (dated.length > 0) {
+       updateExtCalendarPeriod(dated[0].year, dated[0].month - 1);
+     } else {
+       const now = new Date();
+       updateExtCalendarPeriod(now.getFullYear(), now.getMonth());
+     }
+   }
+ 
+   function setExtYearView(year) {
+     updateExtCalendarPeriod(Number(year) || 2026, extCalendarMonth);
+   }
+ 
+   function updateExtCalendarPeriod(year, monthIndex) {
+     extCalendarYear = year;
+     extCalendarMonth = monthIndex;
+ 
+     const picker = document.getElementById('ext-month-picker');
+     if (picker) picker.value = `${year}-${monthIndex}`;
+ 
+     const qBadge = document.getElementById('ext-quarter-badge');
+     if (qBadge) {
+       const q = Math.floor(monthIndex / 3) + 1;
+       qBadge.textContent = `Q${q} FY${year}`;
+     }
+ 
+     const mTitle = document.getElementById('ext-month-view-title');
+     if (mTitle) mTitle.textContent = `${MONTH_NAMES[monthIndex]} ${year}`;
+ 
+     [2025, 2026, 2027].forEach(yr => {
+       const btn = document.getElementById('ext-btn-yr-' + yr);
+       if (btn) {
+         btn.className = (yr === year)
+           ? 'px-3 py-1 rounded-lg text-xs font-bold bg-emerald-700 text-white shadow-xs transition-all'
+           : 'px-3 py-1 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface transition-all';
+       }
+     });
+ 
+     renderExtAllViews();
+   }
+ 
+   function renderExtAllViews() {
+     const filtered = getFilteredExtItems();
+     renderExtMonthView(filtered, extCalendarYear, extCalendarMonth);
+     renderExtWeekView(filtered, extCalendarYear, extCalendarMonth);
+     renderExtYearMatrix(filtered, extCalendarYear, extCalendarMonth);
+     renderExtDynamicListView(filtered);
+   }
+ 
+   function renderExtMonthView(items, year, monthIndex) {
+     const grid = document.getElementById('ext-month-calendar-grid');
+     if (!grid) return;
+ 
+     const firstDayDate = new Date(year, monthIndex, 1);
+     let startOffset = firstDayDate.getDay() - 1;
+     if (startOffset < 0) startOffset = 6; // Senin = 0 ... Minggu = 6
+ 
+     const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+     const prevMonthDays = new Date(year, monthIndex, 0).getDate();
+     const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
+ 
+     const now = new Date();
+     const isCurrentMonth = now.getFullYear() === year && now.getMonth() === monthIndex;
+     const todayDate = now.getDate();
+ 
+     let html = '';
+     for (let i = 0; i < totalCells; i++) {
+       const dayNum = i - startOffset + 1;
+       const colIdx = i % 7;
+       const isWeekend = colIdx === 5 || colIdx === 6;
+ 
+       if (dayNum < 1) {
+         const pDay = prevMonthDays + dayNum;
+         html += `<div class="min-h-[110px] p-2.5 bg-surface-container-low/30 text-outline-variant flex flex-col gap-1 select-none"><span class="font-title-sm text-title-sm font-medium">${pDay}</span></div>`;
+       } else if (dayNum > daysInMonth) {
+         const nDay = dayNum - daysInMonth;
+         html += `<div class="min-h-[110px] p-2.5 bg-surface-container-low/30 text-outline-variant flex flex-col gap-1 select-none"><span class="font-title-sm text-title-sm font-medium">${nDay}</span></div>`;
+       } else {
+         const isToday = isCurrentMonth && dayNum === todayDate;
+         const cellClass = isToday
+           ? 'min-h-[110px] p-2.5 flex flex-col justify-between bg-emerald-500/[0.06] ring-2 ring-emerald-600 ring-inset rounded-lg'
+           : `min-h-[110px] p-2.5 flex flex-col justify-between ${isWeekend ? 'bg-surface-container-low/20' : 'hover:bg-surface-container-low/40'} transition-colors`;
+         const dayHeader = isToday
+           ? `<div class="flex items-center justify-between"><span class="font-title-sm text-title-sm text-emerald-700 font-extrabold">${dayNum}</span><span class="text-[10px] bg-emerald-700 text-white px-1.5 py-0.2 rounded font-semibold">Hari Ini</span></div>`
+           : `<div class="flex items-center justify-between"><span class="font-title-sm text-title-sm ${isWeekend ? 'text-outline font-semibold' : 'text-on-surface font-bold'}">${dayNum}</span></div>`;
+ 
+         html += `
+           <div data-ext-day="${dayNum}" class="${cellClass}">
+             ${dayHeader}
+             <div class="ext-day-events mt-1 flex flex-col gap-1 w-full flex-1"></div>
+           </div>
+         `;
+       }
+     }
+     grid.innerHTML = html;
+ 
+     // Inject badges for scheduled items in this month (matching Internal Training style with green theme)
+     let monthEventCount = 0;
+     const monthStart = new Date(year, monthIndex, 1);
+     const monthEnd = new Date(year, monthIndex, daysInMonth, 23, 59, 59);
+ 
+     items.forEach(item => {
+       const sParsed = parseDateString(item.start);
+       const eParsed = parseDateString(item.end) || sParsed;
+       if (!sParsed) return;
+ 
+       const sDate = new Date(sParsed.year, sParsed.month - 1, sParsed.day);
+       const eDate = new Date(eParsed.year, eParsed.month - 1, eParsed.day, 23, 59, 59);
+       if (eDate < monthStart || sDate > monthEnd) return;
+ 
+       monthEventCount++;
+       const isTraining = item.source_type === 'external_training';
+       const safeUid = escapeHtml(item.uid).replace(/'/g, "\\'");
+       const colorCls = isTraining ? 'bg-emerald-700 text-white' : 'bg-teal-600 text-white';
+ 
+       for (let d = 1; d <= daysInMonth; d++) {
+         const cur = new Date(year, monthIndex, d, 12, 0, 0);
+         if (cur >= sDate && cur <= eDate) {
+           const cellEvents = grid.querySelector(`[data-ext-day="${d}"] .ext-day-events`);
+           if (!cellEvents) continue;
+ 
+           const isStart = d === sParsed.day && (monthIndex + 1) === sParsed.month;
+           const badge = document.createElement('div');
+           badge.className = `mt-0.5 sm:mt-1 p-1 sm:p-1.5 rounded-md sm:rounded-lg ${colorCls} text-[10px] sm:text-[11px] leading-tight shadow-xs cursor-pointer hover:opacity-90 hover:scale-[1.01] transition-all`;
+           badge.title = `${item.agenda} - Klik untuk melihat rincian`;
+           badge.setAttribute('onclick', `openTrainingDetailModal('${safeUid}')`);
+ 
+           const subInfo = isTraining
+             ? `${escapeHtml(item.batch || 'Batch')} &bull; ${(item.peserta || []).length}/${item.kuota || 15} Peserta`
+             : `${escapeHtml(item.room || 'Agenda Luar Training')}`;
+ 
+           badge.innerHTML = isStart
+             ? `<div class="font-bold truncate">${escapeHtml(item.agenda)}</div><div class="text-[9.5px] sm:text-[10px] opacity-90 truncate">${subInfo}</div>`
+             : `<div class="font-semibold truncate opacity-90">&#8627; ${escapeHtml(item.agenda)}</div>`;
+           cellEvents.appendChild(badge);
+         }
+       }
+     });
+ 
+     const unscheduled = items.filter(it => !parseDateString(it.start));
+     const countLabel = document.getElementById('ext-calendar-session-count');
+     if (countLabel) {
+       countLabel.innerHTML = `&bull; ${monthEventCount} Sesi Terjadwal (${MONTH_NAMES[monthIndex]} ${year})` +
+         (unscheduled.length > 0 ? ` &bull; ${unscheduled.length} Rencana Program` : '');
+     }
+ 
+     const unsBox = document.getElementById('ext-unscheduled-box');
+     if (unsBox) {
+       if (unscheduled.length > 0) {
+         unsBox.classList.remove('hidden');
+         unsBox.innerHTML = `
+           <div class="flex flex-col gap-2.5">
+             <div class="text-label-md font-semibold text-on-surface flex items-center gap-2">
+               <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+               <span>Rencana Program External Training (Menunggu Tanggal Pelaksanaan)</span>
+             </div>
+             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+               ${unscheduled.map(u => {
+                 const safeUid = escapeHtml(u.uid).replace(/'/g, "\\'");
+                 return `
+                   <div onclick="openTrainingDetailModal('${safeUid}')" class="p-3 rounded-xl bg-surface-container-lowest hover:bg-emerald-50/50 border border-outline-variant/50 flex items-center justify-between gap-2 cursor-pointer transition-all">
+                     <div class="min-w-0">
+                       <div class="font-semibold text-on-surface text-body-sm truncate">${escapeHtml(u.agenda)}</div>
+                       <div class="text-[11px] text-on-surface-variant">Tanggal Menyusul (TBA)</div>
+                     </div>
+                     <span class="material-symbols-outlined text-emerald-700 text-[18px] shrink-0">chevron_right</span>
+                   </div>
+                 `;
+               }).join('')}
+             </div>
+           </div>
+         `;
+       } else {
+         unsBox.classList.add('hidden');
+         unsBox.innerHTML = '';
+       }
+     }
+   }
+ 
+   function renderExtWeekView(items, year, monthIndex) {
+     const body = document.getElementById('ext-week-view-body');
+     const titleEl = document.getElementById('ext-week-view-title');
+     const badgeEl = document.getElementById('ext-week-count-badge');
+     if (!body) return;
+ 
+     if (titleEl) titleEl.textContent = `Jadwal Mingguan: ${MONTH_NAMES[monthIndex]} ${year}`;
+ 
+     const monthStart = new Date(year, monthIndex, 1);
+     const monthEnd = new Date(year, monthIndex + 1, 0);
+     const datedItems = items.map(it => {
+       const s = parseDateString(it.start);
+       const e = parseDateString(it.end) || s;
+       if (!s) return null;
+       return {
+         it,
+         r: [new Date(s.year, s.month - 1, s.day), new Date(e.year, e.month - 1, e.day)]
+       };
+     }).filter(x => x && x.r[0] <= monthEnd && x.r[1] >= monthStart);
+ 
+     if (badgeEl) badgeEl.textContent = `${datedItems.length} Agenda Terjadwal`;
+ 
+     if (!datedItems.length) {
+       body.innerHTML = `<div class="p-8 text-center text-on-surface-variant bg-surface-container-low/40 rounded-2xl">Tidak ada agenda terjadwal pada ${MONTH_NAMES[monthIndex]} ${year}.</div>`;
+       return;
+     }
+ 
+     const DAY = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+     const short = d => `${d.getDate()} ${MONTH_NAMES[d.getMonth()].slice(0, 3)}`;
+     let html = '';
+     for (let ws = new Date(year, monthIndex, 1 - ((monthStart.getDay() + 6) % 7)); ws <= monthEnd; ws = new Date(ws.getFullYear(), ws.getMonth(), ws.getDate() + 7)) {
+       const we = new Date(ws.getFullYear(), ws.getMonth(), ws.getDate() + 6);
+       const inWeek = datedItems.filter(x => x.r[0] <= we && x.r[1] >= ws);
+       const heads = DAY.map((n, i) => {
+         const d = new Date(ws.getFullYear(), ws.getMonth(), ws.getDate() + i);
+         return `<div class="text-center text-[11px] ${i > 4 ? 'text-outline' : 'text-on-surface-variant'} ${d.getMonth() !== monthIndex ? 'opacity-40' : ''}"><span class="font-semibold">${n}</span> ${d.getDate()}</div>`;
+       }).join('');
+       const bars = inWeek.map(x => {
+         const a = Math.max(0, Math.round((x.r[0] - ws) / 864e5));
+         const b = Math.min(6, Math.round((x.r[1] - ws) / 864e5));
+         const isTr = x.it.source_type === 'external_training';
+         const barColor = isTr ? 'bg-emerald-700 text-white' : 'bg-teal-600 text-white';
+         const safeUid = escapeHtml(x.it.uid).replace(/'/g, "\\'");
+         const subLabel = isTr
+           ? `${escapeHtml(x.it.room || '')} &bull; ${(x.it.peserta || []).length}/${x.it.kuota || 15} Peserta`
+           : `${escapeHtml(x.it.room || 'Agenda Luar Training')}`;
+         const xScope = x.it.source_type || 'external_training';
         const xKey = x.it.id_jadwal || x.it.uid;
         const isAdminOn = typeof window.isAdminAuthenticated === 'function' && window.isAdminAuthenticated();
         const extAdminActions = isAdminOn
           ? `<span class="inline-flex items-center gap-0.5 ml-1 shrink-0"><span onclick="event.stopPropagation(); openAdminScheduleModal('edit', ${jsArg(xKey)}, ${jsArg(xScope)})" class="w-5 h-5 rounded bg-black/25 hover:bg-black/45 text-white inline-flex items-center justify-center cursor-pointer" title="Edit Jadwal"><span class="material-symbols-outlined text-[12px]">edit</span></span><span onclick="event.stopPropagation(); openAdminDeleteModal(${jsArg(xKey)}, ${jsArg(xScope)}, ${jsArg(x.it.agenda)})" class="w-5 h-5 rounded bg-red-600/80 hover:bg-red-700 text-white inline-flex items-center justify-center cursor-pointer" title="Hapus Jadwal"><span class="material-symbols-outlined text-[12px]">delete</span></span></span>`
           : '';
-        const subLabel = isTr
-          ? `${escapeHtml(x.it.room || '')} &bull; ${(x.it.peserta || []).length}/${x.it.kuota || 15} Peserta`
-          : `${escapeHtml(x.it.room || 'Agenda Luar Training')}`;
         return `<div onclick="openTrainingDetailModal('${safeUid}')" style="grid-column:${a + 1} / ${b + 2}" class="${barColor} shadow-xs hover:opacity-90 rounded-lg px-2.5 py-1.5 text-left text-[12px] leading-tight transition-all min-w-0 cursor-pointer flex items-center justify-between gap-1"><div class="min-w-0 flex-1"><span class="block font-bold truncate">${escapeHtml(x.it.agenda)}</span><span class="block text-[10px] opacity-90 truncate">${subLabel}</span></div>${extAdminActions}</div>`;
-      }).join('');
-      html += `<div class="min-w-[640px]"><div class="text-label-md font-semibold text-on-surface mb-2">${short(ws)} - ${short(we)}</div><div class="grid grid-cols-7 gap-1 pb-1 border-b border-surface-container">${heads}</div><div class="grid grid-cols-7 gap-1 pt-2">${bars || '<div class="col-span-7 text-center text-[12px] text-outline py-2">Tidak ada sesi</div>'}</div></div>`;
-    }
-    body.innerHTML = html;
-  }
+       }).join('');
+       html += `<div class="min-w-[640px]"><div class="text-label-md font-semibold text-on-surface mb-2">${short(ws)} - ${short(we)}</div><div class="grid grid-cols-7 gap-1 pb-1 border-b border-surface-container">${heads}</div><div class="grid grid-cols-7 gap-1 pt-2">${bars || '<div class="col-span-7 text-center text-[12px] text-outline py-2">Tidak ada sesi</div>'}</div></div>`;
+     }
+     body.innerHTML = html;
+   }
 
   function renderExtYearMatrix(items, year, activeMonth) {
     const grid = document.getElementById('ext-year-matrix-grid');
@@ -10107,10 +11016,21 @@
       });
     });
 
-    // Tab awal dari hash URL (#beranda, #pendaftaran, #jadwal); default Beranda
-    switchPageTab((window.location.hash || '').replace('#', '') || 'beranda');
+    // Tab awal dari hash URL (#beranda, #pendaftaran, #jadwal, #waiting-list); default Beranda
+    var initHash = (window.location.hash || '').replace('#', '');
+    if (initHash === 'waiting-list') {
+      switchPageTab('jadwal');
+      setTimeout(function() { if (typeof openWaitingListModal === 'function') openWaitingListModal(); }, 350);
+    } else {
+      switchPageTab(initHash || 'beranda');
+    }
     window.addEventListener('hashchange', function() {
-      switchPageTab((window.location.hash || '').replace('#', '') || 'beranda');
+      var h = (window.location.hash || '').replace('#', '');
+      if (h === 'waiting-list') {
+        if (typeof openWaitingListModal === 'function') openWaitingListModal();
+      } else {
+        switchPageTab(h || 'beranda');
+      }
     });
 
     // Pencarian cepat header: filter tabel peserta + sinkron ke pencarian jadwal
@@ -10276,9 +11196,10 @@
 
   /* ------------------------------ Master kompetensi ------------------------------ */
   async function loadMasterViaGviz() {
-    const url = 'https://docs.google.com/spreadsheets/d/' + SPREADSHEET_ID + '/gviz/tq?tqx=out:json&headers=1&sheet=Master_Competency&tq=' + encodeURIComponent('select C, D');
-    const txt = await (await fetch(url)).text();
-    const json = JSON.parse(txt.substring(txt.indexOf('{'), txt.lastIndexOf('}') + 1));
+    const json = typeof fetchGvizSheetJson === 'function'
+      ? await fetchGvizSheetJson(SPREADSHEET_ID, 'Master_Competency', 'select C, D')
+      : null;
+    if (!json || !json.table || !Array.isArray(json.table.rows)) return [];
     return (json.table.rows || []).map((r) => ({
       nama: r.c && r.c[0] && r.c[0].v != null ? String(r.c[0].v) : '',
       jenis: r.c && r.c[1] && r.c[1].v != null ? String(r.c[1].v) : ''
@@ -11982,6 +12903,11 @@
         _toast('success', 'Login Admin', 'Selamat datang, ' + _adminState.name + '.');
         var pwEl = document.getElementById('admin-login-password');
         if (pwEl) pwEl.value = '';
+        if (typeof window._onAdminLoginSuccess === 'function') {
+          var cb = window._onAdminLoginSuccess;
+          window._onAdminLoginSuccess = null;
+          setTimeout(cb, 120);
+        }
       } else {
         _showAdminLoginError(_errMsg(res.code, res.message));
       }
