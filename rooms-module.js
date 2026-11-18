@@ -302,13 +302,14 @@
     const usedAgendaIds = new Set();
 
     // A. Ambil Data Jadwal Resmi (Internal, External, Agenda Luar)
-    const internalList = (window.LIVE_SCHEDULES && Array.isArray(window.LIVE_SCHEDULES) && window.LIVE_SCHEDULES.length > 0)
+    const internalListAll = (window.LIVE_SCHEDULES && Array.isArray(window.LIVE_SCHEDULES) && window.LIVE_SCHEDULES.length > 0)
       ? window.LIVE_SCHEDULES
       : ((window.DATABASE_DATA && Array.isArray(window.DATABASE_DATA))
         ? window.DATABASE_DATA
         : ((typeof LIVE_SCHEDULES !== 'undefined' && Array.isArray(LIVE_SCHEDULES))
           ? LIVE_SCHEDULES
-          : []));
+          : [])); // Training Request belum disetujui: tidak memakai ruangan
+    const internalList = internalListAll.filter(i => !i.is_request);
 
     const extList = (window.EXTERNAL_DATA && Array.isArray(window.EXTERNAL_DATA)) ? window.EXTERNAL_DATA : [];
     const agList = (window.AGENDA_DATA && Array.isArray(window.AGENDA_DATA)) ? window.AGENDA_DATA : [];
@@ -350,6 +351,7 @@
       if (!item) return;
       const dObj = item.date_obj || parseToDateObj(item.start || item.tanggal_pelatihan || item.tanggal);
       const endObj = item.end_date_obj || parseToDateObj(item.end || item.tanggal_selesai || item.tanggal_pelatihan || item.tanggal);
+      const isRoomBooking = item.is_room_booking === true;
       registerMaster(
         item.id_jadwal || item.id,
         item.agenda || item.nama_silabus || item.nama_pelatihan,
@@ -358,8 +360,10 @@
         item.batch,
         item.kuota || item.kuota_peserta,
         item.sisa_kuota,
-        'internal',
-        'Internal Training',
+        isRoomBooking ? 'room_booking' : 'internal',
+        isRoomBooking
+          ? `Booking Ruangan - ${item.usage_type === 'non_training' ? 'Non-Training' : 'Training'}`
+          : 'Internal Training',
         item.duration_hour || item.duration || 2,
         item.start_hour || item.jam_mulai,
         dObj,
@@ -472,8 +476,10 @@
         hour_display: `${startHour} - ${endHour} WIB`,
         pic: resolvedPic,
         contact: matched ? (matched.contact || '') : (row.notes || ''),
-        category: matched ? matched.category : 'custom',
-        category_label: matched ? matched.category_label : 'Penggunaan Ruangan',
+        category: row.is_room_booking ? 'room_booking' : (matched ? matched.category : 'custom'),
+        category_label: row.is_room_booking
+          ? `Booking Ruangan - ${row.usage_type === 'non_training' ? 'Non-Training' : 'Training'}`
+          : (matched ? matched.category_label : 'Penggunaan Ruangan'),
         batch: matched ? matched.batch : '',
         kuota: matched ? matched.kuota : 0,
         sisa_kuota: matched ? matched.sisa_kuota : 0,
@@ -486,7 +492,7 @@
 
     // D. Masukkan Pelatihan Internal/External yang memiliki ruangan tapi belum ada di roomsUse
     internalList.forEach(item => {
-      if (!item || !item.ruangan) return;
+      if (!item || !(item.room || item.ruangan)) return;
       const id = String(item.id_jadwal || item.id || '').trim();
       const dObj = item.date_obj || parseToDateObj(item.start || item.tanggal_pelatihan || item.tanggal);
       const iso = dObj ? toIsoDate(dObj) : '';
@@ -504,7 +510,7 @@
         source: 'internal_training',
         id_jadwal: id || 'JADWAL-' + Date.now(),
         agenda: agendaTitle || 'Pelatihan Internal',
-        room: item.ruangan,
+        room: item.room || item.ruangan,
         date_iso: iso,
         date_obj: dObj,
         end_date_obj: endObj,
@@ -516,12 +522,16 @@
         hour_display: `${startHour} - ${endHour} WIB`,
         pic: item.nama_trainer || item.pic || 'Trainer L&D',
         contact: item.trainer_contact || '',
-        category: 'internal',
-        category_label: 'Internal Training',
+        category: item.is_room_booking ? 'room_booking' : 'internal',
+        category_label: item.is_room_booking
+          ? `Booking Ruangan - ${item.usage_type === 'non_training' ? 'Non-Training' : 'Training'}`
+          : 'Internal Training',
         batch: item.batch ? `Batch ${item.batch}` : '',
         kuota: item.kuota || item.kuota_peserta || 0,
         sisa_kuota: item.sisa_kuota != null ? item.sisa_kuota : (item.kuota || 0),
-        status: item.status || item.status_pelatihan || 'CONFIRMED'
+        status: item.status || item.status_pelatihan || 'CONFIRMED',
+        is_room_booking: item.is_room_booking === true,
+        usage_type: item.usage_type || ''
       });
     });
 
@@ -1823,9 +1833,10 @@
     const agendaSelect = document.getElementById('rb-agenda-id-select');
     if (agendaSelect) {
       let optHtml = `<option value="custom">&mdash; Booking Mandiri / Acara Baru &mdash;</option>`;
-      const internalList = (window.LIVE_SCHEDULES && Array.isArray(window.LIVE_SCHEDULES))
+      const internalListAll = (window.LIVE_SCHEDULES && Array.isArray(window.LIVE_SCHEDULES))
         ? window.LIVE_SCHEDULES
         : ((window.DATABASE_DATA && Array.isArray(window.DATABASE_DATA)) ? window.DATABASE_DATA : []);
+      const internalList = internalListAll.filter(i => !i.is_request && (!i.is_room_booking || i.linked_schedule_id));
 
       if (internalList.length > 0) {
         optHtml += `<optgroup label="Jadwal Pelatihan Internal">`;
@@ -1880,11 +1891,13 @@
     const duration = parseFloat(document.getElementById('rb-duration')?.value || 2) || 2;
     const selectedAgendaId = document.getElementById('rb-agenda-id-select')?.value || '';
     const agenda = document.getElementById('rb-agenda')?.value || '';
+    const usageType = document.getElementById('rb-usage-type')?.value || '';
     const pic = document.getElementById('rb-pic')?.value || '';
+    const contact = document.getElementById('rb-contact')?.value || '';
     const notes = document.getElementById('rb-notes')?.value || '';
 
-    if (!room || !date || !agenda) {
-      alert("Mohon lengkapi Ruangan, Tanggal, dan Nama Agenda / Kegiatan.");
+    if (!room || !date || !agenda || !pic || !usageType) {
+      alert("Mohon lengkapi Ruangan, Tanggal, Kegunaan, Agenda, dan PIC.");
       if (btn) { btn.disabled = false; btn.innerHTML = origHtml; }
       return;
     }
@@ -1900,17 +1913,21 @@
     const newRecord = {
       no: String(ROOMS_USE_DATA.length + 1),
       agenda_id: agendaId,
+      id_jadwal: agendaId,
       agenda: agenda,
       date: date,
       room: room,
       hour: hourDot,
       duration: duration,
       pic: pic,
+      contact: contact,
       notes: notes,
-      date_obj: parseToDateObj(date)
+      date_obj: parseToDateObj(date),
+      is_room_booking: true,
+      usage_type: usageType,
+      linked_schedule_id: usageType === 'training' && selectedAgendaId !== 'custom' ? selectedAgendaId : ''
     };
 
-    let savedRemote = false;
     try {
       const apiUrl = (typeof API_URL !== 'undefined' && API_URL)
         ? API_URL
@@ -1926,13 +1943,20 @@
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(payload)
       });
-
-      if (resp.ok) {
-        const res = await resp.json();
-        if (res && res.status === 'success') savedRemote = true;
+      const res = await resp.json();
+      if (!resp.ok || !res || res.status !== 'success') {
+        throw new Error((res && res.message) || `Server menolak booking (HTTP ${resp.status}).`);
+      }
+      if (res.schedule && res.schedule.id_jadwal) {
+        newRecord.agenda_id = res.schedule.id_jadwal;
+        newRecord.id_jadwal = res.schedule.id_jadwal;
+        newRecord.linked_schedule_id = res.schedule.linked_schedule_id || '';
       }
     } catch (netErr) {
-      console.warn("Koneksi simpan booking online gagal, menyimpan di sesi lokal:", netErr);
+      console.error("Gagal menyimpan booking ruangan:", netErr);
+      alert(`Booking gagal disimpan ke Jadwal Pelatihan. ${netErr.message || netErr}`);
+      if (btn) { btn.disabled = false; btn.innerHTML = origHtml; }
+      return;
     }
 
     ROOMS_USE_DATA.push(newRecord);
@@ -1944,9 +1968,7 @@
 
     if (btn) { btn.disabled = false; btn.innerHTML = origHtml; }
 
-    const msg = savedRemote
-      ? `Penggunaan ruangan "${room}" pada ${date} (${startHour} - ${endHour} WIB, ${duration} Jam) berhasil dicatat dan disinkronkan ke sheet roomsUse!`
-      : `Penggunaan ruangan "${room}" pada ${date} (${startHour} - ${endHour} WIB, ${duration} Jam) berhasil dicatat dalam sesi lokal.`;
+    const msg = `Booking ruangan "${room}" untuk ${usageType === 'training' ? 'Training' : 'Non-Training'} pada ${date} (${startHour} - ${endHour} WIB, ${duration} Jam) berhasil dicatat di sheet Jadwal Pelatihan.`;
     alert(msg);
   }
 

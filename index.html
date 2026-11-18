@@ -2028,6 +2028,7 @@ Hari Ini
 <option value="internal">Internal Training</option>
 <option value="external">External Training</option>
 <option value="agenda">Agenda di Luar Training</option>
+<option value="room_booking">Booking Ruangan</option>
 <option value="custom">Catatan / Booking Khusus</option>
 </select>
 <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-outline text-[16px] pointer-events-none">expand_more</span>
@@ -2447,7 +2448,7 @@ Data sedang dimasukkan ke sistem.
 <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-amber-400 text-amber-950">Admin Action</span>
 <span class="text-xs text-white/70">Waiting List &rarr; Kalender Resmi</span>
 </div>
-<h3 id="assign-date-modal-title" class="font-headline-sm text-title-md sm:text-headline-sm font-bold leading-tight mt-0.5">Berikan Tanggal &amp; Tetapkan Jadwal</h3>
+<h3 id="assign-date-modal-title" class="font-headline-sm text-title-md sm:text-headline-sm font-bold leading-tight mt-0.5">Setujui Request &amp; Tetapkan Jadwal</h3>
 </div>
 </div>
 <button type="button" onclick="closeAdminAssignDateModal()" class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/10 text-white/70 hover:text-white transition-colors cursor-pointer shrink-0" title="Tutup Modal">
@@ -2457,6 +2458,13 @@ Data sedang dimasukkan ke sistem.
 <form id="admin-assign-date-form" onsubmit="submitAssignDateToWaitingList(event)" class="flex-1 overflow-y-auto p-5 sm:p-7 flex flex-col gap-5">
 <input type="hidden" id="assign-date-req-id" value="">
 <input type="hidden" id="assign-date-agenda" value="">
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-on-surface" for="assign-date-existing-schedule">Gabungkan ke jadwal yang sudah ada (opsional)</label>
+<select id="assign-date-existing-schedule" onchange="handleAssignExistingScheduleChange()" class="w-full h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-xs cursor-pointer">
+<option value="">Buat jadwal baru</option>
+</select>
+<p id="assign-date-existing-schedule-hint" class="text-xs text-on-surface-variant">Pilih jadwal pelatihan yang sama untuk menggabungkan peserta dari request berbeda tanpa membuat jadwal baru.</p>
+</div>
 <div class="p-4 rounded-xl bg-amber-50/70 border border-amber-200/80 flex flex-col gap-2.5">
 <div class="flex items-start justify-between gap-3">
 <div class="min-w-0">
@@ -2516,15 +2524,12 @@ Waktu / Jam Mulai Pelatihan <span class="text-error">*</span>
 <span class="material-symbols-outlined text-[16px] text-primary">meeting_room</span>
 Ruangan Pelatihan <span class="text-error">*</span>
 </label>
-<input type="text" id="assign-date-room" list="assign-date-rooms-list" value="Gold Room" required placeholder="Contoh: Gold Room / Ruang Diklat" class="w-full h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-xs">
+<input type="text" id="assign-date-room" list="assign-date-rooms-list" value="Gold Room 2 &amp; 3" required placeholder="Pilih / ketik ruangan, mis. Gold Room 2 &amp; 3, GSG" class="w-full h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-xs">
 <datalist id="assign-date-rooms-list">
-<option value="Gold Room">Gold Room</option>
-<option value="Ruang Diklat Lantai 2">Ruang Diklat Lantai 2</option>
-<option value="Safety Induction Room">Safety Induction Room</option>
-<option value="Training Center Room A">Training Center Room A</option>
-<option value="Training Center Room B">Training Center Room B</option>
-<option value="Workshop Diklat">Workshop Diklat</option>
-<option value="Meeting Room Utama">Meeting Room Utama</option>
+<option value="Gold Room 2 &amp; 3">Gold Room 2 &amp; 3 (Kap: 30)</option>
+<option value="Gold Room 2">Gold Room 2 (Kap: 20)</option>
+<option value="Gold Room 3">Gold Room 3 (Kap: 10)</option>
+<option value="GSG">GSG (Kap: 100)</option>
 </datalist>
 </div>
 </div>
@@ -2574,8 +2579,40 @@ Batal
 </button>
 <button type="submit" id="assign-date-submit-btn" class="h-10 px-5 rounded-xl bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold inline-flex items-center gap-2 shadow-sm transition-all cursor-pointer">
 <span class="material-symbols-outlined text-[18px]">event_available</span>
-<span id="assign-date-submit-text">Simpan &amp; Masukkan ke Kalender</span>
+<span id="assign-date-submit-text">Setujui &amp; Masukkan ke Kalender</span>
 </button>
+</div>
+</form>
+</div>
+</div>
+<div id="admin-reject-request-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-on-surface/50 hidden backdrop-blur-xs">
+<div role="dialog" aria-modal="true" aria-labelledby="reject-req-title" class="bg-surface-container-lowest rounded-2xl shadow-2xl border border-outline-variant/60 w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden">
+<div class="px-5 sm:px-6 py-4 border-b border-outline-variant/50 bg-red-900 text-white flex items-start justify-between gap-4 shrink-0">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded-xl bg-red-500/20 text-red-200 flex items-center justify-center shrink-0 border border-red-400/40"><span class="material-symbols-outlined text-[22px]">block</span></div>
+<div class="min-w-0"><span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-red-200 text-red-950">Admin Action</span>
+<h3 id="reject-req-title" class="font-headline-sm text-title-md font-bold leading-tight mt-0.5">Tolak Request Pelatihan</h3></div>
+</div>
+<button type="button" onclick="closeRejectRequestModal()" class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/10 text-white/70 hover:text-white transition-colors cursor-pointer shrink-0" title="Tutup"><span class="material-symbols-outlined text-[18px]">close</span></button>
+</div>
+<form id="admin-reject-request-form" onsubmit="submitRejectRequest(event)" class="flex-1 overflow-y-auto p-5 sm:p-6 flex flex-col gap-4">
+<input type="hidden" id="reject-req-id" value="">
+<div class="p-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-950">
+<div class="font-bold" id="reject-req-agenda">-</div>
+<div class="text-xs mt-0.5"><span id="reject-req-peserta">0</span> calon peserta &bull; Pemohon: <span id="reject-req-pic">-</span></div>
+<div class="text-xs mt-2">Request ini akan ditandai <strong>Ditolak</strong> di sheet Data Pendaftaran dan hilang dari kalender &amp; Waiting List.</div>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-on-surface" for="reject-req-reason">Alasan penolakan (opsional)</label>
+<textarea id="reject-req-reason" rows="2" maxlength="120" placeholder="Contoh: Kuota penuh / ruangan tidak tersedia" class="w-full p-3 rounded-xl bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-xs"></textarea>
+</div>
+<div class="flex flex-col gap-1.5">
+<label class="text-xs font-bold text-on-surface" for="reject-req-password">Password Admin (konfirmasi) <span class="text-error">*</span></label>
+<input type="password" id="reject-req-password" autocomplete="current-password" required class="w-full h-10 px-3 rounded-xl bg-surface-container-lowest border border-outline-variant font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary shadow-xs">
+</div>
+<div class="pt-3 border-t border-outline-variant/50 flex flex-wrap items-center justify-between gap-3">
+<button type="button" onclick="closeRejectRequestModal()" class="h-10 px-4 rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md font-semibold transition-colors cursor-pointer">Batal</button>
+<button type="submit" id="reject-req-submit-btn" class="h-10 px-5 rounded-xl bg-red-700 hover:bg-red-800 text-white font-label-md text-label-md font-semibold inline-flex items-center gap-2 shadow-sm transition-all cursor-pointer"><span class="material-symbols-outlined text-[18px]">block</span><span id="reject-req-submit-text">Tolak Request</span></button>
 </div>
 </form>
 </div>
@@ -2696,7 +2733,7 @@ Disamarkan demi privasi
 </div>
 <div>
 <h3 class="font-title-sm text-title-sm font-bold text-white">Catat / Reservasi Ruangan</h3>
-<p class="text-[11px] text-white/70">Pencatatan data pemakaian ke sheet <code class="font-mono bg-white/20 px-1 py-0.2 rounded">roomsUse</code></p>
+<p class="text-[11px] text-white/70">Booking ruangan tercatat di sheet Jadwal Pelatihan</p>
 </div>
 </div>
 <button type="button" onclick="closeRoomBookingModal()" class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/10 text-white/80 hover:text-white transition-colors cursor-pointer">
@@ -2722,6 +2759,13 @@ Disamarkan demi privasi
 <span class="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-outline text-[18px] pointer-events-none">expand_more</span>
 </div>
 <p class="text-[10.5px] text-on-surface-variant mt-1">Pilih jadwal pelatihan yang ada untuk otomatis mengisi nama agenda, PIC, dan jam.</p>
+</div>
+<div>
+<label class="block text-xs font-semibold text-on-surface mb-1">Kegunaan Ruangan <span class="text-error">*</span></label>
+<select id="rb-usage-type" required class="w-full h-10 px-3 bg-surface-container-low text-on-surface text-xs font-semibold rounded-xl border border-outline-variant/40 focus:ring-2 focus:ring-indigo-600 focus:outline-none">
+<option value="training">Training</option>
+<option value="non_training">Non-Training</option>
+</select>
 </div>
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
 <div>
@@ -2770,7 +2814,7 @@ Batal
 </button>
 <button type="submit" id="btn-submit-room-booking" class="h-10 px-5 rounded-xl bg-indigo-700 hover:bg-indigo-800 text-white text-xs font-semibold inline-flex items-center gap-1.5 shadow-sm transition-all cursor-pointer">
 <span class="material-symbols-outlined text-[17px]">save</span>
-<span>Simpan Data Pemakaian</span>
+<span>Simpan Booking Ruangan</span>
 </button>
 </div>
 </form>
@@ -3016,6 +3060,10 @@ ID Jadwal (Auto-Generate)
 <label for="admin-input-room" class="text-label-md font-semibold text-on-surface">Ruangan / Lokasi Pelaksanaan</label>
 <input type="text" id="admin-input-room" list="admin-room-suggestions" placeholder="Contoh: Gold Room / Ruang Diklat Utama" class="w-full h-10 px-3.5 rounded-xl bg-surface-container-lowest border border-outline-variant/70 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary">
 <datalist id="admin-room-suggestions">
+<option value="Gold Room 2 &amp; 3">Gold Room 2 &amp; 3 (Kap: 30)</option>
+<option value="Gold Room 2">Gold Room 2 (Kap: 20)</option>
+<option value="Gold Room 3">Gold Room 3 (Kap: 10)</option>
+<option value="GSG">GSG (Kap: 100)</option>
 <option value="Gold Room"></option>
 <option value="Silver Room"></option>
 <option value="Ruang Diklat Utama"></option>
@@ -3250,6 +3298,7 @@ Masukkan Ulang Password Admin <span class="text-error">*</span>
 </div>
 </div>
 <script defer src="assets/js/index-core.9f1f6a48.js"></script>
+<script defer src="assets/js/waiting-list-merge.js"></script>
 </div>
 <script defer src="assets/js/index-competency.658d4878.js"></script>
 <script defer src="assets/js/index-rooms.19543b0f.js"></script>
