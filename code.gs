@@ -37,6 +37,8 @@ var SHEET_EXTERNAL_SCHEDULE = "External_Training_Schedule";
 var SHEET_AGENDA_LUAR = "AGENDA_DILUAR_TRAINING";
 var SHEET_EXTERNAL_MANPOWER = "External_Training_Manpower";
 var SHEET_AKSES_ADMIN = "akses_admin";
+var SHEET_ROOM_LIST = "roomList";
+var SHEET_ROOMS_USE = "roomsUse";
 var SPREADSHEET_ID = "1Y5IQUSN84p2Os1e9wxraDIfZF6UfOql4Y5EdXbv850A";
 var DRIVE_FOLDER_ID = "1n8o051xeC0EmH1O_vUcfzGn4oZzLAL-a";
 var DEFAULT_COMPANY = "PT Pani Bersama Tambang";
@@ -70,6 +72,12 @@ function isoDate(v, tz) {
 }
 function isClosed(s) { return /tutup|selesai|closed|batal|cancel/i.test(s); }
 function isRejected(s) { return /ditolak|batal|reject/i.test(s); }
+function isRequestRegistrationRow(row, requestId) {
+  var rowId = str(row[8]);
+  if (rowId && rowId.toLowerCase() === requestId.toLowerCase()) return true;
+  var legacyRequest = /^REQ-(.+)$/i.exec(requestId);
+  return !rowId && legacyRequest && str(row[1]).toLowerCase() === legacyRequest[1].toLowerCase();
+}
 
 /**
  * Mengecek apakah pendaftaran pelatihan telah mencapai batas penutupan H-1.
@@ -313,6 +321,11 @@ function loadJadwal(sh, tz) {
     if (!id && !agenda) continue;
     var rawHour = (cStartHour !== -1 && cStartHour < r.length) ? r[cStartHour] : "";
     var parsedH = parseGasStartHour(rawHour, tz);
+    var deskripsi = str(r[cDesc]);
+    var roomBooking = /^\[BOOKING RUANGAN\]/i.test(deskripsi);
+    var usageMatch = deskripsi.match(/Kegunaan:\s*(Non-Training|Training)/i);
+    var linkedMatch = deskripsi.match(/Terkait Jadwal:\s*([^;\r\n]+)/i);
+    var bookingDurationMatch = deskripsi.match(/Durasi Booking:\s*([\d.]+)\s*jam/i);
 
     out.push({
       row: i + 2,
@@ -330,7 +343,11 @@ function loadJadwal(sh, tz) {
       kuota: Number(r[cKuota]) || 0,
       sisaRaw: r[cSisa],
       status: str(r[cStatus]),
-      deskripsi: str(r[cDesc]),
+      deskripsi: deskripsi,
+      isRoomBooking: roomBooking,
+      usageType: usageMatch ? usageMatch[1].toLowerCase().replace("-", "_") : "",
+      linkedScheduleId: linkedMatch ? str(linkedMatch[1]) : "",
+      bookingDuration: bookingDurationMatch ? Number(bookingDurationMatch[1]) : 0,
       statusJadwal: cStatusJadwal !== -1 ? str(r[cStatusJadwal]) : "",
       planStartRaw: cPlanStart !== -1 ? r[cPlanStart] : "",
       planEndRaw: cPlanEnd !== -1 ? r[cPlanEnd] : ""
@@ -559,7 +576,7 @@ function loadExternalData(ss, tz) {
         end: endStr,
         duration: dur,
         duration_day: parseInt(j.dDay, 10) || 0,
-        duration_hour: parseInt(j.dHour, 10) || 0,
+        duration_hour: j.bookingDuration || parseInt(j.dHour, 10) || 0,
         start_hour: j.startHour,
         start_minutes: j.startMinutes,
         agenda: j.agenda,
@@ -777,6 +794,21 @@ function doGet(e) {
       return fail("E_SERVER", "Gagal membaca kalender eksternal: " + errExt);
     }
   }
+  if (e && e.parameter && e.parameter.action === "rooms") {
+    try {
+      var ssRooms = getSpreadsheet();
+      var tzRooms = ssRooms.getSpreadsheetTimeZone() || "Asia/Jakarta";
+      return jsonOut({
+        status: "success",
+        source_list: SHEET_ROOM_LIST,
+        source_use: SHEET_ROOMS_USE,
+        data: loadRoomData(ssRooms, tzRooms),
+        generated_at: new Date().toISOString()
+      });
+    } catch (errRooms) {
+      return fail("E_SERVER", "Gagal membaca data ruangan: " + errRooms);
+    }
+  }
   try {
     var ss = getSpreadsheet(), shJ = ss.getSheetByName(SHEET_JADWAL);
     if (!shJ) return fail("E_SHEET_JADWAL", "Sheet '" + SHEET_JADWAL + "' tidak ditemukan.");
@@ -850,7 +882,10 @@ function doGet(e) {
         status_jadwal: j.statusJadwal || "",
         plan_start: planDates.start || "",
         plan_end: planDates.end || "",
-        deskripsi: j.deskripsi, peserta: peserta
+        deskripsi: j.deskripsi, peserta: peserta,
+        is_room_booking: j.isRoomBooking,
+        usage_type: j.usageType,
+        linked_schedule_id: j.linkedScheduleId
       });
     });
 
@@ -860,6 +895,7 @@ function doGet(e) {
       var idJ = str(r[8]), namaP = str(r[9]);
       var isReq = (/^REQ-/i.test(idJ)) || (/^CUSTOM/i.test(idJ)) || (/custom request/i.test(namaP));
       if (!isReq) return;
+      if (isRejected(str(r[13]))) return; // request yang sudah ditolak admin tidak ditampilkan
 
       var groupKey = idJ || str(r[1]) || namaP;
       if (!reqGroups[groupKey]) {
@@ -898,7 +934,18 @@ function doGet(e) {
       var cleanReqTitle = normStr(req.agenda);
       var matched = null;
 
-      // Cari apakah sudah ada jadwal resmi yang cocok di Jadwal Pelatihan
+      // Cari apakah sudah ada jadwal resmi yang cocok di Jadwal Pelatihan.
+      // Kecocokan JUDUL saja tidak cukup (judul yang sama dipakai banyak batch/tanggal), maka:
+      //  - Request BERTANGGAL  : cocok hanya jika tanggal usulan berada dalam rentang jadwal resmi.
+      //  - Request TENTATIF    : cocok hanya jika hanya ada SATU jadwal resmi dengan judul tersebut.
+      var dayNum = function (str) {
+        var t = String(str || "");
+        var iso = t.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (iso) return (+iso[1]) * 10000 + (+iso[2]) * 100 + (+iso[3]);
+        var d = new Date(Date.parse(t));
+        return isNaN(d.getTime()) ? 0 : d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+      };
+      var titleCands = [];
       for (var m = 0; m < list.length; m++) {
         var itemOfficial = list[m];
         if (itemOfficial.is_request) continue;
@@ -908,11 +955,20 @@ function doGet(e) {
         }
         var cleanOfficialTitle = normStr(itemOfficial.agenda);
         if (cleanReqTitle && cleanOfficialTitle && (cleanOfficialTitle === cleanReqTitle || cleanOfficialTitle.indexOf(cleanReqTitle) !== -1 || cleanReqTitle.indexOf(cleanOfficialTitle) !== -1)) {
-          matched = itemOfficial;
-          break;
+          titleCands.push(itemOfficial);
         }
       }
-
+      if (!matched) {
+        if (!req.is_tentative) {
+          var reqDay = dayNum(req.start);
+          for (var c2 = 0; c2 < titleCands.length; c2++) {
+            var s0 = dayNum(titleCands[c2].start), e0 = dayNum(titleCands[c2].end) || s0;
+            if (reqDay && s0 && reqDay >= s0 && reqDay <= e0) { matched = titleCands[c2]; break; }
+          }
+        } else if (titleCands.length === 1) {
+          matched = titleCands[0];
+        }
+      }
       var isSynced = !!matched;
       var syncedId = matched ? matched.id_jadwal : "";
       var statusLnD = isSynced ? ("Tersinkron dengan Jadwal Resmi (" + syncedId + ")") : "Belum didaftarkan Admin LnD jadwalnya";
@@ -968,7 +1024,10 @@ function doGet(e) {
     var externalData = null;
     try { externalData = loadExternalData(ss, tz); } catch (eExtIgn) {}
 
-    return jsonOut({ status: "success", total: list.length, data: list, external: externalData, generated_at: new Date().toISOString() });
+    var roomsData = null;
+    try { roomsData = loadRoomData(ss, tz); } catch (eRmIgn) {}
+
+    return jsonOut({ status: "success", total: list.length, data: list, external: externalData, rooms: roomsData, generated_at: new Date().toISOString() });
   } catch (err) {
     return fail("E_SERVER", "Terjadi kesalahan saat membaca jadwal: " + err);
   }
@@ -1001,8 +1060,11 @@ function doPost(e) {
     if (pp.data && pp.data.action === "admin_verify_password") return handleAdminVerifyPassword(pp.data);
     if (pp.data && pp.data.action === "admin_add_schedule") return handleAdminSaveSchedule(pp.data, "add");
     if (pp.data && pp.data.action === "admin_edit_schedule") return handleAdminSaveSchedule(pp.data, "edit");
+    if (pp.data && pp.data.action === "admin_assign_request_to_schedule") return handleAdminAssignRequestToSchedule(pp.data);
     if (pp.data && pp.data.action === "admin_batch_add_schedule") return handleAdminBatchAddSchedule(pp.data);
     if (pp.data && pp.data.action === "admin_delete_schedule") return handleAdminDeleteSchedule(pp.data);
+    if (pp.data && pp.data.action === "admin_reject_request") return handleAdminRejectRequest(pp.data);
+    if (pp.data && (pp.data.action === "book_room" || pp.data.action === "add_room_use")) return handleAddRoomUse(pp.data);
     var payload = pp.data || {}, list = payload.peserta;
 
     if (!Array.isArray(list) || !list.length) return fail("E_PESERTA_KOSONG", "Daftar peserta tidak boleh kosong.");
@@ -1939,28 +2001,31 @@ function handleAdminSaveSchedule(p, mode) {
       if (!auth.ok) return fail("E_AUTH", auth.message);
     }
     var item = p.schedule || p;
-    var saved = saveSingleScheduleToSheet(ss, tz, item, mode || "add", 0);
-
-    // Sinkronisasi request waiting list jika disediakan sync_request_id
     var syncReqId = str(p.sync_request_id || item.sync_request_id);
+    var shP = null, participantRows = [];
     if (syncReqId) {
-      try {
-        var shP = ss.getSheetByName(SHEET_PENDAFTARAN);
-        if (shP && shP.getLastRow() >= 2) {
-          var pLastRow = shP.getLastRow();
-          var pVals = shP.getRange(2, 1, pLastRow - 1, 12).getValues();
-          for (var pi = 0; pi < pVals.length; pi++) {
-            var curIdJad = str(pVals[pi][8]);
-            if (curIdJad && curIdJad.toLowerCase() === syncReqId.toLowerCase()) {
-              shP.getRange(pi + 2, 9).setValue(saved.id_jadwal);
-              if (saved.start) shP.getRange(pi + 2, 11).setValue(saved.start);
-              if (saved.end) shP.getRange(pi + 2, 12).setValue(saved.end);
-            }
-          }
-        }
-      } catch (errSync) {
-        Logger.log("Gagal sinkron data pendaftaran waiting list: " + errSync);
+      shP = ss.getSheetByName(SHEET_PENDAFTARAN);
+      if (!shP || shP.getLastRow() < 2) {
+        return fail("E_REQUEST_NOT_FOUND", "Data peserta request " + syncReqId + " tidak ditemukan.");
       }
+      var pLastRow = shP.getLastRow();
+      var pVals = shP.getRange(2, 1, pLastRow - 1, 12).getValues();
+      for (var pi = 0; pi < pVals.length; pi++) {
+        if (isRequestRegistrationRow(pVals[pi], syncReqId)) {
+          participantRows.push(pi + 2);
+        }
+      }
+      if (!participantRows.length) {
+        return fail("E_REQUEST_NOT_FOUND", "Peserta untuk request " + syncReqId + " tidak ditemukan; jadwal belum dibuat.");
+      }
+    }
+
+    var saved = saveSingleScheduleToSheet(ss, tz, item, mode || "add", 0);
+    for (var syncIdx = 0; syncIdx < participantRows.length; syncIdx++) {
+      var participantRow = participantRows[syncIdx];
+      shP.getRange(participantRow, 9).setValue(saved.id_jadwal);
+      if (saved.start) shP.getRange(participantRow, 11).setValue(saved.start);
+      if (saved.end) shP.getRange(participantRow, 12).setValue(saved.end);
     }
 
     SpreadsheetApp.flush();
@@ -1968,12 +2033,150 @@ function handleAdminSaveSchedule(p, mode) {
       status: "success",
       mode: mode,
       schedule: saved,
+      synced_participants: participantRows.length,
       message: mode === "edit"
         ? "Jadwal pelatihan '" + saved.agenda + "' berhasil diperbarui."
         : "Jadwal pelatihan '" + saved.agenda + "' berhasil ditambahkan (ID: " + saved.id_jadwal + ")."
     });
   } catch (err) {
     return fail("E_SERVER", "Gagal menyimpan jadwal: " + err);
+  }
+}
+
+function handleAdminAssignRequestToSchedule(p) {
+  try {
+    var ss = getSpreadsheet();
+    var tz = ss.getSpreadsheetTimeZone() || "Asia/Jakarta";
+    if (p.admin_password) {
+      var auth = verifyAdminAuth(ss, p.admin_username, p.admin_password, false);
+      if (!auth.ok) return fail("E_AUTH", auth.message);
+    }
+
+    var requestId = str(p.request_id);
+    var scheduleId = str(p.schedule_id);
+    if (!/^(REQ-|CUSTOM)/i.test(requestId)) return fail("E_VALIDASI", "ID request tidak valid.");
+    if (!scheduleId || /^(REQ-|CUSTOM)/i.test(scheduleId)) return fail("E_VALIDASI", "Pilih jadwal resmi yang valid.");
+
+    var shJ = ss.getSheetByName(SHEET_JADWAL);
+    var shP = ss.getSheetByName(SHEET_PENDAFTARAN);
+    if (!shJ) return fail("E_SHEET_JADWAL", "Sheet '" + SHEET_JADWAL + "' tidak ditemukan.");
+    if (!shP || shP.getLastRow() < 2) return fail("E_NOT_FOUND", "Data peserta request tidak ditemukan.");
+
+    var schedules = loadJadwal(shJ, tz);
+    var target = null;
+    for (var si = 0; si < schedules.length; si++) {
+      if (schedules[si].id && schedules[si].id.toLowerCase() === scheduleId.toLowerCase()) {
+        target = schedules[si];
+        break;
+      }
+    }
+    if (!target) return fail("E_JADWAL_TIDAK_ADA", "Jadwal tujuan tidak ditemukan.");
+    if (isClosed(target.status) || isRegistrationClosedH1(target.startRaw, tz)) {
+      return fail("E_JADWAL_DITUTUP", "Jadwal tujuan sudah ditutup atau telah melewati batas pendaftaran.");
+    }
+    if (!target.startRaw) return fail("E_VALIDASI", "Jadwal tujuan belum memiliki tanggal resmi.");
+    if (!(target.kuota > 0)) return fail("E_VALIDASI", "Kuota jadwal tujuan belum ditetapkan.");
+
+    var dataStart = firstDataRow(shP);
+    var pLastRow = shP.getLastRow();
+    var pVals = shP.getRange(dataStart, 1, pLastRow - dataStart + 1, Math.max(14, shP.getLastColumn())).getValues();
+    var regs = readPendaftaran(shP);
+    var participantRows = [];
+    var targetCount = 0;
+    var targetEmployees = {};
+    for (var ri = 0; ri < regs.length; ri++) {
+      var regId = str(regs[ri][8]);
+      if (regId.toLowerCase() === scheduleId.toLowerCase() && !isRejected(str(regs[ri][13]))) {
+        targetCount++;
+        var targetEmployeeId = str(regs[ri][2]).toLowerCase();
+        if (targetEmployeeId) targetEmployees[targetEmployeeId] = true;
+      }
+    }
+
+    var incomingEmployees = {};
+    var requestTitle = "";
+    for (var pi = 0; pi < pVals.length; pi++) {
+      if (!isRequestRegistrationRow(pVals[pi], requestId) || isRejected(str(pVals[pi][13]))) continue;
+      var participantTitle = str(pVals[pi][9]).toLowerCase().replace(/[^a-z0-9]/g, "");
+      if (participantTitle && requestTitle && participantTitle !== requestTitle) {
+        return fail("E_VALIDASI", "Peserta request memiliki nama pelatihan yang berbeda; gabungkan request secara terpisah.");
+      }
+      if (participantTitle) requestTitle = participantTitle;
+      var employeeId = str(pVals[pi][2]).toLowerCase();
+      if (employeeId && (targetEmployees[employeeId] || incomingEmployees[employeeId])) {
+        return fail("E_PESERTA_DUPLIKAT", "Ada peserta request yang sudah terdaftar pada jadwal tujuan. Hapus duplikasi sebelum menggabungkan.");
+      }
+      if (employeeId) incomingEmployees[employeeId] = true;
+      participantRows.push(dataStart + pi);
+    }
+    if (!participantRows.length) return fail("E_REQUEST_NOT_FOUND", "Peserta aktif untuk request " + requestId + " tidak ditemukan.");
+    var targetTitle = str(target.agenda).toLowerCase().replace(/[^a-z0-9]/g, "");
+    if (!requestTitle || requestTitle !== targetTitle) {
+      return fail("E_VALIDASI", "Jadwal tujuan harus memiliki nama pelatihan yang sama dengan request.");
+    }
+    if (targetCount + participantRows.length > target.kuota) {
+      return fail("E_KUOTA_KURANG", "Kuota jadwal tujuan tidak cukup. Sisa kuota " + Math.max(0, target.kuota - targetCount) + ", sedangkan peserta request " + participantRows.length + ".");
+    }
+
+    var startDate = fmtDate(target.startRaw, tz);
+    var endDate = fmtDate(target.endRaw || target.startRaw, tz);
+    for (var moveIdx = 0; moveIdx < participantRows.length; moveIdx++) {
+      var participantRow = participantRows[moveIdx];
+      shP.getRange(participantRow, 9).setValue(target.id);
+      shP.getRange(participantRow, 11).setValue(startDate);
+      shP.getRange(participantRow, 12).setValue(endDate);
+    }
+
+    var remaining = Math.max(0, target.kuota - targetCount - participantRows.length);
+    var scheduleLastCol = Math.max(14, shJ.getLastColumn());
+    var scheduleHeaders = shJ.getRange(1, 1, 1, scheduleLastCol).getValues()[0];
+    function findScheduleCol(regex, fallback) {
+      for (var col = 0; col < scheduleHeaders.length; col++) {
+        if (regex.test(str(scheduleHeaders[col]))) return col;
+      }
+      return fallback;
+    }
+    var cSisa = findScheduleCol(/^(sisa[\s_]?kuota|sisa)/i, 11);
+    var cStatus = findScheduleCol(/^status(?![\s_]?jadwal)/i, 12);
+    shJ.getRange(target.row, cSisa + 1).setValue(remaining);
+    if (cStatus !== -1 && cStatus !== 12) {
+      var targetStatus = remaining === 0 ? "Penuh" : (/^penuh$/i.test(target.status) ? "Buka" : target.status);
+      shJ.getRange(target.row, cStatus + 1).setValue(targetStatus);
+    } else if (remaining === 0) {
+      shJ.getRange(target.row, cStatus + 1).setValue("Penuh");
+    } else if (/^penuh$/i.test(target.status)) {
+      shJ.getRange(target.row, cStatus + 1).setValue("Buka");
+    }
+
+    SpreadsheetApp.flush();
+    var dates = sanitizeJadwalDates(target.startRaw, target.endRaw || target.startRaw, target.dHour, tz);
+    return jsonOut({
+      status: "success",
+      schedule: {
+        id_jadwal: target.id,
+        category: "internal",
+        start: dates.start,
+        end: dates.end,
+        duration_day: parseInt(target.dDay, 10) || 0,
+        duration_hour: parseInt(target.dHour, 10) || 0,
+        duration: computeSmartDuration(target.dDay, target.dHour, target.startRaw, target.endRaw),
+        start_hour: target.startHour,
+        start_minutes: target.startMinutes,
+        agenda: target.agenda,
+        pic: target.pic,
+        room: target.room,
+        batch: target.batch,
+        kuota: target.kuota,
+        sisa_kuota: remaining,
+        total_terdaftar: targetCount + participantRows.length,
+        status: remaining === 0 ? "Penuh" : target.status,
+        peserta: []
+      },
+      synced_participants: participantRows.length,
+      message: participantRows.length + " peserta berhasil digabungkan ke jadwal " + target.id + "."
+    });
+  } catch (err) {
+    return fail("E_SERVER", "Gagal menggabungkan peserta ke jadwal: " + err);
   }
 }
 
@@ -2008,6 +2211,38 @@ function handleAdminBatchAddSchedule(p) {
   }
 }
 
+function handleAdminRejectRequest(p) {
+  try {
+    var ss = getSpreadsheet();
+    var pwd = str(p.password || p.admin_password);
+    var usr = str(p.username || p.admin_username);
+    if (!pwd) return fail("E_PASSWORD_REQUIRED", "Password admin wajib dimasukkan untuk menolak request.");
+    var auth = verifyAdminAuth(ss, usr, pwd, false);
+    if (!auth.ok) return fail("E_AUTH", "Password admin salah! Penolakan request dibatalkan.");
+
+    var reqId = str(p.request_id || p.id_jadwal);
+    if (!/^(REQ-|CUSTOM)/i.test(reqId)) return fail("E_VALIDASI", "ID request tidak valid.");
+    // Alasan: satu baris, maks 120 karakter, tanpa awalan karakter formula spreadsheet.
+    var reason = str(p.reason).replace(/[\r\n]+/g, " ").replace(/^[=+\-@\s]+/, "").slice(0, 120);
+
+    var shP = ss.getSheetByName(SHEET_PENDAFTARAN);
+    if (!shP || shP.getLastRow() < 2) return fail("E_NOT_FOUND", "Data pendaftaran tidak ditemukan.");
+    var vals = shP.getRange(2, 1, shP.getLastRow() - 1, 14).getValues();
+    var label = "Ditolak" + (reason ? " - " + reason : "");
+    var n = 0;
+    for (var i = 0; i < vals.length; i++) {
+      if (isRequestRegistrationRow(vals[i], reqId) && !isRejected(str(vals[i][13]))) {
+        shP.getRange(i + 2, 14).setValue(label); // kolom N = Validasi
+        n++;
+      }
+    }
+    if (!n) return fail("E_NOT_FOUND", "Request tidak ditemukan atau sudah ditolak sebelumnya.");
+    SpreadsheetApp.flush();
+    return jsonOut({ status: "success", rejected_rows: n, request_id: reqId, message: "Request " + reqId + " ditolak (" + n + " peserta)." });
+  } catch (err) {
+    return fail("E_SERVER", "Gagal menolak request: " + err);
+  }
+}
 function handleAdminDeleteSchedule(p) {
   try {
     var ss = getSpreadsheet();
@@ -2170,4 +2405,291 @@ function setupDailyAutoLockTrigger() {
   var msg = "Pemicu otomatis Auto-Lock H-1 berhasil dipasang! Fungsi autoLockSchedulesH1 akan berjalan otomatis setiap hari pukul 12:00 siang (Cut-off H-1) dan pukul 00:00 tengah malam.";
   Logger.log(msg);
   return msg;
+}
+
+/**
+ * =========================================================================
+ * PENGELOLAAN DATA RUANGAN & BOOKING (roomList; booking tersimpan di Jadwal Pelatihan)
+ * =========================================================================
+ */
+function loadRoomData(ss, tz) {
+  var shList = ss.getSheetByName(SHEET_ROOM_LIST);
+  var shUse = ss.getSheetByName(SHEET_ROOMS_USE);
+
+  var roomList = [];
+  if (shList && shList.getLastRow() >= 2) {
+    var lastCol = Math.max(4, shList.getLastColumn());
+    var headerVals = shList.getRange(1, 1, 1, lastCol).getValues()[0];
+    function findColList(regex, defIdx) {
+      for (var c = 0; c < headerVals.length; c++) {
+        if (regex.test(str(headerVals[c]))) return c;
+      }
+      return defIdx;
+    }
+    var cName = findColList(/^(name|nama|nama[\s_]?ruangan|room|ruangan)/i, 0);
+    var cCap = findColList(/^(capacity|kapasitas|kuota|seat)/i, 1);
+    var cPic = findColList(/^(pic|penanggung[\s_]?jawab|pengelola)/i, 2);
+    var cContact = findColList(/^(contact|kontak|no[\s_]?hp|telepon|wa)/i, 3);
+
+    var rows = shList.getRange(2, 1, shList.getLastRow() - 1, lastCol).getValues();
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i];
+      var name = str(r[cName]);
+      if (!name) continue;
+      roomList.push({
+        name: name,
+        capacity: Number(r[cCap]) || 0,
+        pic: str(r[cPic]) || "LnD",
+        contact: str(r[cContact]) || ""
+      });
+    }
+  }
+
+  // Fallback default bila sheet roomList kosong
+  if (!roomList.length) {
+    roomList = [
+      { name: "Gold Room 2", capacity: 20, pic: "LnD", contact: "" },
+      { name: "Gold Room 3", capacity: 10, pic: "LnD", contact: "" },
+      { name: "Gold Room 2 & 3", capacity: 30, pic: "LnD", contact: "" },
+      { name: "GSG", capacity: 100, pic: "Aden & Site Service", contact: "" }
+    ];
+  }
+
+  // Pre-load lookup map dari Jadwal Pelatihan, External_Training_Schedule, dan AGENDA_DILUAR_TRAINING
+  var agendaMap = {};
+  function populateAgendaMap(sheetName, cat, label) {
+    try {
+      var sh = ss.getSheetByName(sheetName);
+      if (!sh || sh.getLastRow() < 2) return;
+      var vals = sh.getDataRange().getValues();
+      if (!vals || vals.length < 2) return;
+      var h = vals[0];
+      var cId = -1, cAgenda = -1, cPic = -1, cRoom = -1, cBatch = -1, cKuota = -1, cSisa = -1, cStatus = -1, cDur = -1, cStart = -1;
+      for (var col = 0; col < h.length; col++) {
+        var colName = str(h[col]).toLowerCase();
+        if (/^(id_jadwal|id|booking_id)/i.test(colName) && cId === -1) cId = col;
+        if (/^(agenda|nama_silabus|nama_pelatihan|nama_program|nama_agenda)/i.test(colName) && cAgenda === -1) cAgenda = col;
+        if (/^(pic|trainer|nama_trainer|lembaga)/i.test(colName) && cPic === -1) cPic = col;
+        if (/^(room|ruangan|location)/i.test(colName) && cRoom === -1) cRoom = col;
+        if (/^(batch)/i.test(colName) && cBatch === -1) cBatch = col;
+        if (/^(kuota|kuota_peserta)/i.test(colName) && cKuota === -1) cKuota = col;
+        if (/^(sisa|sisa_kuota)/i.test(colName) && cSisa === -1) cSisa = col;
+        if (/^(status)/i.test(colName) && cStatus === -1) cStatus = col;
+        if (/^(duration_hour|duration|durasi)/i.test(colName) && cDur === -1) cDur = col;
+        if (/^(start[\s_]?hour|jam_mulai|jam)/i.test(colName) && cStart === -1) cStart = col;
+      }
+      for (var rowIdx = 1; rowIdx < vals.length; rowIdx++) {
+        var rData = vals[rowIdx];
+        var idKey = cId !== -1 ? str(rData[cId]) : "";
+        if (!idKey) continue;
+        agendaMap[idKey] = {
+          agenda: cAgenda !== -1 ? str(rData[cAgenda]) : "",
+          pic: cPic !== -1 ? str(rData[cPic]) : "",
+          room: cRoom !== -1 ? str(rData[cRoom]) : "",
+          batch: cBatch !== -1 ? str(rData[cBatch]) : "",
+          kuota: cKuota !== -1 ? Number(rData[cKuota]) || 0 : 0,
+          sisa_kuota: cSisa !== -1 ? Number(rData[cSisa]) || 0 : 0,
+          status: cStatus !== -1 ? str(rData[cStatus]) : "CONFIRMED",
+          duration: cDur !== -1 ? (Number(rData[cDur]) || 2) : 2,
+          start_hour: cStart !== -1 ? str(rData[cStart]) : "08:00",
+          category: cat,
+          category_label: label
+        };
+      }
+    } catch (eMap) {
+      // Abaikan jika sheet terkait tidak ada
+    }
+  }
+
+  populateAgendaMap(SHEET_JADWAL, "internal", "Internal Training");
+  populateAgendaMap(SHEET_EXTERNAL_SCHEDULE, "external", "External Training");
+  populateAgendaMap(SHEET_AGENDA_LUAR, "agenda", "Agenda Luar Training");
+
+  var roomsUse = [];
+  if (shUse && shUse.getLastRow() >= 2) {
+    var lastColUse = Math.max(6, shUse.getLastColumn());
+    var hUse = shUse.getRange(1, 1, 1, lastColUse).getValues()[0];
+    function findColUse(regex, defIdx) {
+      for (var c = 0; c < hUse.length; c++) {
+        if (regex.test(str(hUse[c]))) return c;
+      }
+      return defIdx;
+    }
+    var cNo = findColUse(/^(no|nomor)/i, 0);
+    var cId = findColUse(/^(agenda_id|id_jadwal|id|booking_id)/i, 1);
+    var cDate = findColUse(/^(date|tanggal)/i, 2);
+    var cRoom = findColUse(/^(room|ruangan)/i, 3);
+    var cHour = findColUse(/^(hour|jam|start[\s_]?hour|waktu)/i, 4);
+    var cDuration = findColUse(/^(duration|durasi|durasi[\s_]?jam)/i, 5);
+
+    var uRows = shUse.getRange(2, 1, shUse.getLastRow() - 1, lastColUse).getValues();
+    for (var j = 0; j < uRows.length; j++) {
+      var ur = uRows[j];
+      var dateVal = ur[cDate];
+      var dStr = dateVal ? fmtDate(dateVal, tz) : "";
+      var idVal = str(ur[cId]);
+      var hourVal = str(ur[cHour]);
+      var roomVal = cRoom !== -1 ? str(ur[cRoom]) : "";
+      var durVal = cDuration !== -1 ? (Number(ur[cDuration]) || 2) : 2;
+      if (!dStr && !idVal && !hourVal) continue;
+
+      var info = agendaMap[idVal] || {};
+
+      // Normalisasi jam mulai dan hitung jam selesai dari hour + duration
+      var rawStart = hourVal || info.start_hour || "08.00";
+      var sClean = String(rawStart).trim().replace(".", ":");
+      if (sClean.indexOf("-") !== -1) sClean = sClean.split("-")[0].trim();
+      var sParts = sClean.split(":");
+      var sH = Number(sParts[0]) || 8;
+      var sM = sParts.length > 1 ? (Number(sParts[1]) || 0) : 0;
+      var totalMinutes = (sH * 60) + sM + Math.round(durVal * 60);
+      var endH = Math.floor(totalMinutes / 60) % 24;
+      var endM = totalMinutes % 60;
+      var startStr = (sH < 10 ? "0" + sH : "" + sH) + ":" + (sM < 10 ? "0" + sM : "" + sM);
+      var endStr = (endH < 10 ? "0" + endH : "" + endH) + ":" + (endM < 10 ? "0" + endM : "" + endM);
+
+      roomsUse.push({
+        no: str(ur[cNo]) || String(j + 1),
+        agenda_id: idVal,
+        id: idVal,
+        date: dStr,
+        room: roomVal || info.room || "",
+        hour: hourVal,
+        start_hour: startStr,
+        end_hour: endStr,
+        duration: durVal,
+        agenda: info.agenda || idVal,
+        pic: info.pic || "-",
+        batch: info.batch || "",
+        kuota: info.kuota || 0,
+        sisa_kuota: info.sisa_kuota != null ? info.sisa_kuota : (info.kuota || 0),
+        category: info.category || "custom",
+        category_label: info.category_label || "Penggunaan Ruangan",
+        status: info.status || "CONFIRMED"
+      });
+    }
+  }
+
+  return {
+    room_list: roomList,
+    rooms_use: roomsUse,
+    total_rooms: roomList.length
+  };
+}
+
+function handleAddRoomUse(p) {
+  try {
+    var ss = getSpreadsheet();
+    var tz = ss.getSpreadsheetTimeZone() || "Asia/Jakarta";
+    var shJ = ss.getSheetByName(SHEET_JADWAL);
+    if (!shJ) return fail("E_SHEET_JADWAL", "Sheet '" + SHEET_JADWAL + "' tidak ditemukan.");
+
+    var usageType = str(p.usage_type).toLowerCase();
+    if (usageType !== "training" && usageType !== "non_training") {
+      return fail("E_VALIDASI", "Pilih kegunaan Training atau Non-Training.");
+    }
+    var roomVal = str(p.room || p.ruangan);
+    var agenda = str(p.agenda);
+    var pic = str(p.pic) || "Belum ditentukan";
+    var contact = str(p.contact || p.kontak);
+    var rawDate = str(p.date || p.tanggal);
+    var dObj = parseDateInputForSheet(rawDate);
+    var rawHour = str(p.hour || p.jam || p.start_hour);
+    var durationVal = Number(p.duration || p.durasi);
+    if (!roomVal || !agenda || !rawDate || !(dObj instanceof Date) || isNaN(dObj.getTime())) {
+      return fail("E_VALIDASI", "Ruangan, tanggal, dan agenda wajib diisi dengan benar.");
+    }
+    if (!/^([01]?\d|2[0-3])[:.][0-5]\d$/.test(rawHour) ||
+        !isFinite(durationVal) || durationVal < 0.5 || durationVal > 24) {
+      return fail("E_VALIDASI", "Jam mulai atau durasi booking tidak valid.");
+    }
+
+    var schedules = loadJadwal(shJ, tz);
+    var linkedId = usageType === "training" ? str(p.agenda_id || p.id_jadwal) : "";
+    var linked = null;
+    if (linkedId && linkedId !== "custom") {
+      for (var i = 0; i < schedules.length; i++) {
+        if (schedules[i].id.toLowerCase() === linkedId.toLowerCase()) {
+          linked = schedules[i];
+          break;
+        }
+      }
+    }
+
+    var cleanHour = rawHour.replace(".", ":");
+    var note = str(p.notes || p.keterangan);
+    var bookingLine = "[BOOKING RUANGAN] Kegunaan: " +
+      (usageType === "training" ? "Training" : "Non-Training") +
+      "; Durasi Booking: " + durationVal + " jam" +
+      (linked ? "; Terkait Jadwal: " + linked.id : "") +
+      (contact ? "; Kontak: " + contact.replace(/[\r\n]+/g, " ") : "") +
+      (note ? "; Catatan: " + note.replace(/[\r\n]+/g, " ") : "");
+    var previousDescription = linked
+      ? str(linked.deskripsi).replace(/^\[BOOKING RUANGAN\][^\r\n]*(?:\r?\n)?/i, "")
+      : "";
+    var description = bookingLine + (previousDescription ? "\n" + previousDescription : "");
+    var saveItem = {
+      category: "internal",
+      id_jadwal: linked ? linked.id : "AUTO",
+      original_id: linked ? linked.id : "",
+      start: rawDate,
+      end: rawDate,
+      duration_day: 1,
+      duration_hour: Math.ceil(durationVal),
+      start_hour: cleanHour,
+      agenda: agenda,
+      pic: pic,
+      room: roomVal,
+      batch: linked ? linked.batch : "Booking Ruangan",
+      kuota: linked ? linked.kuota : 0,
+      sisa_kuota: linked ? linked.sisaRaw : 0,
+      status: linked ? linked.status : "Tutup (Booking Ruangan)",
+      deskripsi: description,
+      status_jadwal: linked ? linked.statusJadwal : ""
+    };
+    var saved = saveSingleScheduleToSheet(ss, tz, saveItem, linked ? "edit" : "add", 0);
+    saved.is_room_booking = true;
+    saved.usage_type = usageType;
+    saved.linked_schedule_id = linked ? linked.id : "";
+    SpreadsheetApp.flush();
+
+    return jsonOut({
+      status: "success",
+      message: "Booking ruangan berhasil dicatat di sheet " + SHEET_JADWAL,
+      schedule: saved
+    });
+  } catch (err) {
+    return fail("E_SERVER", "Gagal menyimpan pemakaian ruangan: " + err);
+  }
+}
+
+/**
+ * UTILITAS (jalankan manual dari editor Apps Script, TIDAK otomatis):
+ * Mengisi kolom ID_Jadwal yang kosong pada sheet Jadwal (mis. baris rencana Desember)
+ * dengan format JADWAL-YYYY-MM-N, melanjutkan nomor terbesar yang sudah ada untuk bulan tsb.
+ * Baris tanpa ID tidak bisa didaftari / dibuka detailnya dengan benar di frontend.
+ */
+function fillMissingScheduleIds() {
+  var ss = getSpreadsheet(), sh = ss.getSheetByName(SHEET_JADWAL);
+  if (!sh) throw new Error("Sheet '" + SHEET_JADWAL + "' tidak ditemukan.");
+  var tz = ss.getSpreadsheetTimeZone() || "Asia/Jakarta";
+  var last = sh.getLastRow();
+  if (last < 2) return 0;
+  var vals = sh.getRange(2, 1, last - 1, 7).getValues(); // A..G : ID, START, END, ..., AGENDA
+  var maxByYm = {};
+  vals.forEach(function (r) {
+    var m = str(r[0]).match(/^JADWAL-(\d{4})-(\d{2})-(\d+)$/i);
+    if (m) { var k = m[1] + "-" + m[2]; maxByYm[k] = Math.max(maxByYm[k] || 0, +m[3]); }
+  });
+  var filled = 0;
+  for (var i = 0; i < vals.length; i++) {
+    var id = str(vals[i][0]), agenda = str(vals[i][6]);
+    if (id || !agenda || !vals[i][1]) continue;
+    var ym = Utilities.formatDate(new Date(vals[i][1]), tz, "yyyy-MM");
+    maxByYm[ym] = (maxByYm[ym] || 0) + 1;
+    sh.getRange(i + 2, 1).setValue("JADWAL-" + ym + "-" + maxByYm[ym]);
+    filled++;
+  }
+  Logger.log("ID_Jadwal terisi: " + filled + " baris.");
+  return filled;
 }

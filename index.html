@@ -703,30 +703,30 @@ Pantau agenda pelatihan, ketersediaan kuota ruangan, dan jadwal sertifikasi kary
 </div>
 <div class="flex flex-wrap items-center justify-between gap-2.5 pt-1">
 <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
-<button type="button" onclick="downloadTrainingCalendarPdf('internal')" class="inline-flex items-center justify-center gap-2 h-9 sm:h-10 px-3.5 sm:px-4 rounded-xl bg-red-700 hover:bg-red-800 text-white font-label-md text-label-md font-semibold shadow-sm whitespace-nowrap transition-all cursor-pointer" title="Cetak / Download Kalender Pelatihan Resmi ke Dokumen PDF (.pdf)">
+<button type="button" onclick="downloadTrainingCalendarPdf('internal')" class="inline-flex items-center justify-center gap-1.5 h-9 sm:h-10 px-3.5 rounded-xl bg-red-700 hover:bg-red-800 text-white font-label-md text-label-md font-semibold shadow-sm whitespace-nowrap transition-all cursor-pointer" title="Cetak / Download Kalender Pelatihan Resmi ke Dokumen PDF (.pdf)">
 <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
 <span>Download Kalender (.pdf)</span>
 </button>
-<button type="button" onclick="downloadTrainingCalendarIcs('internal')" class="inline-flex items-center justify-center gap-2 h-9 sm:h-10 px-3.5 sm:px-4 rounded-xl bg-primary text-on-primary font-label-md text-label-md font-semibold shadow-sm hover:bg-primary-container whitespace-nowrap transition-all cursor-pointer" title="Download Kalender Pelatihan (.ics) lengkap dengan jam dan ruangan untuk Google Calendar, Outlook, dan HP">
+<button type="button" onclick="downloadTrainingCalendarIcs('internal')" class="inline-flex items-center justify-center gap-1.5 h-9 sm:h-10 px-3.5 rounded-xl bg-primary text-on-primary font-label-md text-label-md font-semibold shadow-sm hover:bg-primary-container whitespace-nowrap transition-all cursor-pointer" title="Download Kalender Pelatihan (.ics) lengkap dengan jam dan ruangan untuk Google Calendar, Outlook, dan HP">
 <span class="material-symbols-outlined text-[18px]">event</span>
 <span>Download Kalender (.ics)</span>
 </button>
-<button type="button" onclick="exportSchedulesToCsv('internal')" class="inline-flex items-center justify-center gap-2 h-9 sm:h-10 px-3.5 sm:px-4 rounded-xl bg-surface-container-lowest text-on-surface font-label-md text-label-md shadow-sm hover:bg-surface-container-low border border-outline-variant/50 whitespace-nowrap transition-all cursor-pointer" title="Ekspor daftar jadwal lengkap (.csv / Excel)">
+<button type="button" onclick="exportSchedulesToCsv('internal')" class="inline-flex items-center justify-center gap-1.5 h-9 sm:h-10 px-3.5 rounded-xl bg-surface-container-lowest text-on-surface font-label-md text-label-md shadow-sm hover:bg-surface-container-low border border-outline-variant/50 whitespace-nowrap transition-all cursor-pointer" title="Ekspor daftar jadwal lengkap (.csv / Excel)">
 <span class="material-symbols-outlined text-[18px] text-tertiary">table_view</span>
 <span>Ekspor Excel (.csv)</span>
 </button>
-<a href="annual-training-master-plan.html" class="inline-flex items-center justify-center gap-2 h-9 sm:h-10 px-3.5 sm:px-4 rounded-xl bg-surface-container-lowest text-primary font-label-md text-label-md font-semibold shadow-sm hover:bg-primary-fixed/30 border border-primary/30 whitespace-nowrap transition-all cursor-pointer" title="Buka halaman Annual Training Master Plan">
+<a href="annual-training-master-plan.html" class="inline-flex items-center justify-center gap-1.5 h-9 sm:h-10 px-3.5 rounded-xl bg-surface-container-lowest text-primary font-label-md text-label-md font-semibold shadow-sm hover:bg-primary-fixed/30 border border-primary/30 whitespace-nowrap transition-all cursor-pointer" title="Buka halaman Annual Training Master Plan">
 <span class="material-symbols-outlined text-[18px]">view_timeline</span>
 <span>Annual Master Plan</span>
 </a>
-<button type="button" onclick="openWaitingListModal()" id="btn-waiting-list" class="inline-flex items-center justify-center gap-2 h-9 sm:h-10 px-3.5 sm:px-4 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-900 border border-amber-500/40 font-label-md text-label-md font-semibold shadow-xs whitespace-nowrap transition-all cursor-pointer" title="Lihat Waiting List &amp; Permintaan Jadwal Training">
+<button type="button" onclick="openWaitingListModal()" id="btn-waiting-list" class="inline-flex items-center justify-center gap-1.5 h-9 sm:h-10 px-3.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-900 border border-amber-500/40 font-label-md text-label-md font-semibold shadow-xs whitespace-nowrap transition-all cursor-pointer" title="Lihat Waiting List &amp; Permintaan Jadwal Training">
 <span class="material-symbols-outlined text-[18px] text-amber-700">hourglass_top</span>
 <span>Waiting List</span>
 <span id="waiting-list-count-badge" class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-amber-600 text-white leading-none">0</span>
 </button>
 </div>
 <div data-admin-only="true" data-admin-display="flex" class="hidden flex-wrap items-center gap-2 sm:gap-2.5 sm:ml-auto">
-<button type="button" onclick="openAdminScheduleModal('batch', null, 'internal')" class="inline-flex items-center justify-center gap-2 h-9 sm:h-10 px-3.5 sm:px-4 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300/80 font-label-md text-label-md shadow-xs whitespace-nowrap transition-all font-semibold cursor-pointer">
+<button type="button" onclick="openAdminScheduleModal('batch', null, 'internal')" class="inline-flex items-center justify-center gap-1.5 h-9 sm:h-10 px-3.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300/80 font-label-md text-label-md shadow-xs whitespace-nowrap transition-all font-semibold cursor-pointer">
 <span class="material-symbols-outlined text-[18px] text-amber-700">library_add</span>
 <span>Batch / Multiple Add</span>
 </button>
@@ -1131,26 +1131,7 @@ Hari Ini
 <div class="day-events-container mt-1 flex flex-col gap-1 w-full flex-1" data-day-container="oct-5"></div>
 </div>
 </div>
-<div class="p-4 sm:p-5 bg-amber-500/10 border-t border-surface-container flex flex-col gap-3.5">
-<div class="flex flex-wrap items-center justify-between gap-2.5">
-<div class="flex items-center gap-2">
-<span class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-800 flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-[19px]">notifications_active</span>
-</span>
-<span class="text-xs sm:text-sm font-bold text-on-surface uppercase tracking-wider">Catatan &amp; Ketentuan Resmi Kalender Pelatihan</span>
-</div>
-<div class="flex flex-wrap items-center gap-2">
-<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold text-xs shadow-2xs">
-<span class="material-symbols-outlined text-[15px] text-emerald-700">handshake</span>
-Telah Disepakati Bersama
-</span>
-<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-950 border border-amber-300 font-bold text-xs shadow-2xs">
-<span class="material-symbols-outlined text-[15px] text-amber-700">schedule</span>
-Cut-Off Tgl 25
-</span>
-</div>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+<details class="cal-notes relative border-t border-surface-container bg-amber-500/10"><summary class="flex flex-wrap items-center justify-between gap-2 px-4 py-2 cursor-pointer select-none list-none text-xs font-bold text-on-surface"><span class="flex items-center gap-2 uppercase tracking-wider"><span class="material-symbols-outlined text-[18px] text-amber-800">notifications_active</span>Catatan &amp; Ketentuan Resmi Kalender Pelatihan</span><span class="flex items-center gap-2 font-semibold"><span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 text-[11px]"><span class="material-symbols-outlined text-[14px] text-emerald-700">handshake</span>Telah Disepakati Bersama</span><span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-950 border border-amber-300 text-[11px]"><span class="material-symbols-outlined text-[14px] text-amber-700">schedule</span>Cut-Off Tgl 25</span><span class="material-symbols-outlined text-[20px] cal-notes-chevron transition-transform">expand_less</span></span></summary><div class="cal-notes-body absolute bottom-full left-0 right-0 z-30 p-4 bg-surface-container-lowest border-t border-x border-outline-variant/50 rounded-t-2xl shadow-xl flex flex-col gap-3"><div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
 <div class="p-3.5 rounded-xl bg-surface-container-lowest/90 border border-amber-200/80 shadow-2xs flex items-start gap-3">
 <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 mt-0.5">
 <span class="material-symbols-outlined text-[18px]">mark_email_read</span>
@@ -1173,8 +1154,7 @@ Kalender ini telah <strong class="text-emerald-900 font-bold">disepakati bersama
 </p>
 </div>
 </div>
-</div>
-<div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-[11px] text-on-surface-variant font-medium border-t border-surface-container/60">
+</div><div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-[11px] text-on-surface-variant font-medium border-t border-surface-container/60">
 <span class="flex items-center gap-1.5">
 <span class="material-symbols-outlined text-[14px] text-primary">groups</span>
 <span>Stakeholder: Trainer Internal &bull; Seluruh HOD Terkait &bull; Learning &amp; Development Pani Gold Project</span>
@@ -1183,8 +1163,7 @@ Kalender ini telah <strong class="text-emerald-900 font-bold">disepakati bersama
 <span class="material-symbols-outlined text-[14px]">policy</span>
 <span>SOP Pelaksanaan Pelatihan &amp; Manajemen Kuota</span>
 </span>
-</div>
-</div>
+</div></div></details>
 </div>
 <div id="view-week" class="view-panel bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/40 overflow-hidden flex flex-col hidden">
 <div class="px-6 py-4 border-b border-surface-container flex flex-wrap items-center justify-between gap-3 bg-surface-container-low/30">
@@ -1198,26 +1177,7 @@ Kalender ini telah <strong class="text-emerald-900 font-bold">disepakati bersama
 <div id="week-capacity-summary" class="text-body-sm text-on-surface-variant"></div>
 </div>
 <div id="week-view-body" class="p-4 sm:p-6 flex flex-col gap-6 overflow-x-auto"></div>
-<div class="p-4 sm:p-5 bg-amber-500/10 border-t border-surface-container flex flex-col gap-3.5">
-<div class="flex flex-wrap items-center justify-between gap-2.5">
-<div class="flex items-center gap-2">
-<span class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-800 flex items-center justify-center shrink-0">
-<span class="material-symbols-outlined text-[19px]">notifications_active</span>
-</span>
-<span class="text-xs sm:text-sm font-bold text-on-surface uppercase tracking-wider">Catatan &amp; Ketentuan Resmi Kalender Pelatihan</span>
-</div>
-<div class="flex flex-wrap items-center gap-2">
-<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold text-xs shadow-2xs">
-<span class="material-symbols-outlined text-[15px] text-emerald-700">handshake</span>
-Telah Disepakati Bersama
-</span>
-<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-950 border border-amber-300 font-bold text-xs shadow-2xs">
-<span class="material-symbols-outlined text-[15px] text-amber-700">schedule</span>
-Cut-Off Tgl 25
-</span>
-</div>
-</div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+<details class="cal-notes relative border-t border-surface-container bg-amber-500/10"><summary class="flex flex-wrap items-center justify-between gap-2 px-4 py-2 cursor-pointer select-none list-none text-xs font-bold text-on-surface"><span class="flex items-center gap-2 uppercase tracking-wider"><span class="material-symbols-outlined text-[18px] text-amber-800">notifications_active</span>Catatan &amp; Ketentuan Resmi Kalender Pelatihan</span><span class="flex items-center gap-2 font-semibold"><span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 text-[11px]"><span class="material-symbols-outlined text-[14px] text-emerald-700">handshake</span>Telah Disepakati Bersama</span><span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-950 border border-amber-300 text-[11px]"><span class="material-symbols-outlined text-[14px] text-amber-700">schedule</span>Cut-Off Tgl 25</span><span class="material-symbols-outlined text-[20px] cal-notes-chevron transition-transform">expand_less</span></span></summary><div class="cal-notes-body absolute bottom-full left-0 right-0 z-30 p-4 bg-surface-container-lowest border-t border-x border-outline-variant/50 rounded-t-2xl shadow-xl flex flex-col gap-3"><div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
 <div class="p-3.5 rounded-xl bg-surface-container-lowest/90 border border-amber-200/80 shadow-2xs flex items-start gap-3">
 <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 mt-0.5">
 <span class="material-symbols-outlined text-[18px]">mark_email_read</span>
@@ -1240,8 +1200,7 @@ Kalender ini telah <strong class="text-emerald-900 font-bold">disepakati bersama
 </p>
 </div>
 </div>
-</div>
-</div>
+</div></div></details>
 </div>
 <div class="view-panel bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/40 p-6 flex flex-col gap-6 hidden" id="view-year">
 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-surface-container">
@@ -3318,5 +3277,7 @@ Masukkan Ulang Password Admin <span class="text-error">*</span>
 <a href="work-flow.html"><span class="material-symbols-outlined">route</span>Work Flow</a>
 </div>
 <script defer src="assets/js/ux.f0ae2177.js"></script>
+<script defer src="calendar-fit-pdf.js"></script>
+
 </body>
 </html>
