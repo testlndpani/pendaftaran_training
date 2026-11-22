@@ -1,0 +1,262 @@
+/* =====================================================================
+   Kalender Internal & External: tampilan baru
+   Hanya menyentuh panel bulanan (#view-month, #ext-view-month) dan modal
+   "+N lagi". Header situs, menu, dan bagian halaman lain tidak diubah.
+   ===================================================================== */
+
+:is(#view-month, #ext-view-month) {
+  --cr-accent: #0037b0;
+  --cr-accent-soft: #e8edff;
+  --cr-accent-line: #c3cffa;
+  --cr-line: #e2e8f0;
+  --cr-ink: #0f172a;
+  --cr-mute: #64748b;
+  --cr-faint: #94a3b8;
+  --cr-past: .5;
+}
+#ext-view-month {
+  --cr-accent: #047857;
+  --cr-accent-soft: #ecfdf5;
+  --cr-accent-line: #a7f3d0;
+}
+
+/* ---------- Kontrol tambahan di toolbar: Tampilan & Lampau ---------- */
+.cr-toolbar-right { flex-wrap: wrap; gap: 8px; }
+.cr-opts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.cr-seg {
+  display: inline-flex; align-items: center; gap: 2px; padding: 2px;
+  background: #f1f5f9; border: 1px solid var(--cr-line); border-radius: 12px;
+}
+.cr-seg-label { padding: 0 6px 0 8px; font-size: 10.5px; font-weight: 700; color: #334155; white-space: nowrap; }
+.cr-seg button {
+  padding: 3px 10px; border: 0; border-radius: 9px; background: transparent;
+  font: inherit; font-size: 12px; font-weight: 500; color: #475569; cursor: pointer;
+  transition: background-color .15s, color .15s;
+}
+.cr-seg button:hover { color: #0f172a; background: rgba(255,255,255,.7); }
+.cr-seg button[aria-pressed="true"] {
+  background: #fff; color: var(--cr-btn-accent, #0037b0); font-weight: 700;
+  box-shadow: 0 1px 2px rgba(15,23,42,.12);
+}
+.cr-opts[data-kind="external"] { --cr-btn-accent: #047857; }
+.cr-seg button:focus-visible, .cr-more:focus-visible, .cr-modal button:focus-visible {
+  outline: 2px solid var(--cr-btn-accent, #0037b0); outline-offset: 1px;
+}
+
+/* ---------- Bar judul panel + legenda ---------- */
+:is(#view-month, #ext-view-month) > div:first-child {
+  flex-wrap: wrap; gap: 8px 20px; padding: 10px 20px; background: #f8fafc;
+}
+:is(#view-month, #ext-view-month) :is(#calendar-session-count, #ext-calendar-session-count) {
+  font-size: 12px !important; font-weight: 700; padding: 2px 10px; border-radius: 999px;
+  background: var(--cr-accent-soft); color: var(--cr-accent);
+}
+.cr-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; font-size: 11px; font-weight: 600; color: var(--cr-mute); }
+.cr-legend > span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.cr-sw { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.cr-sw--req { background: #fef3c7; border: 1.5px dashed #d97706; }
+.cr-sw--past { background: #94a3b8; opacity: .5; }
+
+/* ---------- Baris nama hari ---------- */
+:is(#view-month, #ext-view-month) > div:nth-child(2) {
+  background: #f1f5f9; font-size: 11px !important; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; color: #475569; padding-top: 8px !important; padding-bottom: 8px !important;
+}
+:is(#view-month, #ext-view-month) > div:nth-child(2) > div { border-right: 1px solid var(--cr-line); }
+:is(#view-month, #ext-view-month) > div:nth-child(2) > div:last-child { border-right: 0; color: #e11d48; }
+
+/* ---------- Sel tanggal ---------- */
+:is(#view-month, #ext-view-month) .cr-grid > .cr-cell {
+  background: #fff; border-color: var(--cr-line); position: relative;
+  transition: background-color .15s;
+}
+:is(#view-month, #ext-view-month) .cr-grid > .cr-cell:hover { background: #f8fafc; }
+:is(#view-month, #ext-view-month) .cr-grid > .cr-cell[data-wk="1"] { background: #fbfcfe; }
+:is(#view-month, #ext-view-month) .cr-grid > .cr-cell--out { background: #f8fafc; opacity: .55; }
+:is(#view-month, #ext-view-month) .cr-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 4px;
+  padding-bottom: 3px; border-bottom: 1px solid #f1f5f9;
+}
+:is(#view-month, #ext-view-month) .cr-date { font-size: 12px !important; font-weight: 800; color: var(--cr-ink); line-height: 1.2; }
+:is(#view-month, #ext-view-month) .cr-cell[data-wk="1"] .cr-date { color: var(--cr-faint); }
+:is(#view-month, #ext-view-month) .cr-cell[data-sun="1"] .cr-date { color: #e11d48; }
+:is(#view-month, #ext-view-month) .cr-cell--out .cr-date { color: var(--cr-faint); font-weight: 600; }
+:is(#view-month, #ext-view-month) .cr-head { justify-content: flex-start; gap: 6px; }
+:is(#view-month, #ext-view-month) .cr-head > :not(.cr-date):not(.cr-hdr-r) { margin-left: auto; }
+:is(#view-month, #ext-view-month) .cr-hdr-r { display: inline-flex; align-items: center; gap: 4px; }
+
+.cr-count {
+  display: inline-flex; align-items: center; padding: 0 6px; border-radius: 5px;
+  font-size: 9.5px !important; font-weight: 700; line-height: 1.5; white-space: nowrap;
+  color: var(--cr-accent); background: var(--cr-accent-soft); border: 1px solid var(--cr-accent-line);
+}
+.cr-count--req { color: #92400e; background: #fef3c7; border-color: #fcd34d; }
+.cr-cutoff {
+  display: inline-flex; align-items: center; padding: 0 6px; border-radius: 999px;
+  font-size: 9.5px !important; font-weight: 800; line-height: 1.5; white-space: nowrap;
+  color: #92400e; background: #fef3c7; border: 1px solid #fcd34d;
+}
+
+/* Hari ini */
+:is(#view-month, #ext-view-month) .cr-cell[data-today="1"] {
+  background: color-mix(in srgb, var(--cr-accent) 5%, #fff); box-shadow: inset 0 0 0 2px var(--cr-accent); z-index: 1;
+}
+:is(#view-month, #ext-view-month) .cr-cell[data-today="1"] .cr-date {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px;
+  border-radius: 999px; background: var(--cr-accent); color: #fff; box-shadow: 0 1px 2px rgba(15,23,42,.25);
+}
+
+/* Hari lampau: transparansi diatur lewat kontrol "Lampau" */
+:is(#view-month, #ext-view-month) .cr-cell[data-past="true"] { opacity: var(--cr-past); transition: opacity .2s, background-color .15s; }
+:is(#view-month, #ext-view-month) .cr-cell[data-past="true"]:hover { opacity: 1; }
+:is(#view-month, #ext-view-month) .cr-cell[data-past="true"] .day-events-container > *,
+:is(#view-month, #ext-view-month) .cr-cell[data-past="true"] .ext-day-events > * { opacity: 1 !important; filter: saturate(.65) !important; }
+
+/* ---------- Kartu event (berlaku di kedua mode) ---------- */
+:is(#view-month, #ext-view-month) .cr-ev { border-radius: 8px; }
+:is(#view-month, #ext-view-month) .cr-more {
+  flex: none; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 3px 8px; border-radius: 8px; border: 1px solid var(--cr-accent-line);
+  background: var(--cr-accent-soft); color: var(--cr-accent); font-size: 10.5px; font-weight: 700; cursor: pointer;
+  transition: background-color .15s, transform .1s;
+}
+:is(#view-month, #ext-view-month) .cr-more:hover { background: var(--cr-accent-line); }
+:is(#view-month, #ext-view-month) .cr-more:active { transform: scale(.97); }
+:is(#view-month, #ext-view-month) .cr-more .material-symbols-outlined { font-size: 14px; flex: none; width: 14px; height: 14px; overflow: hidden; line-height: 14px; }
+/* aturan mesin pas-layar menyembunyikan anak ke-2 dst di setiap kartu; tombol ini tidak boleh ikut terkena */
+:is(#view-month, #ext-view-month) :is(.day-events-container, .ext-day-events) > .cr-more {
+  display: inline-flex !important; padding: 3px 8px !important; font-size: 10.5px !important; line-height: 1.2 !important;
+}
+:is(#view-month, #ext-view-month) :is(.day-events-container, .ext-day-events) > .cr-more > * {
+  display: inline-block !important; font-size: inherit !important; line-height: inherit !important; white-space: nowrap;
+}
+:is(#view-month, #ext-view-month) :is(.day-events-container, .ext-day-events) > .cr-more > .material-symbols-outlined {
+  font-size: 14px !important; line-height: 14px !important;
+}
+/* tombol "+N lagi" bawaan mesin pas-layar dibuat sama */
+:is(#view-month, #ext-view-month) .cal-more {
+  align-self: stretch; text-align: center; border: 1px solid var(--cr-accent-line);
+  background: var(--cr-accent-soft); color: var(--cr-accent); border-radius: 8px;
+}
+:is(#view-month, #ext-view-month) .cal-more:hover { background: var(--cr-accent-line); }
+:is(#view-month, #ext-view-month)[data-density] .cr-ev.cr-hidden { display: none !important; }
+
+/* ---------- Mode DETAIL: halaman menggulir, kartu lengkap ---------- */
+:is(#view-month, #ext-view-month)[data-density="detail"] { height: auto !important; min-height: 0 !important; }
+:is(#view-month, #ext-view-month)[data-density="detail"] .cr-grid {
+  flex: none; grid-auto-rows: auto !important; grid-template-rows: none !important; overflow: visible;
+}
+:is(#view-month, #ext-view-month)[data-density="detail"] .cr-grid > .cr-cell {
+  min-height: 150px !important; padding: 8px !important; overflow: visible !important;
+  display: flex; flex-direction: column; justify-content: flex-start !important; gap: 6px;
+}
+:is(#view-month, #ext-view-month)[data-density="detail"] .cr-grid > .cr-cell > div:first-child { font-size: 12px !important; }
+:is(#view-month, #ext-view-month)[data-density="detail"] :is(.day-events-container, .ext-day-events) {
+  display: flex; flex-direction: column; gap: 5px !important; margin-top: 0 !important; overflow: visible !important; flex: 1 1 auto;
+}
+:is(#view-month, #ext-view-month)[data-density="detail"] .day-events-container > [data-schedule-id],
+:is(#view-month, #ext-view-month)[data-density="detail"] .ext-day-events > div {
+  margin: 0 !important; padding: 6px 8px 6px 10px !important; max-width: 100%; flex: none;
+  font-size: 11.5px !important; line-height: 1.25 !important; border-radius: 8px;
+}
+:is(#view-month, #ext-view-month)[data-density="detail"] .day-events-container > [data-schedule-id] *,
+:is(#view-month, #ext-view-month)[data-density="detail"] .ext-day-events > div * { font-size: inherit !important; line-height: inherit !important; }
+:is(#view-month, #ext-view-month)[data-density="detail"] .day-events-container > [data-schedule-id] > *:nth-child(n+2),
+:is(#view-month, #ext-view-month)[data-density="detail"] .ext-day-events > div > *:nth-child(n+2) { display: flex !important; }
+:is(#view-month, #ext-view-month)[data-density="detail"] .cal-name {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+  white-space: normal !important; font-size: 11.5px !important; font-weight: 700; line-height: 1.25 !important;
+}
+:is(#view-month, #ext-view-month)[data-density="detail"] .cal-meta { flex-wrap: wrap; gap: 3px !important; margin-top: 4px !important; }
+:is(#view-month, #ext-view-month)[data-density="detail"] .cal-chip { font-size: 9.5px !important; padding: 1px 6px !important; line-height: 1.4 !important; }
+
+/* sel tanpa agenda tidak perlu setinggi sel yang berisi kartu */
+:is(#view-month, #ext-view-month)[data-density="detail"] .cr-grid > .cr-cell:not(:has(.cr-ev)) { min-height: 92px !important; }
+
+/* kartu urutan ke-2 dst: satu baris (jam + judul) */
+:is(#view-month, #ext-view-month)[data-density="detail"] .cr-ev--line { display: flex !important; flex-direction: row-reverse; align-items: center; gap: 6px; padding: 4px 8px 4px 10px !important; }
+:is(#view-month, #ext-view-month)[data-density="detail"] .cr-ev--line > :first-child { flex: 1 1 auto; min-width: 0; }
+:is(#view-month, #ext-view-month)[data-density="detail"] .cr-ev--line .cal-name { -webkit-line-clamp: 1; }
+:is(#view-month, #ext-view-month)[data-density="detail"] .cr-ev--line .cal-meta { margin: 0 !important; flex: none; }
+:is(#view-month, #ext-view-month)[data-density="detail"] .cr-ev--line .cal-meta .cal-chip:not(.cal-time) { display: none !important; }
+:is(#view-month, #ext-view-month)[data-density="detail"] .cr-ev--line.cal-req > *:nth-child(n+2) { display: none !important; }
+:is(#view-month, #ext-view-month)[data-density="detail"] .cr-ev--line .cr-quota { display: none; }
+
+/* External: kartu baris tunggal hanya menampilkan judul */
+#ext-view-month[data-density="detail"] .cr-ev--line { display: block !important; padding: 4px 8px 4px 10px !important; }
+#ext-view-month[data-density="detail"] .ext-day-events > div.cr-ev--line > *:nth-child(n+2) { display: none !important; }
+
+/* bilah kuota pada kartu pertama */
+.cr-quota { display: flex; flex-direction: column; gap: 3px; margin-top: 5px; }
+.cr-quota-row { display: flex; justify-content: space-between; gap: 6px; font-size: 9.5px !important; font-weight: 700; opacity: .95; }
+.cr-quota-bar { height: 4px; border-radius: 999px; background: rgba(255,255,255,.28); overflow: hidden; }
+.cr-quota-bar > i { display: block; height: 100%; border-radius: inherit; background: #fff; }
+.cr-quota[data-full="1"] .cr-quota-bar > i { background: #a7f3d0; }
+
+/* ---------- Mode RINGKAS: tetap pas satu layar (mesin bawaan) ---------- */
+:is(#view-month, #ext-view-month)[data-density="compact"] .cr-grid > .cr-cell { background-clip: padding-box; }
+:is(#view-month, #ext-view-month)[data-density="compact"] .cr-count { font-size: 9px !important; padding: 0 4px; }
+:is(#view-month, #ext-view-month)[data-density="compact"] .cr-quota { display: none; }
+
+/* ---------- Modal "+N lagi" ---------- */
+.cr-modal {
+  position: fixed; inset: 0; z-index: 70; display: none; align-items: center; justify-content: center;
+  padding: 16px; background: rgba(2,6,23,.6); -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+}
+.cr-modal.is-open { display: flex; }
+.cr-modal-card {
+  --cr-accent: #0037b0; --cr-accent-soft: #e8edff;
+  width: 100%; max-width: 620px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden;
+  background: #fff; border: 1px solid #f1f5f9; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,.35);
+}
+.cr-modal[data-kind="external"] .cr-modal-card { --cr-accent: #047857; --cr-accent-soft: #ecfdf5; }
+.cr-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 24px; border-bottom: 1px solid #f1f5f9; }
+.cr-modal-title { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.cr-modal-ico { width: 40px; height: 40px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: var(--cr-accent-soft); color: var(--cr-accent); }
+.cr-modal-ico .material-symbols-outlined { font-size: 22px; width: 22px; height: 22px; overflow: hidden; line-height: 22px; }
+.cr-modal-head h3 { margin: 0; font-size: 15px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cr-modal-head p { margin: 2px 0 0; font-size: 12px; font-weight: 500; color: #64748b; }
+.cr-modal-badge { font-size: 11px; font-weight: 700; padding: 1px 8px; border-radius: 999px; background: var(--cr-accent-soft); color: var(--cr-accent); }
+.cr-x .material-symbols-outlined { font-size: 20px; width: 20px; height: 20px; overflow: hidden; line-height: 20px; }
+.cr-x { flex: none; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 999px; background: transparent; color: #64748b; cursor: pointer; }
+.cr-x:hover { background: #f1f5f9; color: #334155; }
+.cr-modal-body { padding: 20px 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+.cr-item { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 14px; border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc; transition: box-shadow .15s, background-color .15s; }
+.cr-item:hover { background: #fff; box-shadow: 0 1px 3px rgba(15,23,42,.1); }
+.cr-item--req { background: #fffbeb; border-color: #fde68a; }
+.cr-item--req:hover { background: #fef3c7; }
+.cr-item-main { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.cr-item-main h4 { margin: 0; font-size: 14px; font-weight: 700; color: #0f172a; line-height: 1.3; overflow-wrap: anywhere; }
+.cr-pill { align-self: flex-start; display: inline-block; padding: 1px 8px; border-radius: 6px; font-size: 10.5px; font-weight: 700; border: 1px solid #6ee7b7; background: #d1fae5; color: #065f46; }
+.cr-pill--req { border-color: #fcd34d; background: #fef3c7; color: #78350f; }
+.cr-pill--muted { border-color: #cbd5e1; background: #e2e8f0; color: #334155; }
+.cr-pill--warn { border-color: #fdba74; background: #fff7ed; color: #9a3412; }
+.cr-item-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+.cr-item-meta span { font-size: 11.5px; font-weight: 600; padding: 1px 8px; border-radius: 999px; background: #fff; border: 1px solid #e2e8f0; color: #475569; }
+.cr-item-go { flex: none; align-self: center; padding: 6px 12px; border: 0; border-radius: 8px; background: #0f172a; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; transition: background-color .15s; }
+.cr-item-go:hover { background: var(--cr-accent); }
+.cr-item--req .cr-item-go { background: #d97706; }
+.cr-item--req .cr-item-go:hover { background: #b45309; }
+.cr-modal-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; font-size: 12px; color: #64748b; }
+.cr-modal-foot button { padding: 6px 16px; border: 1px solid #cbd5e1; border-radius: 12px; background: #fff; color: #334155; font-size: 12px; font-weight: 600; cursor: pointer; }
+.cr-modal-foot button:hover { background: #e2e8f0; }
+
+/* ---------- Layar kecil ---------- */
+@media (max-width: 639px) {
+  :is(#view-month, #ext-view-month)[data-density="detail"] .cr-grid > .cr-cell { min-height: 96px !important; padding: 4px !important; }
+  :is(#view-month, #ext-view-month)[data-density="detail"] .cal-meta .cal-chip:not(.cal-time) { display: none !important; }
+  :is(#view-month, #ext-view-month)[data-density="detail"] .cr-quota { display: none; }
+  :is(#view-month, #ext-view-month) > div:nth-child(2) { font-size: 9.5px !important; letter-spacing: 0; }
+  .cr-seg[data-cr="density"] { display: none; }
+  .cr-count, .cr-cutoff { display: none; }
+  .cr-legend { display: none; }
+  .cr-modal { padding: 8px; }
+  .cr-modal-head, .cr-modal-body, .cr-modal-foot { padding-left: 16px; padding-right: 16px; }
+  .cr-item { flex-direction: column; }
+  .cr-item-go { align-self: stretch; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(#view-month, #ext-view-month) * , .cr-modal * { transition: none !important; }
+}
+@media print { .cr-opts, .cr-more, .cr-count, .cr-cutoff, .cr-modal { display: none !important; } }
